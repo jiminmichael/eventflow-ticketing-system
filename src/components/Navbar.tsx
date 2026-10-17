@@ -10,6 +10,7 @@ import {
   X,
   FileSpreadsheet,
   Flame,
+  ChevronRight,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -35,12 +36,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0B0614]/95 backdrop-blur-md border-b border-[#3B2363]/60 text-white">
-      {/* Top Ticker Bar: Vibrant duotone as per MASTER.md */}
-      <div className="bg-gradient-to-r from-[#7C3AED] via-[#9333EA] to-[#EA580C] text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2 shadow-sm text-white">
-        <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-        <span className="truncate tracking-wide font-semibold">
-          Lagos Party Fiesta 2026 • Landmark Beach Pavilion • Paystack Passes, View-Only Party Menu & Live Guest Collation!
+    <header className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-xl border-b border-[#E5DDD0] text-[#0F291E] shadow-sm">
+      {/* Top Ticker Bar: Emerald luxury gradient */}
+      <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2 shadow-sm text-[#FAF7F2] font-semibold">
+        <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-pulse" />
+        <span className="truncate tracking-wide text-[#FAF7F2]">
+          Lagos Party Fiesta 2026 • Landmark Beach Pavilion • Live Passes, View-Only Menu & Instant QR Issuance
         </span>
       </div>
 
@@ -48,62 +49,62 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo */}
         <div
           onClick={() => handleNav('hero')}
-          className="flex items-center gap-3 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED] rounded-xl p-1"
+          className="flex items-center gap-3 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 rounded-xl p-1"
           tabIndex={0}
           role="button"
           onKeyDown={(e) => e.key === 'Enter' && handleNav('hero')}
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#EA580C] flex items-center justify-center shadow-lg shadow-[#7C3AED]/30 font-black text-white text-lg border border-[#A78BFA]/40 group-hover:scale-105 transition-transform duration-200">
-            <Flame className="w-5 h-5 text-white fill-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center shadow-md shadow-emerald-700/20 font-black text-[#FAF7F2] text-lg border border-emerald-500/30 group-hover:scale-105 transition-transform duration-200">
+            <Flame className="w-5 h-5 text-[#FAF7F2] fill-[#FAF7F2]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-[#FAF5FF] to-[#A78BFA] bg-clip-text text-transparent">
+              <span className="font-extrabold text-lg tracking-tight text-[#0F291E]">
                 Party Fiesta
               </span>
-              <span className="text-xs px-2 py-0.5 rounded font-code font-bold bg-[#7C3AED]/30 text-[#DDD6FE] border border-[#7C3AED]/50">
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-code font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                 2026
               </span>
             </div>
-            <p className="text-[10px] text-[#A78BFA] font-medium tracking-wide">Afrobeats, Grills & Nightlife</p>
+            <p className="text-[10px] text-emerald-700 font-semibold tracking-wide">Afrobeats, Grills & Nightlife</p>
           </div>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-zinc-300">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#2D4A3E]">
           <button
             onClick={() => handleNav('hero')}
-            className="hover:text-[#A78BFA] transition-colors cursor-pointer py-1"
+            className="hover:text-emerald-700 transition-colors cursor-pointer py-1"
           >
             About
           </button>
           <button
             onClick={() => handleNav('schedule')}
-            className="hover:text-[#A78BFA] transition-colors flex items-center gap-1.5 cursor-pointer py-1"
+            className="hover:text-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer py-1"
           >
-            <Calendar className="w-4 h-4 text-[#A78BFA]" />
+            <Calendar className="w-4 h-4 text-emerald-600" />
             DJ Lineup
           </button>
           <button
             onClick={() => handleNav('tickets')}
-            className="hover:text-[#EA580C] transition-colors flex items-center gap-1.5 cursor-pointer py-1 font-bold text-white"
+            className="hover:text-emerald-800 transition-colors flex items-center gap-1.5 cursor-pointer py-1 font-bold text-[#0F291E] group"
           >
-            <Ticket className="w-4 h-4 text-[#EA580C]" />
+            <Ticket className="w-4 h-4 text-emerald-600 group-hover:rotate-12 transition-transform" />
             Passes & Tables
           </button>
           <button
             onClick={() => handleNav('menu')}
-            className="hover:text-[#A78BFA] transition-colors flex items-center gap-1.5 cursor-pointer py-1 text-zinc-200"
+            className="hover:text-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer py-1 text-[#2D4A3E]"
           >
-            <UtensilsCrossed className="w-4 h-4 text-[#EA580C]" />
+            <UtensilsCrossed className="w-4 h-4 text-emerald-600" />
             Party Menu
-            <span className="text-[10px] uppercase font-code px-1.5 py-0.5 rounded bg-[#EA580C]/20 text-[#FDBA74] border border-[#EA580C]/40 font-bold">
+            <span className="text-[9px] uppercase font-code px-1.5 py-0.5 rounded bg-emerald-100/70 text-emerald-800 border border-emerald-200 font-bold">
               View Only
             </span>
           </button>
           <button
             onClick={() => handleNav('faqs')}
-            className="hover:text-[#A78BFA] transition-colors cursor-pointer py-1"
+            className="hover:text-emerald-700 transition-colors cursor-pointer py-1"
           >
             FAQs
           </button>
@@ -115,10 +116,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isAdminLoggedIn && (
             <button
               onClick={onOpenExportGuestlist}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#DDD6FE] bg-[#1E1038] border border-[#7C3AED]/60 hover:bg-[#7C3AED] hover:text-white transition-all shadow-md shadow-[#7C3AED]/20 cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-800 bg-white border border-emerald-300 hover:bg-emerald-50 transition-all shadow-sm cursor-pointer active:scale-95"
               title="Download Excel / CSV of all paid attendees (Admin Authenticated)"
             >
-              <FileSpreadsheet className="w-4 h-4 text-[#A78BFA]" />
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
               <span className="hidden sm:inline">Export Paid Guests</span>
               <span className="sm:hidden">Export</span>
             </button>
@@ -127,17 +128,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           {onOpenLookup && (
             <button
               onClick={onOpenLookup}
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:text-white bg-[#140A26] border border-[#3B2363] hover:border-[#7C3AED] transition-all cursor-pointer"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#2D4A3E] hover:text-[#0F291E] bg-white border border-[#E5DDD0] hover:border-emerald-500 transition-all cursor-pointer shadow-sm"
               title="Lookup your confirmed ticket pass by Order Ref or UUID"
             >
-              <Search className="w-3.5 h-3.5 text-[#A78BFA]" />
+              <Search className="w-3.5 h-3.5 text-emerald-600" />
               <span>Find Pass</span>
             </button>
           )}
 
           <button
             onClick={() => handleNav('tickets')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#EA580C] text-white hover:bg-[#C2410C] active:scale-[0.98] transition-all shadow-md shadow-[#EA580C]/30 cursor-pointer"
+            className="btn-primary py-2 px-4 text-xs font-extrabold shadow-emerald-700/20"
           >
             <Ticket className="w-3.5 h-3.5" />
             <span>Get Pass</span>
@@ -145,80 +146,98 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenAdmin}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm ${
               isAdminLoggedIn
-                ? 'bg-[#7C3AED]/30 text-[#DDD6FE] border-[#7C3AED] shadow-sm shadow-[#7C3AED]/30'
-                : 'bg-[#140A26] text-zinc-300 border-[#3B2363] hover:bg-[#1F1138] hover:text-white hover:border-[#7C3AED]'
+                ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold'
+                : 'bg-white text-[#2D4A3E] border-[#E5DDD0] hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300'
             }`}
             title="Organizer / Door Host Management Portal"
           >
-            <ShieldCheck className="w-4 h-4 text-[#A78BFA]" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span className="hidden sm:inline">{isAdminLoggedIn ? 'Host Active' : 'Organizer Portal'}</span>
           </button>
 
           {/* Mobile hamburger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-[#1E1038] cursor-pointer"
+            className="md:hidden p-2 rounded-xl text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#F3EFE6] cursor-pointer border border-[#E5DDD0] focus:outline-none"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-600" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[#3B2363] bg-[#0E071A] px-4 pt-2 pb-6 space-y-3">
+        <div className="md:hidden border-b border-[#E5DDD0] bg-[#FAF7F2] px-4 pt-3 pb-6 space-y-2.5 shadow-lg animate-in slide-in-from-top-2 duration-200">
+          <div className="text-[10px] uppercase font-code tracking-wider text-emerald-700 px-2 font-bold">
+            Navigation Menu
+          </div>
+
           <button
             onClick={() => handleNav('hero')}
-            className="w-full text-left py-2 text-sm font-semibold text-zinc-200 hover:text-[#A78BFA] cursor-pointer"
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-semibold text-[#0F291E] hover:bg-[#F3EFE6] hover:text-emerald-700 flex items-center justify-between cursor-pointer transition-colors"
           >
-            About
-          </button>
-          <button
-            onClick={() => handleNav('schedule')}
-            className="w-full text-left py-2 text-sm font-semibold text-zinc-200 hover:text-[#A78BFA] flex items-center justify-between cursor-pointer"
-          >
-            <span>DJ Lineup & Flow</span>
-            <Calendar className="w-4 h-4 text-[#A78BFA]" />
-          </button>
-          <button
-            onClick={() => handleNav('tickets')}
-            className="w-full text-left py-2 text-sm font-bold text-[#EA580C] flex items-center justify-between cursor-pointer"
-          >
-            <span>Passes & Tables</span>
-            <Ticket className="w-4 h-4 text-[#EA580C]" />
-          </button>
-          <button
-            onClick={() => handleNav('menu')}
-            className="w-full text-left py-2 text-sm font-semibold text-zinc-200 hover:text-[#A78BFA] flex items-center justify-between cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <span>Party Menu</span>
-              <span className="text-[10px] uppercase font-code px-1.5 py-0.5 rounded bg-[#EA580C]/20 text-[#FDBA74] border border-[#EA580C]/40 font-bold">
-                View Only
-              </span>
-            </div>
-            <UtensilsCrossed className="w-4 h-4 text-[#EA580C]" />
-          </button>
-          <button
-            onClick={() => handleNav('faqs')}
-            className="w-full text-left py-2 text-sm font-semibold text-zinc-200 hover:text-[#A78BFA] cursor-pointer"
-          >
-            FAQs
+            <span>About Fiesta</span>
+            <ChevronRight className="w-4 h-4 text-[#8C9E95]" />
           </button>
 
-          <div className="pt-2 border-t border-[#3B2363] space-y-2">
+          <button
+            onClick={() => handleNav('schedule')}
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-semibold text-[#0F291E] hover:bg-[#F3EFE6] hover:text-emerald-700 flex items-center justify-between cursor-pointer transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-emerald-600" />
+              <span>DJ Lineup & Flow</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-[#8C9E95]" />
+          </button>
+
+          <button
+            onClick={() => handleNav('tickets')}
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-bold text-emerald-900 bg-emerald-100/70 border border-emerald-300 flex items-center justify-between cursor-pointer shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <Ticket className="w-4 h-4 text-emerald-700" />
+              <span>Passes & Tables</span>
+            </div>
+            <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-emerald-700 text-[#FAF7F2] font-code">
+              Online
+            </span>
+          </button>
+
+          <button
+            onClick={() => handleNav('menu')}
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-semibold text-[#0F291E] hover:bg-[#F3EFE6] hover:text-emerald-700 flex items-center justify-between cursor-pointer transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <UtensilsCrossed className="w-4 h-4 text-emerald-600" />
+              <span>Party Food & Drinks</span>
+            </div>
+            <span className="text-[9px] uppercase font-code px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
+              View Only
+            </span>
+          </button>
+
+          <button
+            onClick={() => handleNav('faqs')}
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-semibold text-[#0F291E] hover:bg-[#F3EFE6] hover:text-emerald-700 flex items-center justify-between cursor-pointer transition-colors"
+          >
+            <span>FAQs & Venue Info</span>
+            <ChevronRight className="w-4 h-4 text-[#8C9E95]" />
+          </button>
+
+          <div className="pt-3 border-t border-[#E5DDD0] space-y-2">
             {isAdminLoggedIn && (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenExportGuestlist();
                 }}
-                className="w-full py-2.5 rounded-xl font-bold text-xs bg-[#1E1038] text-[#DDD6FE] border border-[#7C3AED]/70 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:bg-emerald-100"
               >
-                <FileSpreadsheet className="w-4 h-4 text-[#A78BFA]" />
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                 <span>Export Paid Guestlist (.xlsx / .csv)</span>
               </button>
             )}
@@ -229,9 +248,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   onOpenLookup();
                 }}
-                className="w-full py-2.5 rounded-xl font-medium text-xs bg-[#140A26] text-zinc-300 border border-[#3B2363] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-white text-[#2D4A3E] border border-[#E5DDD0] flex items-center justify-center gap-2 cursor-pointer hover:border-emerald-500 shadow-sm"
               >
-                <Search className="w-4 h-4 text-[#A78BFA]" />
+                <Search className="w-4 h-4 text-emerald-600" />
                 <span>Find My Ticket Pass</span>
               </button>
             )}

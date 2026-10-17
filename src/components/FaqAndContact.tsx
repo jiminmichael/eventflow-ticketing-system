@@ -28,17 +28,19 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
   };
 
   return (
-    <footer id="faqs" className="bg-[#0B0614] text-[#FAF5FF]">
+    <footer id="faqs" className="bg-[#FAF7F2] text-[#0F291E]">
       {/* FAQ Section */}
-      <div className="py-20 border-b border-[#3B2363]/60">
+      <div className="py-20 border-b border-[#E5DDD0]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E1038] text-[#DDD6FE] text-xs font-bold mb-3 border border-[#7C3AED]/50">
-              <HelpCircle className="w-3.5 h-3.5 text-[#EA580C]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold mb-3 border border-emerald-300">
+              <HelpCircle className="w-3.5 h-3.5 text-emerald-700" />
               <span>FREQUENTLY ASKED QUESTIONS</span>
             </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">Got Questions? We Have Answers.</h2>
-            <p className="mt-2 text-zinc-300 text-sm">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0F291E]">
+              Got Questions? We Have Answers.
+            </h2>
+            <p className="mt-2 text-[#375245] text-sm">
               Everything you need to know about party passes, Paystack payment verification, view-only menu, and guestlist collation.
             </p>
           </div>
@@ -49,22 +51,26 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
               return (
                 <div
                   key={idx}
-                  className="rounded-2xl bg-[#140A26] border border-[#3B2363] overflow-hidden transition-all"
+                  className={`rounded-2xl transition-all border ${
+                    isOpen
+                      ? 'bg-white border-emerald-500 shadow-md ring-1 ring-emerald-400/30'
+                      : 'bg-white border-[#E5DDD0] hover:border-emerald-400 shadow-sm'
+                  }`}
                 >
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
-                    className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-white hover:text-[#A78BFA] transition-colors cursor-pointer"
+                    className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-[#0F291E] hover:text-emerald-800 transition-colors cursor-pointer"
                   >
                     <span className="text-sm sm:text-base">{faq.question}</span>
                     <ChevronDown
-                      className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-[#EA580C]' : ''
+                      className={`w-5 h-5 text-[#8C9E95] shrink-0 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-emerald-700' : ''
                       }`}
                     />
                   </button>
                   {isOpen && (
-                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-[#3B2363]/60 bg-[#0B0614]/60">
+                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#375245] leading-relaxed border-t border-[#E5DDD0] bg-[#FAF7F2]">
                       {faq.answer}
                     </div>
                   )}
@@ -76,28 +82,28 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
       </div>
 
       {/* Contact & Venue Information */}
-      <div className="py-16 border-b border-zinc-800 bg-zinc-900/40">
+      <div className="py-16 border-b border-[#E5DDD0] bg-[#F3EFE6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Organizer Contact */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-white">Party Host & Support</h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <h3 className="text-base font-bold text-[#0F291E]">Party Host & Support</h3>
+              <p className="text-xs text-[#516E60] leading-relaxed">
                 Organized by {event.organizerName}. Reach out for VIP cabanas, group bookings, table bottle service, and door inquiries.
               </p>
-              <div className="space-y-2 text-xs text-zinc-300">
+              <div className="space-y-2.5 text-xs text-[#2D4A3E]">
                 <a
                   href={`mailto:${event.organizerEmail}`}
-                  className="flex items-center gap-2 hover:text-emerald-400 transition-colors"
+                  className="flex items-center gap-2 hover:text-emerald-700 transition-colors group"
                 >
-                  <Mail className="w-4 h-4 text-emerald-400" />
+                  <Mail className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
                   <span>{event.organizerEmail}</span>
                 </a>
                 <a
                   href={`tel:${event.organizerPhone}`}
-                  className="flex items-center gap-2 hover:text-emerald-400 transition-colors"
+                  className="flex items-center gap-2 hover:text-emerald-700 transition-colors group"
                 >
-                  <Phone className="w-4 h-4 text-emerald-400" />
+                  <Phone className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
                   <span>{event.organizerPhone}</span>
                 </a>
               </div>
@@ -105,30 +111,30 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
 
             {/* Venue Location */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-white">Summit Venue</h3>
-              <div className="flex items-start gap-2.5 text-xs text-zinc-300">
-                <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <h3 className="text-base font-bold text-[#0F291E]">Fiesta Venue</h3>
+              <div className="flex items-start gap-2.5 text-xs text-[#2D4A3E]">
+                <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-white">{event.venue}</div>
-                  <div className="text-zinc-400 mt-0.5">{event.address}</div>
-                  <div className="text-zinc-400">{event.city}, {event.country}</div>
+                  <div className="font-semibold text-[#0F291E]">{event.venue}</div>
+                  <div className="text-[#516E60] mt-0.5">{event.address}</div>
+                  <div className="text-[#516E60]">{event.city}, {event.country}</div>
                 </div>
               </div>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-[#516E60]">
                 Secure on-site parking and designated shuttle services available from VI and Lekki Phase 1.
               </p>
             </div>
 
             {/* Social & Security Badges */}
             <div className="space-y-4">
-              <h3 className="text-base font-bold text-white">Connect & Stay Updated</h3>
+              <h3 className="text-base font-bold text-[#0F291E]">Connect & Stay Updated</h3>
               <div className="flex items-center gap-3">
                 {event.socialLinks.twitter && (
                   <a
                     href={event.socialLinks.twitter}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E5DDD0] flex items-center justify-center text-[#2D4A3E] hover:text-emerald-700 hover:border-emerald-400 transition-all cursor-pointer shadow-sm"
                   >
                     <Twitter className="w-4 h-4" />
                   </a>
@@ -138,7 +144,7 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
                     href={event.socialLinks.instagram}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E5DDD0] flex items-center justify-center text-[#2D4A3E] hover:text-emerald-700 hover:border-emerald-400 transition-all cursor-pointer shadow-sm"
                   >
                     <Instagram className="w-4 h-4" />
                   </a>
@@ -148,7 +154,7 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
                     href={event.socialLinks.linkedin}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E5DDD0] flex items-center justify-center text-[#2D4A3E] hover:text-emerald-700 hover:border-emerald-400 transition-all cursor-pointer shadow-sm"
                   >
                     <Linkedin className="w-4 h-4" />
                   </a>
@@ -158,46 +164,52 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
                     href={event.socialLinks.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                    className="w-9 h-9 rounded-xl bg-white border border-[#E5DDD0] flex items-center justify-center text-[#2D4A3E] hover:text-emerald-700 hover:border-emerald-400 transition-all cursor-pointer shadow-sm"
                   >
                     <Globe className="w-4 h-4" />
                   </a>
                 )}
               </div>
 
-              <div className="pt-2 text-xs text-zinc-400 flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-emerald-400" />
-                <span>Paystack Verified Merchant • Instant UUID Issuance</span>
+              <div className="pt-2 flex flex-wrap gap-2 text-[10px] font-code text-[#516E60]">
+                <span className="px-2.5 py-1 rounded bg-white border border-[#E5DDD0] shadow-sm">
+                  PAYSTACK NGN INTEGRATED
+                </span>
+                <span className="px-2.5 py-1 rounded bg-white border border-[#E5DDD0] shadow-sm">
+                  DIGITAL QR PASSES
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Copyright */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-        <div>
-          © 2026 NaijaVibe Tech & Culture Summit. All rights reserved.
-        </div>
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => onNavigateSection('tickets')}
-            className="hover:text-emerald-400 transition-colors cursor-pointer"
-          >
-            Ticket Tiers
-          </button>
-          <button
-            onClick={() => onNavigateSection('menu')}
-            className="hover:text-amber-400 transition-colors cursor-pointer"
-          >
-            Event Menu
-          </button>
-          <button
-            onClick={() => onNavigateSection('schedule')}
-            className="hover:text-emerald-400 transition-colors cursor-pointer"
-          >
-            Programme
-          </button>
+      {/* Footer Bottom Bar */}
+      <div className="py-6 bg-[#FAF7F2] text-xs text-[#516E60]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <p>© 2026 Lagos Party Fiesta & NaijaVibe Events. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-[#2D4A3E]">
+            <button
+              onClick={() => onNavigateSection('tickets')}
+              className="hover:text-emerald-700 transition-colors cursor-pointer"
+            >
+              Get Passes
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => onNavigateSection('menu')}
+              className="hover:text-emerald-700 transition-colors cursor-pointer"
+            >
+              Party Menu
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => onNavigateSection('schedule')}
+              className="hover:text-emerald-700 transition-colors cursor-pointer"
+            >
+              DJ Flow
+            </button>
+          </div>
         </div>
       </div>
     </footer>

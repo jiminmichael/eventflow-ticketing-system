@@ -80,26 +80,26 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
   };
 
   // If the user is NOT authenticated as an administrator:
-  // Show a secure, locked admin gate - NO payment numbers, revenue, or guestlist exports are exposed
+  // Show a secure, locked admin gate
   if (!adminToken) {
     return (
       <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 mb-10">
-        <div className="rounded-3xl bg-[#140A26]/90 border border-[#3B2363] p-5 sm:p-6 shadow-xl backdrop-blur-md">
+        <div className="rounded-3xl bg-white border border-[#E5DDD0] p-5 sm:p-6 shadow-md">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#A78BFA] shrink-0">
-                <Lock className="w-5 h-5 text-[#EA580C]" />
+              <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+                <Lock className="w-5 h-5 text-emerald-700" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#A78BFA]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                     Payment Collation & Export Portal
                   </span>
-                  <span className="text-[10px] font-code px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 font-semibold">
+                  <span className="text-[10px] font-code px-2 py-0.5 rounded bg-[#FAF7F2] text-[#516E60] border border-[#E5DDD0] font-semibold">
                     Admin Protected
                   </span>
                 </div>
-                <p className="text-xs text-zinc-300 mt-0.5 max-w-2xl">
+                <p className="text-xs text-[#516E60] mt-0.5 max-w-2xl">
                   Real-time payment revenue collation, guest counts, and spreadsheet exports (.xlsx/.csv) are private and visible only to authenticated event administrators.
                 </p>
               </div>
@@ -107,9 +107,9 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
 
             <button
               onClick={onOpenAdmin}
-              className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-[#1E1038] text-[#DDD6FE] border border-[#7C3AED]/70 hover:bg-[#7C3AED] hover:text-white transition-all cursor-pointer shadow-md shadow-[#7C3AED]/20"
+              className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer shadow-sm active:scale-95"
             >
-              <KeyRound className="w-3.5 h-3.5 text-[#EA580C]" />
+              <KeyRound className="w-3.5 h-3.5" />
               <span>Admin Sign In to Collate</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -119,97 +119,76 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
     );
   }
 
-  // Authenticated Administrator View: Full live payment collation and 1-click exports
+  // Authenticated Administrator View
   return (
     <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 mb-10">
-      <div className="rounded-3xl bg-[#140A26]/95 border border-[#7C3AED]/60 p-5 sm:p-7 shadow-2xl shadow-[#7C3AED]/20 backdrop-blur-md">
+      <div className="rounded-3xl bg-white border border-emerald-300 p-5 sm:p-7 shadow-lg">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           {/* Left: Purpose Badge & Collation Metrics */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#7C3AED]/25 text-[#DDD6FE] border border-[#7C3AED]/50">
-                <Sparkles className="w-3.5 h-3.5 text-[#EA580C]" />
-                <span>Live Payment Collation (Admin Authenticated)</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Live Payment Collation (Admin Active)</span>
               </span>
-              <span className="text-xs text-[#A78BFA] font-medium">
+              <span className="text-xs text-[#516E60] font-medium">
                 Direct Paystack revenue collation & instant spreadsheet guestlist export
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 sm:gap-10">
               <div>
-                <span className="text-[11px] uppercase tracking-wider font-code font-bold text-[#A78BFA]">
-                  Payments Collated
+                <span className="text-[10px] uppercase font-code text-[#516E60] block font-bold">
+                  Total Verified Revenue
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#FAF5FF] font-code">
+                <span className="text-2xl sm:text-3xl font-black text-emerald-800 font-code tracking-tight">
                   ₦{totalRevenue.toLocaleString('en-NG')}
-                </div>
+                </span>
               </div>
 
-              <div className="h-10 w-px bg-[#3B2363] hidden sm:block" />
+              <div className="h-9 w-px bg-[#E5DDD0] hidden sm:block" />
 
               <div>
-                <span className="text-[11px] uppercase tracking-wider font-code font-bold text-[#A78BFA]">
-                  Paid Guests Confirmed
+                <span className="text-[10px] uppercase font-code text-[#516E60] block font-bold">
+                  Verified Paid Guests
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#EA580C] font-code">
+                <span className="text-2xl sm:text-3xl font-black text-[#0F291E] font-code tracking-tight">
                   {paidGuestsCount}{' '}
-                  <span className="text-xs font-sans text-[#DDD6FE] font-normal">Attendees</span>
-                </div>
-              </div>
-
-              <div className="h-10 w-px bg-[#3B2363] hidden sm:block" />
-
-              <div>
-                <span className="text-[11px] uppercase tracking-wider font-code font-bold text-[#A78BFA]">
-                  Payment Verification
+                  <span className="text-xs text-emerald-700 font-normal">checked / paid</span>
                 </span>
-                <div className="flex items-center gap-1.5 text-xs text-zinc-200 font-semibold mt-1">
-                  <ShieldCheck className="w-4 h-4 text-[#A78BFA]" />
-                  <span>100% Verified Paystack</span>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Right: Explicit Export Buttons matching MASTER.md */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+          {/* Right: Quick Export Buttons */}
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <button
               onClick={handleQuickExcelExport}
               disabled={isDownloading}
-              className="px-5 py-3.5 rounded-xl font-bold text-xs bg-[#EA580C] text-white hover:bg-[#C2410C] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#EA580C]/25 cursor-pointer disabled:opacity-50"
-              title="Download instant Excel spreadsheet of all confirmed paid guests"
+              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-extrabold text-xs bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] hover:from-emerald-500 hover:to-teal-700 transition-all shadow-md shadow-emerald-700/20 cursor-pointer active:scale-95 disabled:opacity-50"
             >
-              <Download className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} />
-              <span>
-                {isDownloading
-                  ? 'Exporting Spreadsheet...'
-                  : downloadSuccess
-                  ? 'Spreadsheet Downloaded!'
-                  : 'Export Paid Guestlist (.xlsx)'}
-              </span>
+              {downloadSuccess ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-[#FAF7F2]" />
+                  <span>Excel Spreadsheet Downloaded!</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  <span>Quick Export Excel (.xlsx)</span>
+                </>
+              )}
             </button>
 
             <button
               onClick={onOpenExportModal}
-              className="px-5 py-3.5 rounded-xl font-bold text-xs bg-[#1E1038] text-[#DDD6FE] border border-[#7C3AED]/70 hover:bg-[#7C3AED] hover:text-white active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-[#7C3AED]/15"
+              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-xs bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer shadow-sm"
             >
-              <FileSpreadsheet className="w-4 h-4 text-[#A78BFA]" />
-              <span>View Full Collation Table</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#A78BFA]" />
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Full Collation & Filters</span>
             </button>
           </div>
         </div>
-
-        {downloadSuccess && (
-          <div className="mt-3 text-xs text-[#A78BFA] flex items-center gap-1.5 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-[#EA580C]" />
-            <span className="font-medium text-white">
-              Excel file downloaded! Contains verified attendee names, phone numbers, UUIDs, ticket
-              tiers, and Paystack reference numbers.
-            </span>
-          </div>
-        )}
       </div>
     </section>
   );

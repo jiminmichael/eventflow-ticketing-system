@@ -45,7 +45,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 NaijaVibe Summit Server running at http://0.0.0.0:${PORT}`);
+    console.log(`🚀 Lagos Party Fiesta Portal running at http://localhost:${PORT}`);
   });
 }
 

@@ -3,14 +3,13 @@ import { MenuItem } from '../types.js';
 import {
   UtensilsCrossed,
   Info,
-  CheckCircle2,
-  XCircle,
   Search,
   MapPin,
   X,
   Sparkles,
-  Flame,
-  Wine,
+  ChevronDown,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 
 interface EventMenuSectionProps {
@@ -21,6 +20,7 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedItemDetail, setSelectedItemDetail] = useState<MenuItem | null>(null);
+  const [mobileViewMode, setMobileViewMode] = useState<'grid' | 'compact'>('compact');
 
   // Extract unique categories
   const categories = ['ALL', ...Array.from(new Set(menuItems.map((m) => m.category)))];
@@ -42,75 +42,124 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
   });
 
   return (
-    <section id="menu" className="py-20 bg-[#0B0614] text-[#FAF5FF] border-b border-[#3B2363]/60">
+    <section id="menu" className="py-20 bg-[#FAF7F2] text-[#0F291E] border-b border-[#E5DDD0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E1038] text-[#DDD6FE] text-xs font-bold mb-3 border border-[#7C3AED]/50">
-            <UtensilsCrossed className="w-3.5 h-3.5 text-[#EA580C]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold mb-3 border border-emerald-300">
+            <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-700" />
             <span>AVAILABLE AT THE PARTY • VIEW ONLY</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F291E]">
             Party Food, Grills & Drinks Menu
           </h2>
 
-          <p className="mt-3 text-zinc-300 text-sm sm:text-base leading-relaxed">
+          <p className="mt-3 text-[#375245] text-sm sm:text-base leading-relaxed">
             Check out what will be cooking and pouring at the party! Smoky firewood asun, juicy suya skewers, craft cocktails, champagne, and ice-cold beers.
           </p>
         </div>
 
-        {/* View-Only Informational Alert Banner (Strict Requirement) */}
-        <div className="max-w-4xl mx-auto mb-10 p-5 rounded-3xl bg-[#1E1038] border border-[#7C3AED]/60 text-[#DDD6FE] text-xs sm:text-sm flex items-start gap-3.5 shadow-xl">
-          <Info className="w-5 h-5 text-[#EA580C] shrink-0 mt-0.5" />
+        {/* View-Only Informational Alert Banner */}
+        <div className="max-w-4xl mx-auto mb-10 p-5 rounded-3xl bg-emerald-50/90 border border-emerald-300 text-emerald-950 text-xs sm:text-sm flex items-start gap-3.5 shadow-sm">
+          <Info className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <div className="font-extrabold text-white flex items-center gap-2 text-sm">
-              <span>View-Only Menu • No Online Checkout for Food/Drinks</span>
-              <span className="px-2 py-0.5 rounded bg-[#EA580C]/25 text-[#FDBA74] text-[10px] font-code uppercase font-bold border border-[#EA580C]/40">
-                Pay on site
+            <div className="font-extrabold text-[#0F291E] flex items-center gap-2 text-sm">
+              <span>View-Only Menu • Ordered & Paid At Venue Stalls</span>
+              <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-code uppercase font-bold border border-emerald-300">
+                On-Site Food & Drinks
               </span>
             </div>
-            <p className="text-zinc-300 text-xs leading-relaxed">
+            <p className="text-[#375245] text-xs leading-relaxed">
               All menu offerings below are for viewing only so guests know what food and drinks are available.
-              <strong className="text-white"> Items cannot be purchased online, added to a cart, or included in your party ticket payment.</strong>
-              All dishes, grills, and drinks are ordered and paid for directly at the food stalls and bars during the party via cash, POS card, or transfer.
+              <strong className="text-[#0F291E]"> Items cannot be purchased online or added to your entry ticket order.</strong> All food, grills, and drinks are purchased directly at the stalls during the fiesta.
             </p>
           </div>
         </div>
 
-        {/* Search & Category Filter Bar */}
-        <div className="max-w-4xl mx-auto mb-10 space-y-4">
+        {/* Search & Category Filter Controls */}
+        <div className="max-w-4xl mx-auto mb-8 space-y-4">
           {/* Search Box */}
           <div className="relative max-w-md mx-auto">
-            <Search className="w-4 h-4 text-[#A78BFA] absolute left-3.5 top-3.5 pointer-events-none" />
+            <Search className="w-4 h-4 text-emerald-600 absolute left-3.5 top-3.5 pointer-events-none" />
             <input
               type="text"
               placeholder="Search suya, asun, jollof, cocktails, chapman..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#140A26] border border-[#3B2363] rounded-2xl text-xs sm:text-sm text-white focus:outline-none focus:border-[#7C3AED] placeholder:text-zinc-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#D5CDC0] rounded-2xl text-xs sm:text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600 placeholder:text-[#8C9E95] transition-colors shadow-sm"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-3 text-zinc-400 hover:text-white text-xs cursor-pointer"
+                className="absolute right-3 top-3 text-[#516E60] hover:text-[#0F291E] text-xs cursor-pointer"
               >
                 Clear
               </button>
             )}
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap justify-center gap-2">
+          {/* MOBILE DROPDOWN: Category Filter on Smaller Screens */}
+          <div className="block sm:hidden">
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="mobile-menu-category" className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                Filter Category:
+              </label>
+              {/* Mobile View Toggle: Grid vs Compact */}
+              <div className="flex items-center bg-white border border-[#D5CDC0] rounded-lg p-0.5 text-xs shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setMobileViewMode('compact')}
+                  className={`px-2 py-1 rounded flex items-center gap-1 cursor-pointer ${
+                    mobileViewMode === 'compact' ? 'bg-emerald-700 text-[#FAF7F2] font-bold' : 'text-[#516E60]'
+                  }`}
+                  title="Compact list view"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>List</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileViewMode('grid')}
+                  className={`px-2 py-1 rounded flex items-center gap-1 cursor-pointer ${
+                    mobileViewMode === 'grid' ? 'bg-emerald-700 text-[#FAF7F2] font-bold' : 'text-[#516E60]'
+                  }`}
+                  title="Grid cards view"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>Cards</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <select
+                id="mobile-menu-category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full appearance-none py-3 px-4 rounded-xl bg-white border border-emerald-300 text-sm font-bold text-[#0F291E] focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === 'ALL' ? 'All Party Offerings (Food, Drinks, Merch)' : cat}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-emerald-700 absolute right-4 top-3.5 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* DESKTOP / TABLET PILL BUTTONS */}
+          <div className="hidden sm:flex flex-wrap justify-center gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-[#EA580C] text-white shadow-md shadow-[#EA580C]/25 font-bold'
-                    : 'bg-[#140A26] text-zinc-300 hover:text-white border border-[#3B2363] hover:border-[#7C3AED]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] shadow-sm font-bold'
+                    : 'bg-white text-[#2D4A3E] hover:text-emerald-800 border border-[#E5DDD0] hover:border-emerald-300'
                 }`}
               >
                 {cat === 'ALL' ? 'All Party Offerings' : cat}
@@ -119,160 +168,180 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
           </div>
         </div>
 
-        {/* Menu Items Grid */}
+        {/* Menu Items Rendering */}
         {filteredItems.length === 0 ? (
-          <div className="text-center p-12 bg-[#140A26] rounded-3xl border border-[#3B2363] text-zinc-400 max-w-md mx-auto space-y-2">
-            <UtensilsCrossed className="w-8 h-8 text-[#A78BFA] mx-auto" />
-            <p className="font-semibold text-white">No party items match your search</p>
-            <p className="text-xs text-zinc-400">Try selecting another category or clear your search query.</p>
+          <div className="text-center p-12 bg-white rounded-3xl border border-[#E5DDD0] text-[#516E60] max-w-md mx-auto space-y-2 shadow-sm">
+            <UtensilsCrossed className="w-8 h-8 text-emerald-600 mx-auto" />
+            <p className="font-semibold text-[#0F291E]">No party items match your search</p>
+            <p className="text-xs text-[#516E60]">Try selecting another category or clear your search query.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setSelectedItemDetail(item)}
-                className="flex flex-col rounded-3xl bg-[#140A26] border border-[#3B2363] overflow-hidden hover:border-[#7C3AED] transition-all duration-200 shadow-md group cursor-pointer"
-                tabIndex={0}
-                role="button"
-                onKeyDown={(e) => e.key === 'Enter' && setSelectedItemDetail(item)}
-              >
-                {/* Item Thumbnail */}
-                <div className="relative h-48 bg-[#0B0614] overflow-hidden">
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#140A26] text-[#A78BFA]">
-                      <UtensilsCrossed className="w-12 h-12" />
-                    </div>
-                  )}
-
-                  {/* Dietary / Feature Tag */}
-                  {item.dietaryOrTag && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-[#0B0614]/85 backdrop-blur-md text-[#FDBA74] border border-[#EA580C]/40">
-                      {item.dietaryOrTag}
-                    </span>
-                  )}
-
-                  {/* Availability Badge */}
-                  <span
-                    className={`absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[10px] font-semibold flex items-center gap-1 ${
-                      item.isAvailable
-                        ? 'bg-[#1E1038]/90 text-[#A78BFA] border border-[#7C3AED]/40'
-                        : 'bg-rose-950/80 text-rose-400 border border-rose-500/30'
-                    }`}
-                  >
-                    {item.isAvailable ? (
-                      <>
-                        <CheckCircle2 className="w-3 h-3 text-[#EA580C]" />
-                        At Venue
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="w-3 h-3 text-rose-400" />
-                        Sold Out
-                      </>
-                    )}
-                  </span>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-1.5">
-                    <div className="text-[10px] font-code uppercase tracking-wider text-[#A78BFA] font-bold">
-                      {item.category}
-                    </div>
-                    <h3 className="text-base font-extrabold text-white group-hover:text-[#DDD6FE] transition-colors line-clamp-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-xs text-zinc-300 line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 border-t border-[#3B2363]/80 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-[#A78BFA] block uppercase font-code font-bold">
-                        Venue Price
-                      </span>
-                      <span className="text-base font-black text-white font-code">
+          <>
+            {/* MOBILE COMPACT LIST VIEW (Shown on mobile when compact mode is active) */}
+            <div className={`sm:hidden space-y-3 ${mobileViewMode === 'compact' ? 'block' : 'hidden'}`}>
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedItemDetail(item)}
+                  className="p-3.5 rounded-2xl bg-white border border-[#E5DDD0] hover:border-emerald-400 flex items-center gap-3.5 cursor-pointer shadow-sm active:scale-[0.99] transition-all"
+                >
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#E5DDD0]"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <h4 className="text-sm font-bold text-[#0F291E] truncate">{item.name}</h4>
+                      <span className="text-xs font-extrabold text-emerald-800 font-code shrink-0">
                         ₦{item.price.toLocaleString('en-NG')}
                       </span>
                     </div>
-
-                    <span className="text-[10px] text-[#DDD6FE] font-medium px-2.5 py-1 rounded-lg bg-[#1E1038] border border-[#7C3AED]/40 group-hover:border-[#7C3AED]">
-                      View Info
-                    </span>
+                    <p className="text-[11px] text-[#516E60] line-clamp-1 mt-0.5">{item.description}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-[9px] uppercase font-bold text-[#516E60] px-1.5 py-0.5 rounded bg-[#FAF7F2] border border-[#E5DDD0]">
+                        {item.category}
+                      </span>
+                      {item.dietaryOrTag && (
+                        <span className="text-[9px] font-bold text-emerald-800 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                          {item.dietaryOrTag}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* GRID VIEW (Desktop always; Mobile when grid mode is active) */}
+            <div className={`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${
+              mobileViewMode === 'compact' ? 'hidden sm:grid' : 'grid'
+            }`}>
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedItemDetail(item)}
+                  className="flex flex-col rounded-3xl bg-white border border-[#E5DDD0] overflow-hidden hover:border-emerald-400 transition-all duration-200 shadow-sm group cursor-pointer"
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={(e) => e.key === 'Enter' && setSelectedItemDetail(item)}
+                >
+                  {/* Item Thumbnail */}
+                  <div className="relative h-48 bg-[#FAF7F2] overflow-hidden">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-700">
+                        <UtensilsCrossed className="w-12 h-12" />
+                      </div>
+                    )}
+
+                    {/* Dietary / Feature Tag */}
+                    {item.dietaryOrTag && (
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-white/95 backdrop-blur-md text-emerald-800 border border-emerald-200 shadow-sm">
+                        {item.dietaryOrTag}
+                      </span>
+                    )}
+
+                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[9px] font-code uppercase font-bold bg-white/95 text-[#2D4A3E] border border-[#E5DDD0] shadow-sm">
+                      {item.category}
+                    </span>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                    <div>
+                      <h3 className="font-bold text-[#0F291E] text-base group-hover:text-emerald-800 transition-colors line-clamp-1">
+                        {item.name}
+                      </h3>
+                      <p className="text-xs text-[#516E60] mt-1 line-clamp-2 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-[#E5DDD0] flex items-center justify-between">
+                      <div>
+                        <div className="text-[10px] uppercase font-code text-[#516E60] font-semibold">
+                          Price at Venue
+                        </div>
+                        <div className="text-lg font-black font-code text-emerald-800">
+                          ₦{item.price.toLocaleString('en-NG')}
+                        </div>
+                      </div>
+
+                      <span className="text-[10px] font-semibold text-[#516E60] group-hover:text-emerald-700 transition-colors flex items-center gap-1">
+                        Details ▾
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
-        {/* MODAL: VIEW ITEM DETAILS & VENDOR BOOTH LOCATION (STRICTLY VIEW ONLY) */}
+        {/* Modal Item Detail View */}
         {selectedItemDetail && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-md bg-[#140A26] border border-[#7C3AED]/60 rounded-3xl p-6 text-white space-y-4 shadow-2xl overflow-hidden">
-              <div className="flex items-center justify-between border-b border-[#3B2363] pb-3">
-                <span className="text-xs font-code font-bold text-[#EA580C] uppercase">
-                  {selectedItemDetail.category} • Party Offering
-                </span>
-                <button
-                  onClick={() => setSelectedItemDetail(null)}
-                  className="p-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedItemDetail(null)}
+          >
+            <div
+              className="relative max-w-md w-full rounded-3xl bg-white border border-[#E5DDD0] overflow-hidden shadow-2xl p-6 text-[#0F291E] space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedItemDetail(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-[#FAF7F2] hover:bg-[#EAE4D8] text-[#2D4A3E] hover:text-[#0F291E] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
 
-              {selectedItemDetail.imageUrl && (
-                <div className="h-44 rounded-2xl overflow-hidden border border-[#3B2363]">
-                  <img
-                    src={selectedItemDetail.imageUrl}
-                    alt={selectedItemDetail.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              <img
+                src={selectedItemDetail.imageUrl}
+                alt={selectedItemDetail.name}
+                className="w-full h-52 object-cover rounded-2xl border border-[#E5DDD0]"
+              />
 
-              <div className="space-y-2">
-                <div className="flex items-baseline justify-between">
-                  <h3 className="text-xl font-extrabold text-white">{selectedItemDetail.name}</h3>
-                  <span className="text-lg font-black text-[#EA580C] font-code">
-                    ₦{selectedItemDetail.price.toLocaleString('en-NG')}
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-code uppercase font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    {selectedItemDetail.category}
                   </span>
+                  {selectedItemDetail.dietaryOrTag && (
+                    <span className="text-[10px] font-bold text-teal-800">
+                      • {selectedItemDetail.dietaryOrTag}
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-zinc-300 leading-relaxed">
+                <h3 className="text-xl font-bold text-[#0F291E]">{selectedItemDetail.name}</h3>
+                <p className="text-xs text-[#516E60] mt-2 leading-relaxed">
                   {selectedItemDetail.description}
                 </p>
               </div>
 
-              {selectedItemDetail.ingredients && (
-                <div className="p-3 rounded-xl bg-[#0B0614] border border-[#3B2363] text-xs space-y-1">
-                  <span className="font-bold text-[#A78BFA] block">Key Ingredients & Flavors:</span>
-                  <p className="text-zinc-300">{selectedItemDetail.ingredients}</p>
+              <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E5DDD0] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] text-[#516E60] uppercase font-code">Venue Counter Price</div>
+                  <div className="text-xl font-black text-emerald-800 font-code">
+                    ₦{selectedItemDetail.price.toLocaleString('en-NG')}
+                  </div>
                 </div>
-              )}
+                <div className="text-right">
+                  <div className="text-[10px] text-amber-700 font-bold uppercase font-code">Payment Method</div>
+                  <div className="text-xs text-[#2D4A3E] font-medium">POS / Cash at Stall</div>
+                </div>
+              </div>
 
-              {selectedItemDetail.boothLocation && (
-                <div className="flex items-center gap-2 text-xs text-zinc-300">
-                  <MapPin className="w-4 h-4 text-[#EA580C]" />
-                  <span>
-                    Service Location: <strong>{selectedItemDetail.boothLocation}</strong>
-                  </span>
-                </div>
-              )}
-
-              <div className="pt-2 border-t border-[#3B2363]">
-                <div className="p-3 rounded-xl bg-[#1E1038] border border-[#7C3AED]/50 text-xs text-[#DDD6FE] flex items-center gap-2 font-medium">
-                  <Info className="w-4 h-4 text-[#EA580C] shrink-0" />
-                  <span>Available on-site at the party. Pay directly at the vendor stall or bar.</span>
-                </div>
+              <div className="text-[11px] text-[#375245] bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-start gap-2">
+                <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                <span>
+                  Reminder: Food & drinks are purchased on-site and cannot be added to ticket checkout.
+                </span>
               </div>
             </div>
           </div>

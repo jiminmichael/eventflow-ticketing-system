@@ -2,31 +2,31 @@
 
 @layer base {
   :root {
-    --color-primary: #7C3AED;
-    --color-on-primary: #FFFFFF;
-    --color-secondary: #A78BFA;
-    --color-on-secondary: #0F172A;
-    --color-accent: #EA580C;
-    --color-on-accent: #FFFFFF;
-    --color-background: #0B0614;
-    --color-foreground: #FAF5FF;
-    --color-card: #140A26;
-    --color-card-foreground: #FAF5FF;
-    --color-muted: #24143D;
-    --color-muted-foreground: #A78BFA;
-    --color-border: #3B2363;
-    --color-destructive: #DC2626;
-    --color-ring: #7C3AED;
+    --color-primary: #047857;
+    --color-on-primary: #FAF7F2;
+    --color-secondary: #065F46;
+    --color-on-secondary: #FAF7F2;
+    --color-accent: #10B981;
+    --color-on-accent: #FAF7F2;
+    --color-background: #FAF7F2;
+    --color-foreground: #0F291E;
+    --color-card: #FFFFFF;
+    --color-card-foreground: #0F291E;
+    --color-muted: #F3EFE6;
+    --color-muted-foreground: #4B6356;
+    --color-border: #E6DFD3;
+    --color-destructive: #E11D48;
+    --color-ring: #047857;
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-    --shadow-xl: 0 20px 25px -5px rgba(124, 58, 237, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 1px 2px rgba(15, 41, 30, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 41, 30, 0.07), 0 2px 4px -2px rgba(15, 41, 30, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 41, 30, 0.08), 0 4px 6px -4px rgba(15, 41, 30, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(4, 120, 87, 0.12), 0 8px 10px -6px rgba(15, 41, 30, 0.06);
   }
 
   body {
-    background-color: #0B0614;
-    color: #FAF5FF;
+    background-color: #FAF7F2;
+    color: #0F291E;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -35,7 +35,8 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    color: #0F291E;
   }
 }
 
@@ -47,82 +48,90 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Sleek Scrollbar */
+/* Custom Warm Milk & Emerald Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0614;
+  background: #FAF7F2;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3B2363;
+  background: #D5CDC0;
   border-radius: 9999px;
-  border: 2px solid #0B0614;
+  border: 2px solid #FAF7F2;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7C3AED;
+  background: #047857;
 }
 
-/* Buttons matching MASTER.md */
+/* Milk & Emerald Button Styles */
 .btn-primary {
-  background: #EA580C;
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #059669 0%, #047857 50%, #064E3B 100%);
+  color: #FAF7F2;
   padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 700;
+  border-radius: 12px;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 200ms ease;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  box-shadow: 0 4px 18px rgba(4, 120, 87, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover {
-  opacity: 0.95;
-  background: #C2410C;
-  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(4, 120, 87, 0.38);
+  filter: brightness(1.05);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
-  background: transparent;
-  color: #DDD6FE;
-  border: 2px solid #7C3AED;
+  background: #FFFFFF;
+  color: #064E3B;
+  border: 1px solid #D1E7DD;
   padding: 12px 24px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 200ms ease;
+  transition: all 250ms ease;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 41, 30, 0.05);
 }
 
 .btn-secondary:hover {
-  background: rgba(124, 58, 237, 0.2);
-  color: #FFFFFF;
-  border-color: #A78BFA;
+  background: #F3FBF7;
+  color: #047857;
+  border-color: #059669;
+  transform: translateY(-1px);
 }
 
-/* Glass Panels with Violet/Nightlife Depth */
+/* Glass Panels with Warm Milk & Emerald Elegance */
 .glass-panel {
-  background: rgba(20, 10, 38, 0.75);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(167, 139, 250, 0.15);
+  border: 1px solid rgba(230, 223, 211, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(15, 41, 30, 0.05);
 }
 
 .glass-panel-glow {
-  background: rgba(20, 10, 38, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(124, 58, 237, 0.4);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(4, 120, 87, 0.3);
+  box-shadow: 0 8px 30px rgba(4, 120, 87, 0.12);
 }
 
 /* Ticket Notches */
@@ -138,7 +147,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #0B0614;
+  background: #FAF7F2;
   z-index: 10;
 }
 
@@ -154,7 +163,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #0B0614;
+  background: #FAF7F2;
   z-index: 10;
 }
 

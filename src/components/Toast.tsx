@@ -38,21 +38,21 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border text-xs font-medium backdrop-blur-xl animate-in slide-in-from-bottom-5 duration-200 ${
+            className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl border text-xs font-semibold backdrop-blur-2xl animate-in slide-in-from-bottom-5 duration-200 ${
               toast.type === 'success'
-                ? 'bg-zinc-900/95 border-emerald-500/40 text-emerald-200'
+                ? 'bg-white border-emerald-500 text-emerald-900 shadow-emerald-950/10'
                 : toast.type === 'error'
-                ? 'bg-zinc-900/95 border-rose-500/40 text-rose-200'
-                : 'bg-zinc-900/95 border-amber-500/40 text-amber-200'
+                ? 'bg-white border-rose-400 text-rose-900 shadow-rose-950/10'
+                : 'bg-white border-teal-400 text-teal-900 shadow-teal-950/10'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
-            {toast.type === 'info' && <Info className="w-4 h-4 text-amber-400 shrink-0" />}
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
+            {toast.type === 'info' && <Info className="w-4 h-4 text-teal-600 shrink-0" />}
             <span className="flex-1 leading-snug">{toast.message}</span>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-zinc-400 hover:text-white p-0.5 rounded cursor-pointer"
+              className="text-[#8C9E95] hover:text-[#0F291E] p-0.5 rounded cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>

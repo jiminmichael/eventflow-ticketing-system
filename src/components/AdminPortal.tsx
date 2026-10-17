@@ -491,21 +491,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
-      <div className="relative w-full max-w-7xl h-[92vh] bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl flex flex-col text-white overflow-hidden">
+      <div className="relative w-full max-w-7xl h-[92vh] bg-white border border-[#E5DDD0] rounded-3xl shadow-2xl flex flex-col text-[#0F291E] overflow-hidden">
         {/* Top Portal Header */}
-        <div className="bg-[#0E061A] px-6 py-4 border-b border-[#3B2363] flex items-center justify-between shrink-0">
+        <div className="bg-[#FAF7F2] px-6 py-4 border-b border-[#E5DDD0] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#EA580C] flex items-center justify-center text-white font-bold shadow-md shadow-[#7C3AED]/30">
-              <ShieldCheck className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center text-[#FAF7F2] font-bold shadow-md shadow-emerald-700/20">
+              <ShieldCheck className="w-6 h-6 text-[#FAF7F2]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-extrabold text-white">Lagos Party Fiesta — Admin & Door Portal</h2>
-                <span className="text-[10px] font-code px-2 py-0.5 rounded bg-[#7C3AED]/30 text-[#DDD6FE] border border-[#7C3AED]/50 font-bold">
+                <h2 className="text-lg font-extrabold text-[#0F291E]">Lagos Party Fiesta — Admin & Door Portal</h2>
+                <span className="text-[10px] font-code px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
                   Host Active
                 </span>
               </div>
-              <p className="text-xs text-zinc-300">
+              <p className="text-xs text-[#516E60]">
                 Ticketing inventory, attendee database, Paystack verification, and spreadsheet exports.
               </p>
             </div>
@@ -517,15 +517,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <button
                   onClick={loadAllAdminData}
                   disabled={isLoadingData}
-                  className="p-2 rounded-xl bg-[#1E1038] hover:bg-[#7C3AED] text-[#DDD6FE] hover:text-white transition-colors cursor-pointer border border-[#3B2363]"
+                  className="p-2 rounded-xl bg-white hover:bg-[#FAF7F2] text-emerald-800 transition-colors cursor-pointer border border-[#D5CDC0]"
                   title="Refresh Dashboard Data"
                 >
-                  <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-[#EA580C]' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 ${isLoadingData ? 'animate-spin text-emerald-700' : ''}`} />
                 </button>
 
                 <button
                   onClick={onLogout}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-950/60 text-rose-300 border border-rose-500/30 hover:bg-rose-900 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Log Out</span>
@@ -535,7 +535,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-[#1E1038] transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#516E60] hover:text-[#0F291E] hover:bg-[#FAF7F2] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -545,28 +545,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* ADMIN CONTENT: Login Gate vs Authenticated Dashboard */}
         {!adminToken ? (
           /* LOGIN GATE */
-          <div className="flex-1 flex items-center justify-center p-6 bg-zinc-950 overflow-y-auto">
-            <div className="w-full max-w-md p-8 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-2xl space-y-6">
+          <div className="flex-1 flex items-center justify-center p-6 bg-[#FAF7F2] overflow-y-auto">
+            <div className="w-full max-w-md p-8 rounded-3xl bg-white border border-[#E5DDD0] shadow-xl space-y-6">
               <div className="text-center space-y-2">
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto mb-3">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center mx-auto mb-3">
                   <Lock className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-extrabold text-white">Administrator Access</h3>
-                <p className="text-xs text-zinc-400">
+                <h3 className="text-2xl font-extrabold text-[#0F291E]">Administrator Access</h3>
+                <p className="text-xs text-[#516E60]">
                   Authenticate to manage attendee records, adjust pricing, and download Excel reports.
                 </p>
               </div>
 
               {loginError && (
-                <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                   <span>{loginError}</span>
                 </div>
               )}
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
                     Username
                   </label>
                   <input
@@ -574,12 +574,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     required
                     value={loginForm.username}
                     onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-mono"
+                    className="w-full bg-[#FAF7F2] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600 font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
                     Password
                   </label>
                   <input
@@ -588,23 +588,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     placeholder="Enter admin password"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-[#FAF7F2] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600"
                   />
                 </div>
 
                 {/* Convenience Demo Notice */}
-                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400 space-y-1">
-                  <div className="text-amber-400 font-bold">Standard Credentials (.env.example):</div>
-                  <div className="font-mono text-zinc-300">
-                    Username: <span className="text-white font-bold">admin</span> | Password:{' '}
-                    <span className="text-white font-bold">Admin@2026!</span>
+                <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E5DDD0] text-[11px] text-[#516E60] space-y-1">
+                  <div className="text-emerald-800 font-bold">Standard Credentials (.env.example):</div>
+                  <div className="font-mono text-[#2D4A3E]">
+                    Username: <span className="text-[#0F291E] font-bold">admin</span> | Password:{' '}
+                    <span className="text-[#0F291E] font-bold">Admin@2026!</span>
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoggingIn}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] hover:from-emerald-500 hover:to-teal-700 transition-all shadow-md shadow-emerald-700/20 disabled:opacity-50 cursor-pointer"
                 >
                   {isLoggingIn ? 'Authenticating...' : 'Sign In to Admin Portal'}
                 </button>
@@ -613,15 +613,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         ) : (
           /* AUTHENTICATED DASHBOARD */
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-white">
             {/* Sidebar Tabs */}
-            <div className="w-full md:w-60 bg-[#0E061A] border-r border-[#3B2363] p-3 flex md:flex-col gap-1.5 shrink-0 overflow-x-auto text-xs font-semibold">
+            <div className="w-full md:w-60 bg-[#FAF7F2] border-r border-[#E5DDD0] p-3 flex md:flex-col gap-1.5 shrink-0 overflow-x-auto text-xs font-semibold">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'overview'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <TrendingUp className="w-4 h-4" />
@@ -632,13 +632,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('attendees')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'attendees'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <Users className="w-4 h-4" />
                 <span>Attendees & UUIDs</span>
-                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-[#140A26] font-code">
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white font-code text-emerald-800 border border-[#E5DDD0]">
                   {attendees.length}
                 </span>
               </button>
@@ -647,11 +647,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('checkin')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'checkin'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
-                <QrCode className="w-4 h-4 text-[#A78BFA]" />
+                <QrCode className="w-4 h-4 text-emerald-700" />
                 <span>Gate Check-In</span>
               </button>
 
@@ -659,8 +659,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('tiers')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'tiers'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <Ticket className="w-4 h-4" />
@@ -671,8 +671,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('menu')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'menu'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <UtensilsCrossed className="w-4 h-4" />
@@ -683,8 +683,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('payments')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'payments'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <CreditCard className="w-4 h-4" />
@@ -695,8 +695,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 onClick={() => setActiveTab('settings')}
                 className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
                   activeTab === 'settings'
-                    ? 'bg-[#EA580C] text-white font-bold shadow-md shadow-[#EA580C]/25'
-                    : 'text-zinc-300 hover:text-white hover:bg-[#1E1038]'
+                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] font-bold shadow-sm'
+                    : 'text-[#2D4A3E] hover:text-[#0F291E] hover:bg-[#EAE4D8]'
                 }`}
               >
                 <Settings className="w-4 h-4" />
