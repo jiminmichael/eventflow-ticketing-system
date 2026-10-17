@@ -18,9 +18,10 @@ import { EventDetails } from '../types.js';
 interface FaqAndContactProps {
   event: EventDetails;
   onNavigateSection: (sectionId: string) => void;
+  onOpenAdmin?: () => void;
 }
 
-export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateSection }) => {
+export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateSection, onOpenAdmin }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
@@ -209,6 +210,18 @@ export const FaqAndContact: React.FC<FaqAndContactProps> = ({ event, onNavigateS
             >
               DJ Flow
             </button>
+            {onOpenAdmin && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={onOpenAdmin}
+                  className="text-[#8C9E95] hover:text-emerald-700 transition-colors cursor-pointer text-[11px]"
+                  title="Organizer & Door Host Sign In"
+                >
+                  Organizer Access
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

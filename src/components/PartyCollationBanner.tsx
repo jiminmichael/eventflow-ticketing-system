@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   FileSpreadsheet,
   Download,
-  ShieldCheck,
-  Lock,
-  ArrowRight,
   Sparkles,
   CheckCircle2,
-  KeyRound,
 } from 'lucide-react';
 import { downloadFile } from '../utils/download.js';
 
@@ -80,43 +76,9 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
   };
 
   // If the user is NOT authenticated as an administrator:
-  // Show a secure, locked admin gate
+  // Do not show any admin prompt or banner to regular public visitors
   if (!adminToken) {
-    return (
-      <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 mb-10">
-        <div className="rounded-3xl bg-white border border-[#E5DDD0] p-5 sm:p-6 shadow-md">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                <Lock className="w-5 h-5 text-emerald-700" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-                    Payment Collation & Export Portal
-                  </span>
-                  <span className="text-[10px] font-code px-2 py-0.5 rounded bg-[#FAF7F2] text-[#516E60] border border-[#E5DDD0] font-semibold">
-                    Admin Protected
-                  </span>
-                </div>
-                <p className="text-xs text-[#516E60] mt-0.5 max-w-2xl">
-                  Real-time payment revenue collation, guest counts, and spreadsheet exports (.xlsx/.csv) are private and visible only to authenticated event administrators.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={onOpenAdmin}
-              className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer shadow-sm active:scale-95"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Admin Sign In to Collate</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   // Authenticated Administrator View

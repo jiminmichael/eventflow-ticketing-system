@@ -319,7 +319,11 @@ function MainApp() {
         <EventMenuSection menuItems={menuItems} />
 
         {/* Step 7: Contact information, FAQs, and footer */}
-        <FaqAndContact event={event} onNavigateSection={handleNavigateSection} />
+        <FaqAndContact
+          event={event}
+          onNavigateSection={handleNavigateSection}
+          onOpenAdmin={() => setAdminOpen(true)}
+        />
       </main>
 
       {/* Step 5: Paystack payment checkout modal */}

@@ -144,18 +144,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Get Pass</span>
           </button>
 
-          <button
-            onClick={onOpenAdmin}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm ${
-              isAdminLoggedIn
-                ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold'
-                : 'bg-white text-[#2D4A3E] border-[#E5DDD0] hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300'
-            }`}
-            title="Organizer / Door Host Management Portal"
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="hidden sm:inline">{isAdminLoggedIn ? 'Host Active' : 'Organizer Portal'}</span>
-          </button>
+          {isAdminLoggedIn && (
+            <button
+              onClick={onOpenAdmin}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-sm bg-emerald-100 text-emerald-900 border-emerald-300"
+              title="Organizer / Door Host Management Portal"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span className="hidden sm:inline">Host Active</span>
+            </button>
+          )}
 
           {/* Mobile hamburger button */}
           <button
