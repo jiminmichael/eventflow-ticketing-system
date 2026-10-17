@@ -1,0 +1,6 @@
+{
+  "name": "NaijaVibe Tech & Culture Summit 2026 - Event Ticketing & Registration",
+  "description": "Comprehensive event ticketing, attendee registration, Paystack payment processing, view-only event menu, and secure admin management portal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #7C3AED;
+    --color-on-primary: #FFFFFF;
+    --color-secondary: #A78BFA;
+    --color-on-secondary: #0F172A;
+    --color-accent: #EA580C;
+    --color-on-accent: #FFFFFF;
+    --color-background: #0B0614;
+    --color-foreground: #FAF5FF;
+    --color-card: #140A26;
+    --color-card-foreground: #FAF5FF;
+    --color-muted: #24143D;
+    --color-muted-foreground: #A78BFA;
+    --color-border: #3B2363;
+    --color-destructive: #DC2626;
+    --color-ring: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(124, 58, 237, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  }
+
+  body {
+    background-color: #0B0614;
+    color: #FAF5FF;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+.font-editorial {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0614;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3B2363;
+  border-radius: 9999px;
+  border: 2px solid #0B0614;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7C3AED;
+}
+
+/* Buttons matching MASTER.md */
+.btn-primary {
+  background: #EA580C;
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 200ms ease;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+}
+
+.btn-primary:hover {
+  opacity: 0.95;
+  background: #C2410C;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #DDD6FE;
+  border: 2px solid #7C3AED;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(124, 58, 237, 0.2);
+  color: #FFFFFF;
+  border-color: #A78BFA;
+}
+
+/* Glass Panels with Violet/Nightlife Depth */
+.glass-panel {
+  background: rgba(20, 10, 38, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(167, 139, 250, 0.15);
+}
+
+.glass-panel-glow {
+  background: rgba(20, 10, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+}
+
+/* Ticket Notches */
+.ticket-notch-left {
+  position: relative;
+}
+.ticket-notch-left::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0B0614;
+  z-index: 10;
+}
+
+.ticket-notch-right {
+  position: relative;
+}
+.ticket-notch-right::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0B0614;
+  z-index: 10;
+}
+
+/* Print Optimization for Attendee Tickets */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-ticket,
+  #printable-ticket * {
+    visibility: visible;
+  }
+
+  #printable-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 24px;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px dashed #000000 !important;
+    box-shadow: none !important;
+  }
+
+  #printable-ticket h3,
+  #printable-ticket div,
+  #printable-ticket span {
+    color: #000000 !important;
+  }
+
+  #printable-ticket svg {
+    filter: invert(0) !important;
+  }
+}
