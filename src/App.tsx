@@ -14,7 +14,8 @@ import { TicketLookupModal } from './components/TicketLookupModal.js';
 import { ToastProvider, useToast } from './components/Toast.js';
 import { PartyCollationBanner } from './components/PartyCollationBanner.js';
 import { ExportGuestlistModal } from './components/ExportGuestlistModal.js';
-import { Loader2, Ticket, ArrowUp } from 'lucide-react';
+import { Loader2, Ticket, ArrowUp, RefreshCw } from 'lucide-react';
+import { fallbackEvent, fallbackTicketTiers, fallbackMenuItems } from './fallbackData.js';
 
 interface AttendeeWithQr extends Attendee {
   qrSvg?: string;
@@ -22,13 +23,15 @@ interface AttendeeWithQr extends Attendee {
 
 function MainApp() {
   const { showToast } = useToast();
-  const [event, setEvent] = useState<EventDetails | null>(null);
-  const [tiers, setTiers] = useState<TicketTier[]>([]);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+  const [event, setEvent] = useState<EventDetails>(fallbackEvent);
+  const [tiers, setTiers] = useState<TicketTier[]>(fallbackTicketTiers);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(fallbackMenuItems);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(false);
 
   // Selected ticket tier for registration
-  const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
+  const [selectedTier, setSelectedTier] = useState<TicketTier | null>(() => {
+    return fallbackTicketTiers.find((t) => t.isActive && t.soldQuantity < t.availableQuantity) || null;
+  });
 
   // Registration & Payment state
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
@@ -72,28 +75,31 @@ function MainApp() {
     try {
       setIsLoadingInitial(true);
       const [eventRes, tiersRes, menuRes] = await Promise.all([
-        fetch('/api/event'),
-        fetch('/api/tickets'),
-        fetch('/api/menu'),
+        fetch('/api/event').catch(() => null),
+        fetch('/api/tickets').catch(() => null),
+        fetch('/api/menu').catch(() => null),
       ]);
 
-      if (eventRes.ok) {
+      if (eventRes && eventRes.ok) {
         const ev = await eventRes.json();
-        setEvent(ev);
+        if (ev && ev.id) setEvent(ev);
       }
-      if (tiersRes.ok) {
+      if (tiersRes && tiersRes.ok) {
         const trs: TicketTier[] = await tiersRes.json();
-        setTiers(trs);
-        const activeOne = trs.find((t) => t.isActive && t.soldQuantity < t.availableQuantity);
-        if (activeOne) setSelectedTier(activeOne);
+        if (Array.isArray(trs) && trs.length > 0) {
+          setTiers(trs);
+          const activeOne = trs.find((t) => t.isActive && t.soldQuantity < t.availableQuantity);
+          if (activeOne) setSelectedTier(activeOne);
+        }
       }
-      if (menuRes.ok) {
+      if (menuRes && menuRes.ok) {
         const m = await menuRes.json();
-        setMenuItems(m.items || []);
+        if (m && Array.isArray(m.items)) {
+          setMenuItems(m.items);
+        }
       }
     } catch (err) {
-      console.error('[App] Failed to load initial data:', err);
-      showToast('Failed to load event data. Please refresh.', 'error');
+      console.warn('[App] Could not load live server data, using cached fallback:', err);
     } finally {
       setIsLoadingInitial(false);
     }
@@ -238,13 +244,24 @@ function MainApp() {
     showToast(`Found Order ${order.orderReference}`, 'success');
   };
 
-  if (isLoadingInitial || !event) {
+  if (!event) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white space-y-4">
-        <Loader2 className="w-9 h-9 animate-spin text-emerald-400" />
-        <div className="text-sm font-semibold text-zinc-300 font-mono">
-          Loading Lagos Party Fiesta Portal...
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-white space-y-4 px-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2">
+          <Ticket className="w-6 h-6" />
         </div>
+        <div className="text-lg font-bold text-white">
+          Lagos Party Fiesta Portal
+        </div>
+        <p className="text-sm text-zinc-400 max-w-md">
+          Unable to connect to the event servers. Please check your connection and retry.
+        </p>
+        <button
+          onClick={fetchInitialData}
+          className="mt-3 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold text-sm flex items-center gap-2 cursor-pointer transition-colors shadow-lg shadow-emerald-500/20"
+        >
+          <RefreshCw className="w-4 h-4" /> Retry Loading
+        </button>
       </div>
     );
   }

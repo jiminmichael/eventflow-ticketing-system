@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import {
   EventDetails,
@@ -21,7 +22,14 @@ interface DatabaseSchema {
   payments: PaymentAudit[];
 }
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
+const SEED_DATA_DIR = path.resolve(process.cwd(), 'data');
+const SEED_DB_FILE = path.join(SEED_DATA_DIR, 'db.json');
+
+// In serverless environments like Vercel, the root filesystem is read-only.
+// Use temporary directory for writes when running in Vercel or serverless.
+const DATA_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'eventflow_data')
+  : path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 // Default Seed Data for Party Platform
@@ -564,6 +572,18 @@ class DatabaseService {
           menuItems: parsed.menuItems || initialMenuItems,
           payments: parsed.payments || initialPayments,
         };
+      } else if (fs.existsSync(SEED_DB_FILE)) {
+        const fileContent = fs.readFileSync(SEED_DB_FILE, 'utf-8');
+        const parsed = JSON.parse(fileContent);
+        this.data = {
+          event: { ...initialEvent, ...(parsed.event || {}) },
+          ticketTiers: parsed.ticketTiers || initialTicketTiers,
+          orders: parsed.orders || initialOrders,
+          attendees: parsed.attendees || initialAttendees,
+          menuItems: parsed.menuItems || initialMenuItems,
+          payments: parsed.payments || initialPayments,
+        };
+        this.saveToDisk();
       } else {
         this.saveToDisk();
       }

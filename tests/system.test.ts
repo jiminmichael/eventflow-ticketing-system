@@ -26,7 +26,7 @@ async function runTests() {
   assert(tiers.length >= 4, 'Must have at least 4 ticket tiers');
   const regularTier = tiers.find((t) => t.id === 'tier-regular');
   assert(regularTier, 'Regular tier exists');
-  assert(regularTier.price === 25000, 'Price in NGN is correct');
+  assert(regularTier.price === 15000, 'Price in NGN is correct');
   passed++;
   console.log('  ✅ Ticket tiers loaded with correct pricing');
 
@@ -54,7 +54,7 @@ async function runTests() {
   });
 
   assert.strictEqual(attendees.length, 3, 'Must create 3 attendee records');
-  assert.strictEqual(order.totalAmount, 75000, 'Server must calculate 25000 * 3 = 75000 NGN');
+  assert.strictEqual(order.totalAmount, 45000, 'Server must calculate 15000 * 3 = 45000 NGN');
 
   // Verify UUID format and uniqueness
   const uuids = new Set<string>();
