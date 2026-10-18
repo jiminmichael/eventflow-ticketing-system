@@ -18,7 +18,7 @@ interface HeroProps {
   event: EventDetails;
   onGetTicketsClick: () => void;
   onViewMenuClick: () => void;
-  onOpenExportModal: () => void;
+  onOpenExportModal?: () => void;
   isAdminLoggedIn?: boolean;
 }
 
@@ -26,7 +26,6 @@ export const Hero: React.FC<HeroProps> = ({
   event,
   onGetTicketsClick,
   onViewMenuClick,
-  onOpenExportModal,
   isAdminLoggedIn = false,
 }) => {
   // Live countdown to party date

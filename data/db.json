@@ -116,7 +116,7 @@
       "description": "Standard party entry pass with drink voucher and party pack.",
       "price": 15000,
       "availableQuantity": 300,
-      "soldQuantity": 95,
+      "soldQuantity": 98,
       "maxPerRegistration": 5,
       "salesStartDate": "2026-08-01",
       "salesEndDate": "2026-11-14",
@@ -425,6 +425,42 @@
         }
       ],
       "verifiedAt": "2026-10-17T18:07:28.977Z"
+    },
+    {
+      "id": "ord-78737aac-9cb3-4066-8dd3-4d56a30d92ca",
+      "orderReference": "ORD-2026-35172",
+      "customerFirstName": "Kola",
+      "customerLastName": "Ade",
+      "customerEmail": "kola@test.ng",
+      "customerPhone": "+2348011223344",
+      "institution": "Lagos Ventures",
+      "ticketTierId": "tier-regular",
+      "ticketTierName": "Regular Party Pass",
+      "ticketQuantity": 3,
+      "unitPrice": 15000,
+      "totalAmount": 45000,
+      "currency": "NGN",
+      "paymentStatus": "verified",
+      "paymentReference": "EVT-TEST-1792333651768",
+      "createdAt": "2026-10-18T14:27:31.774Z",
+      "attendeeUuids": [
+        "675c5cc7-0789-4e62-8e74-0cef5e75d553",
+        "3642c774-da68-444a-8a2a-566713b6d7fa",
+        "2ee956a6-24df-476a-a35b-fd13945efb77"
+      ],
+      "paymentAuditLog": [
+        {
+          "timestamp": "2026-10-18T14:27:31.774Z",
+          "action": "ORDER_INITIALIZED",
+          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling ₦45,000 (Ref: EVT-TEST-1792333651768)."
+        },
+        {
+          "timestamp": "2026-10-18T14:27:31.844Z",
+          "action": "PAYSTACK_VERIFIED",
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: ₦45,000"
+        }
+      ],
+      "verifiedAt": "2026-10-18T14:27:31.844Z"
     }
   ],
   "attendees": [
@@ -710,6 +746,63 @@
       "paymentReference": "EVT-TEST-1792260448710",
       "checkedIn": false,
       "createdAt": "2026-10-17T18:07:28.712Z"
+    },
+    {
+      "uuid": "675c5cc7-0789-4e62-8e74-0cef5e75d553",
+      "ticketCode": "NVT-PARTY-97323",
+      "orderReference": "ORD-2026-35172",
+      "orderId": "ord-78737aac-9cb3-4066-8dd3-4d56a30d92ca",
+      "ticketTierId": "tier-regular",
+      "ticketTierName": "Regular Party Pass",
+      "unitPrice": 15000,
+      "firstName": "Kola",
+      "lastName": "Ade",
+      "email": "kola@test.ng",
+      "phone": "+2348011223344",
+      "institution": "Lagos Ventures",
+      "additionalNotes": "",
+      "paymentStatus": "verified",
+      "paymentReference": "EVT-TEST-1792333651768",
+      "checkedIn": false,
+      "createdAt": "2026-10-18T14:27:31.774Z"
+    },
+    {
+      "uuid": "3642c774-da68-444a-8a2a-566713b6d7fa",
+      "ticketCode": "NVT-PARTY-29814",
+      "orderReference": "ORD-2026-35172",
+      "orderId": "ord-78737aac-9cb3-4066-8dd3-4d56a30d92ca",
+      "ticketTierId": "tier-regular",
+      "ticketTierName": "Regular Party Pass",
+      "unitPrice": 15000,
+      "firstName": "Simi",
+      "lastName": "Dada",
+      "email": "simi@test.ng",
+      "phone": "+2348022334455",
+      "institution": "Lagos Ventures",
+      "additionalNotes": "",
+      "paymentStatus": "verified",
+      "paymentReference": "EVT-TEST-1792333651768",
+      "checkedIn": false,
+      "createdAt": "2026-10-18T14:27:31.774Z"
+    },
+    {
+      "uuid": "2ee956a6-24df-476a-a35b-fd13945efb77",
+      "ticketCode": "NVT-PARTY-36664",
+      "orderReference": "ORD-2026-35172",
+      "orderId": "ord-78737aac-9cb3-4066-8dd3-4d56a30d92ca",
+      "ticketTierId": "tier-regular",
+      "ticketTierName": "Regular Party Pass",
+      "unitPrice": 15000,
+      "firstName": "Femi",
+      "lastName": "Ojo",
+      "email": "femi@test.ng",
+      "phone": "+2348033445566",
+      "institution": "Lagos Ventures",
+      "additionalNotes": "",
+      "paymentStatus": "verified",
+      "paymentReference": "EVT-TEST-1792333651768",
+      "checkedIn": false,
+      "createdAt": "2026-10-18T14:27:31.774Z"
     }
   ],
   "menuItems": [
@@ -920,6 +1013,23 @@
         "quantity": 3
       },
       "verifiedAt": "2026-10-17T18:07:28.977Z",
+      "channel": "card",
+      "gatewayResponse": "Approved"
+    },
+    {
+      "id": "pay-747e561d-d3ca-4676-ac29-9bdae749b48d",
+      "orderReference": "ORD-2026-35172",
+      "paymentReference": "EVT-TEST-1792333651768",
+      "amount": 45000,
+      "currency": "NGN",
+      "status": "verified",
+      "createdAt": "2026-10-18T14:27:31.774Z",
+      "metadata": {
+        "purchaser": "Kola Ade",
+        "tier": "Regular Party Pass",
+        "quantity": 3
+      },
+      "verifiedAt": "2026-10-18T14:27:31.844Z",
       "channel": "card",
       "gatewayResponse": "Approved"
     }

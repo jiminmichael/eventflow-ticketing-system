@@ -360,23 +360,27 @@ function MainApp() {
       />
 
       {/* Dedicated Paid Guestlist Export Modal (Restricted to Authenticated Admins) */}
-      <ExportGuestlistModal
-        isOpen={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        adminToken={adminToken}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      {exportModalOpen && (
+        <ExportGuestlistModal
+          isOpen={exportModalOpen}
+          onClose={() => setExportModalOpen(false)}
+          adminToken={adminToken}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
 
       {/* Secure Admin Management Dashboard */}
-      <AdminPortal
-        isOpen={adminOpen}
-        onClose={() => setAdminOpen(false)}
-        adminToken={adminToken}
-        onLoginSuccess={handleLoginSuccess}
-        onLogout={handleLogout}
-        event={event}
-        onUpdateEvent={(updated) => setEvent(updated)}
-      />
+      {adminOpen && (
+        <AdminPortal
+          isOpen={adminOpen}
+          onClose={() => setAdminOpen(false)}
+          adminToken={adminToken}
+          onLoginSuccess={handleLoginSuccess}
+          onLogout={handleLogout}
+          event={event}
+          onUpdateEvent={(updated) => setEvent(updated)}
+        />
+      )}
     </div>
   );
 }

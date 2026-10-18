@@ -87,6 +87,17 @@ export const ExportGuestlistModal: React.FC<ExportGuestlistModalProps> = ({
     }
   }, [isOpen, adminToken]);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
@@ -213,6 +224,8 @@ export const ExportGuestlistModal: React.FC<ExportGuestlistModalProps> = ({
     }
     return true;
   });
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm overflow-hidden animate-in fade-in duration-200">
