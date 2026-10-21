@@ -15,7 +15,7 @@ const tierBenefits: Record<string, string[]> = {
     "Complimentary cocktails",
     "1 pot of shisha",
   ],
-  VIP: ["1 shisha", "Unlimited cocktails"],
+  VIP: ["1 shisha", "Complimentary cocktails"],
 };
 
 const tierImages: Record<string, string> = {

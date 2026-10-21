@@ -58,7 +58,7 @@
   "ticketTiers": [
     {
       "id": "hideout-pvc",
-      "name": "With your PVC",
+      "name": "With PVC",
       "code": "PVC",
       "description": "Individual entry to The Hideout. Bring your PVC for this ticket.",
       "price": 15000,

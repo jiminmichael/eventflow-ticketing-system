@@ -22,6 +22,18 @@ interface AttendeeWithQr extends Attendee {
   qrSvg?: string;
 }
 
+async function readApiJson(response: Response) {
+  const body = await response.text();
+  try {
+    return JSON.parse(body);
+  } catch {
+    const detail = body.trim().replace(/\s+/g, ' ').slice(0, 240);
+    throw new Error(
+      `Payment service returned an invalid response (HTTP ${response.status})${detail ? `: ${detail}` : ''}`,
+    );
+  }
+}
+
 function MainApp() {
   const { showToast } = useToast();
   const [event, setEvent] = useState<EventDetails>(fallbackEvent);
@@ -167,7 +179,7 @@ function MainApp() {
         body: JSON.stringify(orderData),
       });
 
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.status) {
         throw new Error(data.message || 'Failed to initialize ticket order');
       }
@@ -209,7 +221,7 @@ function MainApp() {
         }),
       });
 
-      const data = await res.json();
+      const data = await readApiJson(res);
 
       if (!res.ok || !data.status) {
         throw new Error(data.message || 'Payment verification failed or was declined.');

@@ -20,6 +20,7 @@ Open `http://localhost:3000`. Administrator sign-in is at `/admin` or **Organize
 | Variable | Purpose |
 | --- | --- |
 | `APP_URL` | Public origin used for the Paystack return URL; use HTTPS on the deployed site. |
+| `DATABASE_URL` | Neon Postgres connection string. Required on Vercel; configure it in the deployment environment settings. |
 | `PAYSTACK_SECRET_KEY` | Paystack `sk_test_…` or `sk_live_…` secret, used only on the server. Hosted checkout does not require a public key. |
 | `PAYSTACK_SANDBOX` | Explicit local simulation when `true`; disabled in production. Defaults to `false`. |
 | `ADMIN_USERNAME` | Organizer login username. |

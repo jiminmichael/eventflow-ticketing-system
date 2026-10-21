@@ -65,7 +65,7 @@ export const fallbackEvent: EventDetails = {
 export const fallbackTicketTiers: TicketTier[] = [
   {
     id: "hideout-pvc",
-    name: "With your PVC",
+    name: "With PVC",
     code: "PVC",
     description:
       "Individual entry to The Hideout. Bring your PVC for this ticket.",
