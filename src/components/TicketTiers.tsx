@@ -24,7 +24,7 @@ const tierImages: Record<string, string> = {
   COUPLE: "/images/couple.png",
   VIP: "/images/vip.png",
   VVIP: "/images/vvip.png",
-  CABANA: "/images/background-image.png",
+  CABANA: "/images/cabana.png",
 };
 
 interface Props {
