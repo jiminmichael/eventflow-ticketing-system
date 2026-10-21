@@ -161,6 +161,9 @@ try {
     "https://checkout.paystack.com/test-fixture",
   );
   const reference = result.paymentReference;
+  assert.equal((await request(`/orders/${reference}/tickets`)).status, 403, 'Unpaid bookings cannot download tickets');
+  assert.equal((await request('/orders/unknown-reference/tickets')).status, 404);
+
   const order = db.getOrderByReference(reference)!;
   assert.equal(order.attendeeUuids.length, 2);
   assert.equal(new Set(order.attendeeUuids).size, 2);
@@ -188,6 +191,14 @@ try {
       .alreadyConfirmed,
     true,
   );
+  const ticketsResponse = await request(`/orders/${reference}/tickets`);
+  assert.equal(ticketsResponse.status, 200);
+  assert.equal(ticketsResponse.headers.get('cache-control'), 'no-store');
+  const tickets = await ticketsResponse.json();
+  assert.equal(tickets.attendees.length, 2);
+  assert.equal(tickets.attendees[0].uuid, order.attendeeUuids[0]);
+  assert.equal(tickets.event.title, fallbackEvent.title);
+  assert.equal((await request(`/orders/${order.orderReference}/tickets`)).status, 200, 'Private order links are reloadable');
   const guests = await (
     await request(
       "/admin/attendees?paymentStatus=verified",

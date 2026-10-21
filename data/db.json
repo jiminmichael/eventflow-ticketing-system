@@ -765,8 +765,9 @@
       "additionalNotes": "",
       "paymentStatus": "verified",
       "paymentReference": "EVT-TEST-1792258925574",
-      "checkedIn": false,
-      "createdAt": "2026-10-17T17:42:05.576Z"
+      "checkedIn": true,
+      "createdAt": "2026-10-17T17:42:05.576Z",
+      "checkedInAt": "2026-10-21T10:12:29.814Z"
     },
     {
       "uuid": "3b35413d-f205-438d-add2-9c45a22df19c",
@@ -879,8 +880,9 @@
       "additionalNotes": "",
       "paymentStatus": "verified",
       "paymentReference": "EVT-TEST-1792333651768",
-      "checkedIn": false,
-      "createdAt": "2026-10-18T14:27:31.774Z"
+      "checkedIn": true,
+      "createdAt": "2026-10-18T14:27:31.774Z",
+      "checkedInAt": "2026-10-21T10:13:34.518Z"
     },
     {
       "uuid": "2ee956a6-24df-476a-a35b-fd13945efb77",

@@ -265,6 +265,24 @@ const initialPayments: PaymentAudit[] = [
   },
 ];
 
+function validateCatalog(data: Partial<TicketTier & MenuItem>, kind: 'ticket' | 'menu', creating = false) {
+  for (const key of kind === 'ticket' ? ['name', 'code'] : ['name', 'category', 'description']) {
+    const value = (data as Record<string, unknown>)[key];
+    if ((creating || value !== undefined) && (typeof value !== 'string' || !value.trim())) throw new Error(`${key} is required.`);
+  }
+  for (const key of ['price', 'availableQuantity', 'maxPerRegistration', 'guestsPerTicket', 'displayOrder']) {
+    const value = (data as Record<string, unknown>)[key];
+    if (value === undefined) { if (creating && key === 'price') throw new Error('Price is required.'); continue; }
+    const minimum = ['maxPerRegistration', 'guestsPerTicket'].includes(key) ? 1 : 0;
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum || (key !== 'price' && !Number.isInteger(value))) throw new Error(`${key} must be a valid ${key === 'price' ? 'price' : 'whole number'}.`);
+    if (key === 'guestsPerTicket' && value > 50) throw new Error('A package may register at most 50 guests.');
+  }
+  for (const key of ['isActive', 'isAvailable', 'inventoryUnlimited']) {
+    const value = (data as Record<string, unknown>)[key];
+    if (value !== undefined && typeof value !== 'boolean') throw new Error(`${key} must be true or false.`);
+  }
+}
+
 class DatabaseService {
   private data: DatabaseSchema;
   private isLoaded = false;
@@ -359,7 +377,9 @@ class DatabaseService {
   }
 
   createTicketTier(tierData: Omit<TicketTier, 'id' | 'soldQuantity'>): TicketTier {
-    const id = `tier-${tierData.code.toLowerCase().replace(/[^a-z0-9]/g, '-') || uuidv4().slice(0, 8)}`;
+    validateCatalog(tierData, 'ticket', true);
+    if (this.data.ticketTiers.some(t=>t.code.toUpperCase()===tierData.code.trim().toUpperCase())) throw new Error('A ticket tier with this code already exists.');
+    const id = `tier-${uuidv4()}`;
     const newTier: TicketTier = {
       ...tierData,
       id,
@@ -380,7 +400,10 @@ class DatabaseService {
     const index = this.data.ticketTiers.findIndex((t) => t.id === id);
     if (index === -1) return null;
 
+    validateCatalog(updates, 'ticket');
+    if (updates.code && this.data.ticketTiers.some(t=>t.id!==id && t.code.toUpperCase()===updates.code!.trim().toUpperCase())) throw new Error('A ticket tier with this code already exists.');
     const current = this.data.ticketTiers[index];
+    if (updates.availableQuantity !== undefined && !(updates.inventoryUnlimited ?? current.inventoryUnlimited) && updates.availableQuantity < current.soldQuantity) throw new Error('Inventory cannot be lower than the number already reserved or sold.');
     const updatedTier: TicketTier = {
       ...current,
       ...updates,
@@ -402,8 +425,8 @@ class DatabaseService {
   deleteTicketTier(id: string): boolean {
     const tier = this.data.ticketTiers.find((t) => t.id === id);
     if (!tier) return false;
-    // Don't delete if tickets already sold, disable instead
-    if (tier.soldQuantity > 0) {
+    // Preserve all historical order references, including failed orders.
+    if (tier.soldQuantity > 0 || this.data.orders.some(o=>o.ticketTierId===id)) {
       tier.isActive = false;
       this.saveToDisk();
       return true;
@@ -677,6 +700,7 @@ class DatabaseService {
     const attendee = this.data.attendees.find((a) => a.uuid === uuid);
     if (!attendee) return null;
 
+    if (attendee.paymentStatus !== 'verified') throw new Error('Only guests with verified payments can be checked in.');
     attendee.checkedIn = !attendee.checkedIn;
     attendee.checkedInAt = attendee.checkedIn ? new Date().toISOString() : undefined;
     this.saveToDisk();
@@ -732,7 +756,7 @@ class DatabaseService {
 
     if (filter.endDate) {
       const end = new Date(filter.endDate).getTime() + 86400000; // inclusive of end date
-      result = result.filter((a) => new Date(a.createdAt).getTime() <= end);
+      result = result.filter((a) => new Date(a.createdAt).getTime() < end);
     }
 
     return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -748,7 +772,8 @@ class DatabaseService {
   }
 
   createMenuItem(itemData: Omit<MenuItem, 'id'>): MenuItem {
-    const id = `menu-${uuidv4().slice(0, 8)}`;
+    validateCatalog(itemData, 'menu', true);
+    const id = `menu-${uuidv4()}`;
     const newItem: MenuItem = {
       ...itemData,
       id,
@@ -765,6 +790,7 @@ class DatabaseService {
     const index = this.data.menuItems.findIndex((m) => m.id === id);
     if (index === -1) return null;
 
+    validateCatalog(updates, 'menu');
     const current = this.data.menuItems[index];
     const updated: MenuItem = {
       ...current,

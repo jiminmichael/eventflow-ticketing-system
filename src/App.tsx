@@ -1,3 +1,4 @@
+import { TicketDownloads } from './components/TicketDownloads.js';
 import React, { useState, useEffect } from 'react';
 import { EventDetails, TicketTier, MenuItem, Order, Attendee } from './types.js';
 import { Navbar } from './components/Navbar.js';
@@ -227,8 +228,8 @@ function MainApp() {
 
       // Close checkout modal & show confirmation ticket
       setCheckoutModalOpen(false);
-      setConfirmationOpen(true);
-      showToast('Payment verified! Attendee passes issued.', 'success');
+      window.location.replace(`/tickets/${encodeURIComponent(data.order.orderReference)}`);
+      showToast('Payment verified! Your tickets are ready to download.', 'success');
 
       // Refresh ticket tiers to reflect updated inventory
       fetch('/api/tickets')
@@ -257,9 +258,8 @@ function MainApp() {
   };
 
   const handleTicketFound = (order: Order, atts: AttendeeWithQr[]) => {
-    setConfirmedOrder(order);
-    setConfirmedAttendees(atts);
-    setConfirmationOpen(true);
+    if (order.paymentStatus !== 'verified') { showToast('Payment is not verified yet. Please check payment status.', 'info'); return; }
+    window.location.assign(`/tickets/${encodeURIComponent(order.orderReference)}`);
     showToast(`Found Order ${order.orderReference}`, 'success');
   };
 
@@ -407,6 +407,11 @@ function MainApp() {
 }
 
 export default function App() {
+  if (window.location.pathname.startsWith('/tickets/')) {
+    let reference = '';
+    try { reference = decodeURIComponent(window.location.pathname.slice('/tickets/'.length)); } catch {}
+    return <TicketDownloads reference={reference} />;
+  }
   return (
     <ToastProvider>
       <MainApp />

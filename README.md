@@ -30,6 +30,8 @@ Set the Paystack webhook URL to `https://your-domain/api/paystack/webhook`. The 
 
 Without a Paystack secret, real checkout reports that payments are not configured; it does not silently approve payments. Use a Paystack test key to exercise provider checkout before adding a live key. Local simulation is explicitly labelled and never collects card details.
 
+After successful payment verification, guests are redirected to `/tickets/<order-reference>`. Each guest can download a PNG image or PDF containing their contact details, UUID, QR code, event information and payment references. Group bookings also offer a PDF with one page per guest. VVIP/Cabana downloads are paid package confirmations pending team follow-up. **Find My Pass** reopens the download page for verified bookings. Treat the download link as private: anyone with that link can access the booking's tickets. Pending payments cannot download tickets.
+
 ## Tickets and guests
 
 | Ticket/package | Price | Registered people |
@@ -57,7 +59,7 @@ All admin lists, mutations and exports require an authenticated bearer session. 
 
 This backend currently uses a JSON store intended for **one persistent server process**. Mount a durable disk at `DATA_DIR`, back it up, and keep secrets in the host's environment. Run `npm run build`, then `NODE_ENV=production npm start`.
 
-The existing Vercel adapter uses temporary filesystem storage. **Do not use that temporary store for real paid bookings**: it is not durable or shared across instances. A transactional hosted database is required before deploying payment processing to Vercel or multiple backend instances. The included rewrite routes support `/admin` and the Paystack return page, but do not solve storage persistence.
+The existing Vercel adapter uses temporary filesystem storage. **Do not use that temporary store for real paid bookings**: it is not durable or shared across instances. A transactional hosted database is required before deploying payment processing to Vercel or multiple backend instances. The included rewrite routes support `/admin`, the Paystack return page and ticket downloads, but do not solve storage persistence.
 
 Existing historical orders, attendees and payments are preserved. Legacy ticket tiers are inactive; historical records remain available to administrators.
 

@@ -150,12 +150,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
+        if (viewingAttendee) { setViewingAttendee(null); return; }
+        if (tierModalOpen) { setTierModalOpen(false); return; }
+        if (menuModalOpen) { setMenuModalOpen(false); return; }
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, viewingAttendee, tierModalOpen, menuModalOpen]);
 
   if (!isOpen) return null;
 
@@ -226,6 +229,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         method: 'POST',
         headers: { Authorization: `Bearer ${adminToken}` },
       });
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         const { attendee } = await res.json();
         setAttendees((prev) => prev.map((a) => (a.uuid === uuid ? attendee : a)));
@@ -236,9 +240,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           .then((r) => r.json())
           .then(setStats)
           .catch(() => {});
+        return true;
       }
     } catch (err) {
       console.error('[Checkin error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
+      return false;
     }
   };
 
@@ -277,7 +284,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       return;
     }
 
-    await handleToggleCheckin(matched.uuid);
+    const admitted = await handleToggleCheckin(matched.uuid);
+    if (!admitted) { setCheckinResult({success:false,message:'Check-in failed. Please retry.'}); return; }
     setCheckinResult({
       success: true,
       message: `Verified & Successfully Checked In: ${matched.firstName} ${matched.lastName} (${matched.ticketTierName})`,
@@ -304,7 +312,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       if (tierFilter !== 'ALL') params.set('ticketTierId', tierFilter);
       if (paymentFilter !== 'ALL') params.set('paymentStatus', paymentFilter);
       if (checkinFilter !== 'ALL') params.set('checkedIn', checkinFilter);
-      if (dateFilter) params.set('startDate', dateFilter);
+      if (dateFilter) { params.set('startDate', dateFilter); params.set('endDate', dateFilter); }
     }
 
     const timestamp = new Date().toISOString().slice(0, 10);
@@ -347,6 +355,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         body: JSON.stringify(payload),
       });
 
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         setTierModalOpen(false);
         setEditingTier(null);
@@ -354,6 +363,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       }
     } catch (err) {
       console.error('[Tier save error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
@@ -364,11 +374,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         method: 'DELETE',
         headers: { Authorization: `Bearer ${adminToken}` },
       });
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         loadAllAdminData();
       }
     } catch (err) {
       console.error('[Tier delete error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
@@ -400,6 +412,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         body: JSON.stringify(payload),
       });
 
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         setMenuModalOpen(false);
         setEditingMenuItem(null);
@@ -407,6 +420,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       }
     } catch (err) {
       console.error('[Menu item save error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
@@ -417,11 +431,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         method: 'DELETE',
         headers: { Authorization: `Bearer ${adminToken}` },
       });
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         loadAllAdminData();
       }
     } catch (err) {
       console.error('[Menu item delete error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
@@ -436,6 +452,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         },
         body: JSON.stringify({ isAvailable: !item.isAvailable }),
       });
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         setMenuItems((prev) =>
           prev.map((m) => (m.id === item.id ? { ...m, isAvailable: !item.isAvailable } : m))
@@ -443,6 +460,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       }
     } catch (err) {
       console.error('[Toggle availability error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
@@ -460,6 +478,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         body: JSON.stringify(eventSettingsForm),
       });
 
+      if (!res.ok) throw new Error((await res.json()).message || 'The action could not be completed.');
       if (res.ok) {
         const updated = await res.json();
         onUpdateEvent(updated);
@@ -467,12 +486,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       }
     } catch (err) {
       console.error('[Save event error]', err);
+      alert(err instanceof Error ? err.message : 'The action failed. Please try again.');
     }
   };
 
+  const admittedAttendees = attendees
+    .filter((attendee) => attendee.checkedIn)
+    .sort((a, b) => (b.checkedInAt || '').localeCompare(a.checkedInAt || ''));
+
   const filteredAttendees = attendees.filter((a) => {
     if (searchQuery) {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase().trim();
       const match =
         a.uuid.toLowerCase().includes(q) ||
         a.ticketCode.toLowerCase().includes(q) ||
@@ -481,7 +505,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         `${a.firstName} ${a.lastName}`.toLowerCase().includes(q) ||
         a.email.toLowerCase().includes(q) ||
         a.phone.toLowerCase().includes(q) ||
-        a.orderReference.toLowerCase().includes(q);
+        a.orderReference.toLowerCase().includes(q) ||
+        a.ticketTierName.toLowerCase().includes(q);
       if (!match) return false;
     }
     if (tierFilter !== 'ALL' && a.ticketTierId !== tierFilter) return false;
@@ -498,19 +523,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
+    <div className="admin-portal fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
       <div className="relative w-full max-w-7xl h-[92vh] bg-white border border-[#E5DDD0] rounded-3xl shadow-2xl flex flex-col text-[#0F291E] overflow-hidden">
         {/* Top Portal Header */}
-        <div className="bg-[#FAF7F2] px-6 py-4 border-b border-[#E5DDD0] flex items-center justify-between shrink-0">
+        <div className="admin-header bg-[#FAF7F2] px-6 py-4 border-b border-[#E5DDD0] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center text-[#FAF7F2] font-bold shadow-md shadow-emerald-700/20">
               <ShieldCheck className="w-6 h-6 text-[#FAF7F2]" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-extrabold text-[#0F291E]">The Hideout — Admin & Door Portal</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-extrabold text-[#0F291E]">The Hideout — Organizer Portal</h2>
                 <span className="text-[10px] font-code px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
-                  Host Active
+                  {adminToken ? "Host Active" : "Organizer Sign-in"}
                 </span>
               </div>
               <p className="text-xs text-[#516E60]">
@@ -709,33 +734,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 p-6 overflow-y-auto bg-[#F3EFE6]">
+            <div className="admin-content flex-1 min-w-0 min-h-0 p-6 overflow-y-auto bg-[#F3EFE6]">
               {/* TAB 1: OVERVIEW & STATS */}
               {activeTab === 'overview' && stats && (
                 <div className="space-y-6">
                   {/* Revenue Target Progress Bar */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-zinc-900 to-zinc-900 border border-emerald-500/30 shadow-lg space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-emerald-800" />
-                        <h4 className="text-sm font-bold text-[#253C3B] uppercase tracking-wider font-mono">
-                          Total Verified Revenue: ₦{stats.totalVerifiedRevenue.toLocaleString('en-NG')}
-                        </h4>
-                      </div>
-                      <span className="text-xs text-[#52635F] font-mono">
-                        Target Goal: ₦10,000,000 (
-                        {Math.round((stats.totalVerifiedRevenue / 10000000) * 100)}% achieved)
-                      </span>
-                    </div>
-
-                    <div className="w-full h-3 rounded-full bg-[#F3EFE6] overflow-hidden border border-[#D5CDC0]">
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${Math.min(100, Math.round((stats.totalVerifiedRevenue / 10000000) * 100))}%`,
-                        }}
-                      />
-                    </div>
+                  <div className="p-5 rounded-2xl bg-white border border-[#D5CDC0] text-[#253C3B]">
+                    <h3 className="text-lg">Verified payments & guest activity</h3>
+                    <p className="text-xs text-[#52635F]">Revenue includes verified orders only. Pending and failed payments are listed separately below.</p>
                   </div>
 
                   {/* Top Stats Cards */}
@@ -769,9 +775,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <div className="p-5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
                       <div className="flex items-center justify-between text-[#52635F] text-xs font-semibold">
                         <span>Tickets Sold / Inventory</span>
-                        <Ticket className="w-4 h-4 text-teal-400" />
+                        <Ticket className="w-4 h-4 text-teal-800" />
                       </div>
-                      <div className="text-2xl font-extrabold text-teal-400 font-mono mt-2">
+                      <div className="text-2xl font-extrabold text-teal-800 font-mono mt-2">
                         {stats.totalSoldTickets} / {tiers.some(t=>t.isActive && t.inventoryUnlimited) ? 'No overall limit set' : stats.totalAvailableInventory}
                       </div>
                       <div className="text-[11px] text-[#52635F] mt-1">
@@ -819,7 +825,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </div>
 
                   {/* Spreadsheet Export Launch Bar */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-900 to-zinc-950 border border-[#D5CDC0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="p-6 rounded-3xl bg-white border border-[#D5CDC0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="text-sm font-bold text-[#253C3B] flex items-center gap-2">
                         <FileSpreadsheet className="w-4 h-4 text-emerald-800" />
@@ -1105,6 +1111,53 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       )}
                     </div>
                   )}
+
+                  <section className="rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] overflow-hidden">
+                    <div className="p-5 border-b border-[#D5CDC0] flex items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-base font-bold text-[#253C3B]">Checked In & Admitted</h3>
+                        <p className="text-xs text-[#52635F] mt-1">Guests admitted to the event, newest first.</p>
+                      </div>
+                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-sm font-bold" aria-live="polite">
+                        {admittedAttendees.length}
+                      </span>
+                    </div>
+                    {admittedAttendees.length === 0 ? (
+                      <p className="p-6 text-center text-sm text-[#52635F]">
+                        {isLoadingData ? 'Loading admitted guests…' : 'No guests have checked in yet.'}
+                      </p>
+                    ) : (
+                      <ul className="divide-y divide-[#D5CDC0]">
+                        {admittedAttendees.map((attendee) => (
+                          <li key={attendee.uuid} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <button
+                                type="button"
+                                onClick={() => setViewingAttendee(attendee)}
+                                className="text-sm font-bold text-[#253C3B] hover:underline text-left cursor-pointer"
+                                title="View Attendee Record"
+                              >
+                                {attendee.firstName} {attendee.lastName}
+                              </button>
+                              <p className="text-xs text-[#52635F] mt-1">{attendee.ticketTierName}</p>
+                              <p className="text-xs font-mono text-[#52635F] mt-1 break-all">{attendee.ticketCode}</p>
+                            </div>
+                            <div className="sm:text-right shrink-0">
+                              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Admitted
+                              </span>
+                              <p className="text-xs text-[#52635F] mt-1">
+                                {attendee.checkedInAt ? (
+                                  <time dateTime={attendee.checkedInAt}>{new Date(attendee.checkedInAt).toLocaleString()}</time>
+                                ) : 'Check-in time unavailable'}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
                 </div>
               )}
 
@@ -1425,7 +1478,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <div>
                     <h3 className="text-base font-bold text-[#253C3B]">Event Configuration</h3>
                     <p className="text-xs text-[#52635F]">
-                      Update live summit titles, banner visuals, venue location, and contact information.
+                      Update event titles, banner visuals, venue location, and contact information.
                     </p>
                   </div>
 
@@ -1433,7 +1486,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <div className="p-6 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] space-y-4 text-xs">
                       <div>
                         <label className="block text-[#52635F] font-semibold mb-1">
-                          Summit Title
+                          Event Title
                         </label>
                         <input
                           type="text"
@@ -1448,7 +1501,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                       <div>
                         <label className="block text-[#52635F] font-semibold mb-1">
-                          Summit Theme
+                          Event Theme
                         </label>
                         <input
                           type="text"
@@ -1491,7 +1544,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           Banner Image URL
                         </label>
                         <input
-                          type="url"
+                          type="text"
                           value={eventSettingsForm.bannerImage}
                           onChange={(e) =>
                             setEventSettingsForm({
@@ -1505,7 +1558,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                       <div>
                         <label className="block text-[#52635F] font-semibold mb-1">
-                          Full Summit Description
+                          Event Description
                         </label>
                         <textarea
                           rows={4}
@@ -1524,7 +1577,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         type="submit"
                         className="py-2.5 px-6 rounded-xl font-bold text-xs bg-amber-400 text-zinc-950 hover:bg-amber-300 transition-colors shadow-md shadow-amber-400/20 cursor-pointer"
                       >
-                        Save Summit Settings
+                        Save Event Settings
                       </button>
                     </div>
                   </form>
@@ -1541,6 +1594,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <div className="flex items-center justify-between border-b border-[#D5CDC0] pb-3">
                 <h4 className="text-base font-bold text-[#253C3B]">Attendee Registration Record</h4>
                 <button
+                  aria-label="Close attendee details"
                   onClick={() => setViewingAttendee(null)}
                   className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
@@ -1632,6 +1686,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {editingTier ? 'Edit Ticket Tier' : 'Add New Ticket Tier'}
                 </h4>
                 <button
+                  aria-label="Close ticket editor"
                   onClick={() => setTierModalOpen(false)}
                   className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
@@ -1756,7 +1811,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="pt-3 flex justify-end gap-2 border-t border-[#D5CDC0]">
                   <button
                     type="button"
-                    onClick={() => setTierModalOpen(false)}
+                    aria-label="Close ticket editor"
+                  onClick={() => setTierModalOpen(false)}
                     className="px-4 py-2 rounded-xl text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                   >
                     Cancel
@@ -1782,6 +1838,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {editingMenuItem ? 'Edit Menu Item' : 'Add View-Only Menu Item'}
                 </h4>
                 <button
+                  aria-label="Close menu editor"
                   onClick={() => setMenuModalOpen(false)}
                   className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
@@ -1880,7 +1937,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="pt-3 flex justify-end gap-2 border-t border-[#D5CDC0]">
                   <button
                     type="button"
-                    onClick={() => setMenuModalOpen(false)}
+                    aria-label="Close menu editor"
+                  onClick={() => setMenuModalOpen(false)}
                     className="px-4 py-2 rounded-xl text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                   >
                     Cancel

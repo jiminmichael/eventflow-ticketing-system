@@ -983,3 +983,38 @@ h2 em {
 button:disabled {opacity:.55;}
 #menu {background:transparent;}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.registration-form fieldset {padding:20px;}.registration-total{align-items:stretch;flex-direction:column;}}
+
+/* Keep dashboard typography and controls independent of the landing-page hero. */
+.admin-header {gap:16px;flex-wrap:wrap;}
+.admin-header > div:first-child {min-width:0;flex:1 1 420px;}
+.admin-header > div:last-child {flex-shrink:0;margin-left:auto;}
+.admin-header h2 {font-size:28px;line-height:1.15;margin:0;letter-spacing:-.02em;}
+.admin-header p {margin-top:8px;}
+.admin-header button {min-width:44px;min-height:44px;white-space:nowrap;}
+.admin-content {overscroll-behavior:contain;}
+@media(max-width:600px){
+ .admin-header {padding:14px 16px;gap:10px;}
+ .admin-header > div:first-child {flex-basis:100%;}
+ .admin-header h2 {font-size:24px;}
+ .admin-header p {display:none;}
+ .admin-content {padding:16px;}
+}
+
+.ticket-download-page {max-width:1180px;margin:auto;padding:32px 5% 70px;}
+.ticket-download-page header {margin:32px 0;max-width:760px;}
+.ticket-download-page h1 {font-size:clamp(40px,5vw,66px);line-height:1.1;letter-spacing:-.03em;}
+.ticket-download-page h1 em {color:var(--hideout-orange);font-weight:400;}
+.ticket-download-page p {font-size:14px;line-height:1.8;}
+.payment-confirmed {display:flex;align-items:center;gap:10px;color:#215d49;margin:24px 0;}
+.download-layout {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:32px;align-items:start;}
+.download-controls,.download-status {padding:26px;border-radius:12px;}
+.download-controls label {font-size:13px;font-weight:600;}
+.download-controls select {width:100%;min-height:48px;margin:10px 0 20px;padding:10px;border:1px solid #a6b2a9;border-radius:5px;}
+.download-controls h2 {font-size:32px;overflow-wrap:anywhere;}
+.download-controls dl {font-size:13px;margin:20px 0;}
+.download-controls dt {font-weight:600;color:var(--hideout-muted);margin-top:14px;}
+.download-controls dd {overflow-wrap:anywhere;line-height:1.7;}
+.download-controls button {width:100%;margin-top:12px;}
+.ticket-preview img {width:100%;height:auto;display:block;box-shadow:0 10px 40px #253c3b15;border:1px solid #ded8ca;}
+.download-status .btn-primary,.download-status .btn-secondary {margin:12px 12px 12px 0;}
+@media(max-width:700px){.download-layout{grid-template-columns:1fr;}.ticket-download-page{padding-top:20px;}.download-controls{padding:20px;}}

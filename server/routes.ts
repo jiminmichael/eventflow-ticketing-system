@@ -284,6 +284,17 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
   }
 });
 
+// The private order reference is the booking's access link. Never issue downloads for unpaid orders.
+apiRouter.get('/orders/:reference/tickets', (req: Request, res: Response) => {
+  res.setHeader('Cache-Control', 'no-store');
+  const order = db.getOrderByReference(req.params.reference);
+  if (!order) return res.status(404).json({message:'Booking not found. Check your reference or contact the organizers.'});
+  if (order.paymentStatus !== 'verified') return res.status(403).json({message:'Payment has not been verified yet. Please check payment status or retry after a moment.'});
+  const attendees = db.getAttendeesByOrderReference(order.orderReference).filter(a=>a.paymentStatus==='verified');
+  if (!attendees.length) return res.status(409).json({message:'Your guest records are not ready. Please contact the organizers.'});
+  return res.json({event:db.getEvent(),order,attendees});
+});
+
 // Retrieve Order & Attendees for Confirmation Display or Printing
 apiRouter.get('/orders/:reference', async (req: Request, res: Response) => {
   try {
@@ -298,6 +309,7 @@ apiRouter.get('/orders/:reference', async (req: Request, res: Response) => {
     // Generate QR codes for each confirmed attendee ticket
     const attendeesWithQr = await Promise.all(
       attendees.map(async (att) => {
+        if (att.paymentStatus !== 'verified') return att;
         try {
           const qrPayload = JSON.stringify({
             uuid: att.uuid,
@@ -435,7 +447,7 @@ apiRouter.post('/admin/attendees/:uuid/checkin', requireAdmin, (req: Request, re
     }
     res.json({ success: true, attendee });
   } catch (err: any) {
-    res.status(500).json({ error: 'Failed to update check-in', message: err.message });
+    res.status(400).json({ error: 'Failed to update check-in', message: err.message });
   }
 });
 

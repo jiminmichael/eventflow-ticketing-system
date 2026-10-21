@@ -23,9 +23,9 @@ export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
         <span className="small-rule" /> THE VYBECHECK WITH BAMA PRESENTS
       </p>
       <h1>
-        The Hideout<span>Pool Edition.</span>
+        {event.title === 'The Hideout — Pool Edition' ? <>The Hideout<span>Pool Edition.</span></> : event.title}
       </h1>
-      <p className="hero-tagline">The hilltop sunset pool party.</p>
+      <p className="hero-tagline">{event.subtitle}</p>
       <p className="hero-description">{event.description}</p>
       <div className="hero-details">
         <span>

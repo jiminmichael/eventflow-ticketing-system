@@ -93,6 +93,10 @@ export function generateAttendeesExcel(
 /**
  * Generates CSV string for attendees.
  */
+function csvCell(value: unknown): string {
+  return sanitizeCell(value).replace(/"/g, '""');
+}
+
 export function generateAttendeesCsv(attendees: Attendee[]): string {
   const headers = [
     'Attendee UUID',
@@ -117,19 +121,19 @@ export function generateAttendeesCsv(attendees: Attendee[]): string {
 
   for (const a of attendees) {
     const row = [
-      `"${sanitizeCell(a.uuid)}"`,
-      `"${sanitizeCell(a.ticketCode)}"`,
-      `"${sanitizeCell(a.firstName)}"`,
-      `"${sanitizeCell(a.lastName)}"`,
-      `"${sanitizeCell(`${a.firstName} ${a.lastName}`)}"`,
-      `"${sanitizeCell(a.email)}"`,
-      `"${sanitizeCell(a.phone)}"`,
-      `"${sanitizeCell(a.institution || '')}"`,
-      `"${sanitizeCell(a.ticketTierName)}"`,
+      `"${csvCell(a.uuid)}"`,
+      `"${csvCell(a.ticketCode)}"`,
+      `"${csvCell(a.firstName)}"`,
+      `"${csvCell(a.lastName)}"`,
+      `"${csvCell(`${a.firstName} ${a.lastName}`)}"`,
+      `"${csvCell(a.email)}"`,
+      `"${csvCell(a.phone)}"`,
+      `"${csvCell(a.institution || '')}"`,
+      `"${csvCell(a.ticketTierName)}"`,
       a.unitPrice,
-      `"${sanitizeCell(a.orderReference)}"`,
-      `"${sanitizeCell(a.paymentStatus)}"`,
-      `"${sanitizeCell(a.paymentReference)}"`,
+      `"${csvCell(a.orderReference)}"`,
+      `"${csvCell(a.paymentStatus)}"`,
+      `"${csvCell(a.paymentReference)}"`,
       `"${a.checkedIn ? 'YES' : 'NO'}"`,
       `"${a.checkedInAt || ''}"`,
       `"${a.createdAt}"`,

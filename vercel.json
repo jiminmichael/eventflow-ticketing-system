@@ -12,6 +12,10 @@
     {
       "source": "/order-confirmation",
       "destination": "/index.html"
+    },
+    {
+      "source": "/tickets/:reference",
+      "destination": "/index.html"
     }
   ]
 }
