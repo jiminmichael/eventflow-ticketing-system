@@ -4,6 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import express from "express";
+import { SQLiteStore } from "../server/sqlite-store.js";
 import * as XLSX from "xlsx";
 import {
   fallbackEvent,
@@ -271,9 +272,9 @@ try {
     organizerPhone: "+2348009990000",
   });
   assert.equal((await ok("/event")).title, "Audit event title");
-  const persisted = JSON.parse(
-    fs.readFileSync(path.join(directory, "db.json"), "utf8"),
-  );
+  const persistedStore = new SQLiteStore(path.join(directory, "db.sqlite"));
+  const persisted = persistedStore.load()!;
+  persistedStore.close();
   assert.equal(persisted.event.venue, "Audit venue");
   assert.equal(persisted.orders.length, 3);
   const expired = Buffer.from(

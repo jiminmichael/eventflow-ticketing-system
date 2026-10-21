@@ -265,19 +265,19 @@ function MainApp() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center text-[#0F291E] space-y-4 px-4 text-center">
-        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-700 mb-2 shadow-sm">
+      <div className="min-h-screen bg-[var(--brand-obsidian)] flex flex-col items-center justify-center text-[var(--ui-text)] space-y-4 px-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-[var(--brand-emerald)]/10 border border-[var(--brand-emerald)]/20 flex items-center justify-center text-[var(--ui-success)] mb-2 shadow-sm">
           <Ticket className="w-6 h-6" />
         </div>
-        <div className="text-lg font-bold text-[#0F291E]">
+        <div className="text-lg font-bold text-[var(--ui-text)]">
           The Hideout — Pool Edition
         </div>
-        <p className="text-sm text-[#40584D] max-w-md">
+        <p className="text-sm text-[var(--ui-muted)] max-w-md">
           Unable to connect to the event servers. Please check your connection and retry.
         </p>
         <button
           onClick={fetchInitialData}
-          className="mt-3 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-[#FAF7F2] font-bold text-sm flex items-center gap-2 cursor-pointer transition-all shadow-md shadow-emerald-700/20 active:scale-95"
+          className="mt-3 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[var(--brand-violet)] to-[var(--brand-blue)] hover:from-[var(--brand-violet)] hover:to-[var(--brand-blue)] text-[var(--ui-text)] font-bold text-sm flex items-center gap-2 cursor-pointer transition-all shadow-md shadow-[var(--brand-emerald)]/20 active:scale-95"
         >
           <RefreshCw className="w-4 h-4" /> Retry Loading
         </button>

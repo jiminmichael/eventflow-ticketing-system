@@ -84,39 +84,39 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
   // Authenticated Administrator View
   return (
     <section className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 mb-10">
-      <div className="rounded-3xl bg-white border border-emerald-300 p-5 sm:p-7 shadow-lg">
+      <div className="rounded-3xl bg-[var(--brand-surface)] border border-[var(--brand-emerald)] p-5 sm:p-7 shadow-lg">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           {/* Left: Purpose Badge & Collation Metrics */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[var(--ui-raised)] text-[var(--ui-success)] border border-[var(--brand-emerald)]">
+                <Sparkles className="w-3.5 h-3.5 text-[var(--ui-success)]" />
                 <span>Live Payment Collation (Admin Active)</span>
               </span>
-              <span className="text-xs text-[#516E60] font-medium">
+              <span className="text-xs text-[var(--ui-muted)] font-medium">
                 Direct Paystack revenue collation & instant spreadsheet guestlist export
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 sm:gap-10">
               <div>
-                <span className="text-[10px] uppercase font-code text-[#516E60] block font-bold">
+                <span className="text-[10px] uppercase font-code text-[var(--ui-muted)] block font-bold">
                   Total Verified Revenue
                 </span>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-800 font-code tracking-tight">
+                <span className="text-2xl sm:text-3xl font-black text-[var(--ui-success)] font-code tracking-tight">
                   ₦{totalRevenue.toLocaleString('en-NG')}
                 </span>
               </div>
 
-              <div className="h-9 w-px bg-[#E5DDD0] hidden sm:block" />
+              <div className="h-9 w-px bg-[var(--ui-border)] hidden sm:block" />
 
               <div>
-                <span className="text-[10px] uppercase font-code text-[#516E60] block font-bold">
+                <span className="text-[10px] uppercase font-code text-[var(--ui-muted)] block font-bold">
                   Verified Paid Guests
                 </span>
-                <span className="text-2xl sm:text-3xl font-black text-[#0F291E] font-code tracking-tight">
+                <span className="text-2xl sm:text-3xl font-black text-[var(--ui-text)] font-code tracking-tight">
                   {paidGuestsCount}{' '}
-                  <span className="text-xs text-emerald-700 font-normal">checked / paid</span>
+                  <span className="text-xs text-[var(--ui-success)] font-normal">checked / paid</span>
                 </span>
               </div>
             </div>
@@ -127,11 +127,11 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
             <button
               onClick={handleQuickExcelExport}
               disabled={isDownloading}
-              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-extrabold text-xs bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] hover:from-emerald-500 hover:to-teal-700 transition-all shadow-md shadow-emerald-700/20 cursor-pointer active:scale-95 disabled:opacity-50"
+              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-extrabold text-xs bg-gradient-to-r from-[var(--brand-violet)] via-[var(--brand-violet)] to-[var(--brand-blue)] text-[var(--ui-text)] hover:from-[var(--brand-violet)] hover:to-[var(--brand-blue)] transition-all shadow-md shadow-[var(--brand-emerald)]/20 cursor-pointer active:scale-95 disabled:opacity-50"
             >
               {downloadSuccess ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-[#FAF7F2]" />
+                  <CheckCircle2 className="w-4 h-4 text-[var(--ui-text)]" />
                   <span>Excel Spreadsheet Downloaded!</span>
                 </>
               ) : (
@@ -144,9 +144,9 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
 
             <button
               onClick={onOpenExportModal}
-              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-xs bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer shadow-sm"
+              className="flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-xs bg-[var(--brand-surface)] text-[var(--ui-success)] border border-[var(--brand-emerald)] hover:bg-[var(--ui-raised)] transition-all cursor-pointer shadow-sm"
             >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <FileSpreadsheet className="w-4 h-4 text-[var(--ui-success)]" />
               <span>Full Collation & Filters</span>
             </button>
           </div>

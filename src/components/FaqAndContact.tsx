@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUpRight, ArrowUp, Waves, Plus } from "lucide-react";
+import { ArrowUpRight, ArrowUp, Plus } from "lucide-react";
 import { EventDetails } from "../types.js";
 interface Props {
   event: EventDetails;
@@ -59,10 +59,9 @@ export const FaqAndContact: React.FC<Props> = ({
       </div>
     </div>
     <div className="footer-bottom">
-      <span className="brand">
-        <Waves size={25} />
-        The Hideout
-      </span>
+      <a href="#hero" className="brand brand-logo" aria-label="Vybecheck with Bama — home">
+        <img src="/images/vybecheck-logo.png" alt="Vybecheck with Bama" width="1563" height="1563" loading="lazy" decoding="async" />
+      </a>
       <span>© 2026 · {event.organizerName}</span>
       <button onClick={onOpenAdmin}>Organizer access</button>
       <button onClick={() => onNavigateSection("hero")}>Back to top <ArrowUp size={14} aria-hidden="true" /></button>

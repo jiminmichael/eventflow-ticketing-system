@@ -40,19 +40,19 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             key={toast.id}
             className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl border text-xs font-semibold backdrop-blur-2xl animate-in slide-in-from-bottom-5 duration-200 ${
               toast.type === 'success'
-                ? 'bg-white border-emerald-500 text-emerald-900 shadow-emerald-950/10'
+                ? 'bg-[var(--brand-surface)] border-[var(--brand-emerald)] text-[var(--ui-success)] shadow-[var(--brand-emerald)]/10'
                 : toast.type === 'error'
-                ? 'bg-white border-rose-400 text-rose-900 shadow-rose-950/10'
-                : 'bg-white border-teal-400 text-teal-900 shadow-teal-950/10'
+                ? 'bg-[var(--brand-surface)] border-rose-400 text-rose-300 shadow-rose-950/10'
+                : 'bg-[var(--brand-surface)] border-[var(--brand-blue)] text-[var(--brand-blue)] shadow-[var(--brand-blue)]/10'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
-            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
-            {toast.type === 'info' && <Info className="w-4 h-4 text-teal-600 shrink-0" />}
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-[var(--ui-success)] shrink-0" />}
+            {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-300 shrink-0" />}
+            {toast.type === 'info' && <Info className="w-4 h-4 text-[var(--brand-blue)] shrink-0" />}
             <span className="flex-1 leading-snug">{toast.message}</span>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-[#8C9E95] hover:text-[#0F291E] p-0.5 rounded cursor-pointer"
+              className="text-[var(--ui-muted)] hover:text-[var(--ui-text)] p-0.5 rounded cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>

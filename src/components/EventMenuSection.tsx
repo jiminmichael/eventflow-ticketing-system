@@ -42,37 +42,37 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
   });
 
   return (
-    <section id="menu" className="py-20 bg-[#FAF7F2] text-[#0F291E] border-b border-[#E5DDD0]">
+    <section id="menu" className="py-20 bg-[var(--brand-obsidian)] text-[var(--ui-text)] border-b border-[var(--ui-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold mb-3 border border-emerald-300">
-            <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--ui-raised)] text-[var(--ui-success)] text-xs font-bold mb-3 border border-[var(--brand-emerald)]">
+            <UtensilsCrossed className="w-3.5 h-3.5 text-[var(--ui-success)]" />
             <span>AVAILABLE AT THE PARTY • VIEW ONLY</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0F291E]">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--ui-text)]">
             Party Food, Grills & Drinks Menu
           </h2>
 
-          <p className="mt-3 text-[#375245] text-sm sm:text-base leading-relaxed">
+          <p className="mt-3 text-[var(--ui-muted)] text-sm sm:text-base leading-relaxed">
             Check out what will be cooking and pouring at the party! Smoky firewood asun, juicy suya skewers, craft cocktails, champagne, and ice-cold beers.
           </p>
         </div>
 
         {/* View-Only Informational Alert Banner */}
-        <div className="max-w-4xl mx-auto mb-10 p-5 rounded-3xl bg-emerald-50/90 border border-emerald-300 text-emerald-950 text-xs sm:text-sm flex items-start gap-3.5 shadow-sm">
-          <Info className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+        <div className="max-w-4xl mx-auto mb-10 p-5 rounded-3xl bg-[var(--ui-raised)]/90 border border-[var(--brand-emerald)] text-[var(--ui-success)] text-xs sm:text-sm flex items-start gap-3.5 shadow-sm">
+          <Info className="w-5 h-5 text-[var(--ui-success)] shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <div className="font-extrabold text-[#0F291E] flex flex-wrap items-center gap-2 text-sm">
+            <div className="font-extrabold text-[var(--ui-text)] flex flex-wrap items-center gap-2 text-sm">
               <span>View-Only Menu • Ordered & Paid At Venue Stalls</span>
-              <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-code uppercase font-bold border border-emerald-300">
+              <span className="px-2 py-0.5 rounded bg-[var(--ui-raised)] text-[var(--ui-success)] text-[10px] font-code uppercase font-bold border border-[var(--brand-emerald)]">
                 On-Site Food & Drinks
               </span>
             </div>
-            <p className="text-[#375245] text-xs leading-relaxed">
+            <p className="text-[var(--ui-muted)] text-xs leading-relaxed">
               All menu offerings below are for viewing only so guests know what food and drinks are available.
-              <strong className="text-[#0F291E]"> Items cannot be purchased online or added to your entry ticket order.</strong> All food, grills, and drinks are purchased directly at the stalls during the fiesta.
+              <strong className="text-[var(--ui-text)]"> Items cannot be purchased online or added to your entry ticket order.</strong> All food, grills, and drinks are purchased directly at the stalls during the fiesta.
             </p>
           </div>
         </div>
@@ -81,18 +81,18 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
         <div className="max-w-4xl mx-auto mb-8 space-y-4">
           {/* Search Box */}
           <div className="relative max-w-md mx-auto">
-            <Search className="w-4 h-4 text-emerald-600 absolute left-3.5 top-3.5 pointer-events-none" />
+            <Search className="w-4 h-4 text-[var(--ui-success)] absolute left-3.5 top-3.5 pointer-events-none" />
             <input
               type="text"
               placeholder="Search suya, asun, jollof, cocktails, chapman..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#D5CDC0] rounded-2xl text-xs sm:text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600 placeholder:text-[#8C9E95] transition-colors shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-[var(--brand-surface)] border border-[var(--ui-border)] rounded-2xl text-xs sm:text-sm text-[var(--ui-text)] focus:outline-none focus:border-[var(--brand-emerald)] placeholder:text-[var(--ui-muted)] transition-colors shadow-sm"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-3 text-[#516E60] hover:text-[#0F291E] text-xs cursor-pointer"
+                className="absolute right-3 top-3 text-[var(--ui-muted)] hover:text-[var(--ui-text)] text-xs cursor-pointer"
               >
                 Clear
               </button>
@@ -102,16 +102,16 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
           {/* MOBILE DROPDOWN: Category Filter on Smaller Screens */}
           <div className="block sm:hidden">
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="mobile-menu-category" className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <label htmlFor="mobile-menu-category" className="text-xs font-bold text-[var(--ui-success)] uppercase tracking-wider">
                 Filter Category:
               </label>
               {/* Mobile View Toggle: Grid vs Compact */}
-              <div className="flex items-center bg-white border border-[#D5CDC0] rounded-lg p-0.5 text-xs shadow-sm">
+              <div className="flex items-center bg-[var(--brand-surface)] border border-[var(--ui-border)] rounded-lg p-0.5 text-xs shadow-sm">
                 <button
                   type="button"
                   onClick={() => setMobileViewMode('compact')}
                   className={`px-2 py-1 rounded flex items-center gap-1 cursor-pointer ${
-                    mobileViewMode === 'compact' ? 'bg-emerald-700 text-[#FAF7F2] font-bold' : 'text-[#516E60]'
+                    mobileViewMode === 'compact' ? 'bg-[var(--brand-emerald)] text-[var(--ui-text)] font-bold' : 'text-[var(--ui-muted)]'
                   }`}
                   title="Compact list view"
                 >
@@ -122,7 +122,7 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                   type="button"
                   onClick={() => setMobileViewMode('grid')}
                   className={`px-2 py-1 rounded flex items-center gap-1 cursor-pointer ${
-                    mobileViewMode === 'grid' ? 'bg-emerald-700 text-[#FAF7F2] font-bold' : 'text-[#516E60]'
+                    mobileViewMode === 'grid' ? 'bg-[var(--brand-emerald)] text-[var(--ui-text)] font-bold' : 'text-[var(--ui-muted)]'
                   }`}
                   title="Grid cards view"
                 >
@@ -137,7 +137,7 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                 id="mobile-menu-category"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full appearance-none py-3 px-4 rounded-xl bg-white border border-emerald-300 text-sm font-bold text-[#0F291E] focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                className="w-full appearance-none py-3 px-4 rounded-xl bg-[var(--brand-surface)] border border-[var(--brand-emerald)] text-sm font-bold text-[var(--ui-text)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-emerald)] shadow-sm"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -145,7 +145,7 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-emerald-700 absolute right-4 top-3.5 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-[var(--ui-success)] absolute right-4 top-3.5 pointer-events-none" />
             </div>
           </div>
 
@@ -158,8 +158,8 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-[#FAF7F2] shadow-sm font-bold'
-                    : 'bg-white text-[#2D4A3E] hover:text-emerald-800 border border-[#E5DDD0] hover:border-emerald-300'
+                    ? 'bg-gradient-to-r from-[var(--brand-violet)] via-[var(--brand-violet)] to-[var(--brand-blue)] text-[var(--ui-text)] shadow-sm font-bold'
+                    : 'bg-[var(--brand-surface)] text-[var(--ui-text)] hover:text-[var(--ui-success)] border border-[var(--ui-border)] hover:border-[var(--brand-emerald)]'
                 }`}
               >
                 {cat === 'ALL' ? 'All Party Offerings' : cat}
@@ -170,10 +170,10 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
 
         {/* Menu Items Rendering */}
         {filteredItems.length === 0 ? (
-          <div className="text-center p-12 bg-white rounded-3xl border border-[#E5DDD0] text-[#516E60] max-w-md mx-auto space-y-2 shadow-sm">
-            <UtensilsCrossed className="w-8 h-8 text-emerald-600 mx-auto" />
-            <p className="font-semibold text-[#0F291E]">No party items match your search</p>
-            <p className="text-xs text-[#516E60]">Try selecting another category or clear your search query.</p>
+          <div className="text-center p-12 bg-[var(--brand-surface)] rounded-3xl border border-[var(--ui-border)] text-[var(--ui-muted)] max-w-md mx-auto space-y-2 shadow-sm">
+            <UtensilsCrossed className="w-8 h-8 text-[var(--ui-success)] mx-auto" />
+            <p className="font-semibold text-[var(--ui-text)]">No party items match your search</p>
+            <p className="text-xs text-[var(--ui-muted)]">Try selecting another category or clear your search query.</p>
           </div>
         ) : (
           <>
@@ -183,27 +183,27 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                 <div
                   key={item.id}
                   onClick={() => setSelectedItemDetail(item)}
-                  className="p-3.5 rounded-2xl bg-white border border-[#E5DDD0] hover:border-emerald-400 flex items-center gap-3.5 cursor-pointer shadow-sm active:scale-[0.99] transition-all"
+                  className="p-3.5 rounded-2xl bg-[var(--brand-surface)] border border-[var(--ui-border)] hover:border-[var(--brand-emerald)] flex items-center gap-3.5 cursor-pointer shadow-sm active:scale-[0.99] transition-all"
                 >
                   <img
                     src={item.imageUrl}
                     alt={item.name}
-                    className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#E5DDD0]"
+                    className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[var(--ui-border)]"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h4 className="text-sm font-bold text-[#0F291E] truncate">{item.name}</h4>
-                      <span className="text-xs font-extrabold text-emerald-800 font-code shrink-0">
+                      <h4 className="text-sm font-bold text-[var(--ui-text)] truncate">{item.name}</h4>
+                      <span className="text-xs font-extrabold text-[var(--ui-success)] font-code shrink-0">
                         ₦{item.price.toLocaleString('en-NG')}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#516E60] line-clamp-1 mt-0.5">{item.description}</p>
+                    <p className="text-[11px] text-[var(--ui-muted)] line-clamp-1 mt-0.5">{item.description}</p>
                     <div className="flex items-center gap-2 mt-1.5">
-                      <span className="text-[9px] uppercase font-bold text-[#516E60] px-1.5 py-0.5 rounded bg-[#FAF7F2] border border-[#E5DDD0]">
+                      <span className="text-[9px] uppercase font-bold text-[var(--ui-muted)] px-1.5 py-0.5 rounded bg-[var(--brand-obsidian)] border border-[var(--ui-border)]">
                         {item.category}
                       </span>
                       {item.dietaryOrTag && (
-                        <span className="text-[9px] font-bold text-emerald-800 px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                        <span className="text-[9px] font-bold text-[var(--ui-success)] px-1.5 py-0.5 rounded bg-[var(--ui-raised)] border border-[var(--brand-emerald)]">
                           {item.dietaryOrTag}
                         </span>
                       )}
@@ -221,13 +221,13 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                 <div
                   key={item.id}
                   onClick={() => setSelectedItemDetail(item)}
-                  className="flex flex-col rounded-3xl bg-white border border-[#E5DDD0] overflow-hidden hover:border-emerald-400 transition-all duration-200 shadow-sm group cursor-pointer"
+                  className="flex flex-col rounded-3xl bg-[var(--brand-surface)] border border-[var(--ui-border)] overflow-hidden hover:border-[var(--brand-emerald)] transition-all duration-200 shadow-sm group cursor-pointer"
                   tabIndex={0}
                   role="button"
                   onKeyDown={(e) => e.key === 'Enter' && setSelectedItemDetail(item)}
                 >
                   {/* Item Thumbnail */}
-                  <div className="relative h-48 bg-[#FAF7F2] overflow-hidden">
+                  <div className="relative h-48 bg-[var(--brand-obsidian)] overflow-hidden">
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
@@ -235,19 +235,19 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-700">
+                      <div className="w-full h-full flex items-center justify-center bg-[var(--ui-raised)] text-[var(--ui-success)]">
                         <UtensilsCrossed className="w-12 h-12" />
                       </div>
                     )}
 
                     {/* Dietary / Feature Tag */}
                     {item.dietaryOrTag && (
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-white/95 backdrop-blur-md text-emerald-800 border border-emerald-200 shadow-sm">
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-white/95 backdrop-blur-md text-[var(--ui-success)] border border-[var(--brand-emerald)] shadow-sm">
                         {item.dietaryOrTag}
                       </span>
                     )}
 
-                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[9px] font-code uppercase font-bold bg-white/95 text-[#2D4A3E] border border-[#E5DDD0] shadow-sm">
+                    <span className="absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[9px] font-code uppercase font-bold bg-white/95 text-[var(--ui-text)] border border-[var(--ui-border)] shadow-sm">
                       {item.category}
                     </span>
                   </div>
@@ -255,25 +255,25 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
                   {/* Body Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                     <div>
-                      <h3 className="font-bold text-[#0F291E] text-base group-hover:text-emerald-800 transition-colors line-clamp-1">
+                      <h3 className="font-bold text-[var(--ui-text)] text-base group-hover:text-[var(--ui-success)] transition-colors line-clamp-1">
                         {item.name}
                       </h3>
-                      <p className="text-xs text-[#516E60] mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-[var(--ui-muted)] mt-1 line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-[#E5DDD0] flex items-center justify-between">
+                    <div className="pt-3 border-t border-[var(--ui-border)] flex items-center justify-between">
                       <div>
-                        <div className="text-[10px] uppercase font-code text-[#516E60] font-semibold">
+                        <div className="text-[10px] uppercase font-code text-[var(--ui-muted)] font-semibold">
                           Price at Venue
                         </div>
-                        <div className="text-lg font-black font-code text-emerald-800">
+                        <div className="text-lg font-black font-code text-[var(--ui-success)]">
                           ₦{item.price.toLocaleString('en-NG')}
                         </div>
                       </div>
 
-                      <span className="text-[10px] font-semibold text-[#516E60] group-hover:text-emerald-700 transition-colors flex items-center gap-1">
+                      <span className="text-[10px] font-semibold text-[var(--ui-muted)] group-hover:text-[var(--ui-success)] transition-colors flex items-center gap-1">
                         Details ▾
                       </span>
                     </div>
@@ -291,12 +291,12 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
             onClick={() => setSelectedItemDetail(null)}
           >
             <div
-              className="relative max-w-md w-full rounded-3xl bg-white border border-[#E5DDD0] overflow-hidden shadow-2xl p-6 text-[#0F291E] space-y-4"
+              className="relative max-w-md w-full rounded-3xl bg-[var(--brand-surface)] border border-[var(--ui-border)] overflow-hidden shadow-2xl p-6 text-[var(--ui-text)] space-y-4"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelectedItemDetail(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-[#FAF7F2] hover:bg-[#EAE4D8] text-[#2D4A3E] hover:text-[#0F291E] cursor-pointer"
+                className="absolute top-4 right-4 p-2 rounded-full bg-[var(--brand-obsidian)] hover:bg-[var(--ui-raised)] text-[var(--ui-text)] hover:text-[var(--ui-text)] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -304,41 +304,41 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
               <img
                 src={selectedItemDetail.imageUrl}
                 alt={selectedItemDetail.name}
-                className="w-full h-52 object-cover rounded-2xl border border-[#E5DDD0]"
+                className="w-full h-52 object-cover rounded-2xl border border-[var(--ui-border)]"
               />
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-code uppercase font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span className="text-[10px] font-code uppercase font-bold px-2 py-0.5 rounded bg-[var(--ui-raised)] text-[var(--ui-success)] border border-[var(--brand-emerald)]">
                     {selectedItemDetail.category}
                   </span>
                   {selectedItemDetail.dietaryOrTag && (
-                    <span className="text-[10px] font-bold text-teal-800">
+                    <span className="text-[10px] font-bold text-[var(--brand-blue)]">
                       • {selectedItemDetail.dietaryOrTag}
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-[#0F291E]">{selectedItemDetail.name}</h3>
-                <p className="text-xs text-[#516E60] mt-2 leading-relaxed">
+                <h3 className="text-xl font-bold text-[var(--ui-text)]">{selectedItemDetail.name}</h3>
+                <p className="text-xs text-[var(--ui-muted)] mt-2 leading-relaxed">
                   {selectedItemDetail.description}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E5DDD0] flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-[var(--brand-obsidian)] border border-[var(--ui-border)] flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] text-[#516E60] uppercase font-code">Venue Counter Price</div>
-                  <div className="text-xl font-black text-emerald-800 font-code">
+                  <div className="text-[10px] text-[var(--ui-muted)] uppercase font-code">Venue Counter Price</div>
+                  <div className="text-xl font-black text-[var(--ui-success)] font-code">
                     ₦{selectedItemDetail.price.toLocaleString('en-NG')}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] text-amber-700 font-bold uppercase font-code">Payment Method</div>
-                  <div className="text-xs text-[#2D4A3E] font-medium">POS / Cash at Stall</div>
+                  <div className="text-[10px] text-[var(--brand-champagne)] font-bold uppercase font-code">Payment Method</div>
+                  <div className="text-xs text-[var(--ui-text)] font-medium">POS / Cash at Stall</div>
                 </div>
               </div>
 
-              <div className="text-[11px] text-[#375245] bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-start gap-2">
-                <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+              <div className="text-[11px] text-[var(--ui-muted)] bg-[var(--ui-raised)] border border-[var(--brand-emerald)] p-3 rounded-xl flex items-start gap-2">
+                <Info className="w-4 h-4 text-[var(--ui-success)] shrink-0 mt-0.5" />
                 <span>
                   Reminder: Food & drinks are purchased on-site and cannot be added to ticket checkout.
                 </span>

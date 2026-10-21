@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Waves, Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 interface NavbarProps {
   onOpenAdmin: () => void;
   isAdminLoggedIn: boolean;
@@ -21,11 +21,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
   return (
     <header className="hideout-nav">
-      <a href="#hero" className="brand">
-        <Waves size={30} strokeWidth={1.3} />
-        <span>
-          The Hideout<small>POOL EDITION</small>
-        </span>
+      <a href="#hero" className="brand brand-logo" aria-label="Vybecheck with Bama — home">
+        <img src="/images/vybecheck-logo.png" alt="Vybecheck with Bama" width="1563" height="1563" decoding="async" />
       </a>
       <nav
         className={open ? "site-nav is-open" : "site-nav"}

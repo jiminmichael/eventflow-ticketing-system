@@ -2,6 +2,7 @@ import { fallbackEvent, fallbackTicketTiers, fallbackMenuItems } from '../src/fa
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { SQLiteStore } from './sqlite-store.js';
 import { v4 as uuidv4 } from 'uuid';
 import {
   EventDetails,
@@ -14,7 +15,7 @@ import {
   PaymentStatus,
 } from '../src/types.js';
 
-interface DatabaseSchema {
+export interface DatabaseSchema {
   event: EventDetails;
   ticketTiers: TicketTier[];
   orders: Order[];
@@ -31,7 +32,8 @@ const SEED_DB_FILE = path.join(SEED_DATA_DIR, 'db.json');
 const DATA_DIR = process.env.DATA_DIR || (process.env.VERCEL
   ? path.join(os.tmpdir(), 'eventflow_data')
   : path.resolve(process.cwd(), 'data'));
-const DB_FILE = path.join(DATA_DIR, 'db.json');
+const DB_FILE = path.join(DATA_DIR, 'db.sqlite');
+const LEGACY_DB_FILE = path.join(DATA_DIR, 'db.json');
 
 // Default Seed Data for Party Platform
 const initialEvent = fallbackEvent;
@@ -285,8 +287,7 @@ function validateCatalog(data: Partial<TicketTier & MenuItem>, kind: 'ticket' | 
 
 class DatabaseService {
   private data: DatabaseSchema;
-  private isLoaded = false;
-  private writeLock = false;
+  private store!: SQLiteStore;
 
   constructor() {
     this.data = {
@@ -301,54 +302,49 @@ class DatabaseService {
   }
 
   private init() {
+    this.store = new SQLiteStore(DB_FILE);
     try {
-      if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true });
+      const existing = this.store.load();
+      if (existing) {
+        this.data = existing;
+        return;
       }
-
-      if (fs.existsSync(DB_FILE)) {
-        const fileContent = fs.readFileSync(DB_FILE, 'utf-8');
-        const parsed = JSON.parse(fileContent);
+      // Import once. Never overwrite an initialized SQLite database from JSON.
+      const legacyFile = fs.existsSync(LEGACY_DB_FILE) ? LEGACY_DB_FILE : SEED_DB_FILE;
+      if (fs.existsSync(legacyFile)) {
+        const parsed = JSON.parse(fs.readFileSync(legacyFile, 'utf-8'));
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          throw new Error('Invalid legacy database: expected an object.');
+        }
+        for (const key of ['ticketTiers', 'orders', 'attendees', 'menuItems', 'payments']) {
+          if (parsed[key] !== undefined && !Array.isArray(parsed[key])) {
+            throw new Error(`Invalid legacy database collection: ${key}`);
+          }
+        }
         this.data = {
           event: { ...initialEvent, ...(parsed.event || {}) },
-          ticketTiers: parsed.ticketTiers || initialTicketTiers,
-          orders: parsed.orders || initialOrders,
-          attendees: parsed.attendees || initialAttendees,
-          menuItems: parsed.menuItems || initialMenuItems,
-          payments: parsed.payments || initialPayments,
+          ticketTiers: parsed.ticketTiers ?? initialTicketTiers,
+          orders: parsed.orders ?? initialOrders,
+          attendees: parsed.attendees ?? initialAttendees,
+          menuItems: parsed.menuItems ?? initialMenuItems,
+          payments: parsed.payments ?? initialPayments,
         };
-      } else if (fs.existsSync(SEED_DB_FILE)) {
-        const fileContent = fs.readFileSync(SEED_DB_FILE, 'utf-8');
-        const parsed = JSON.parse(fileContent);
-        this.data = {
-          event: { ...initialEvent, ...(parsed.event || {}) },
-          ticketTiers: parsed.ticketTiers || initialTicketTiers,
-          orders: parsed.orders || initialOrders,
-          attendees: parsed.attendees || initialAttendees,
-          menuItems: parsed.menuItems || initialMenuItems,
-          payments: parsed.payments || initialPayments,
-        };
-        this.saveToDisk();
-      } else {
-        this.saveToDisk();
       }
-      this.isLoaded = true;
-    } catch (err) {
-      console.error('[DB] Error initializing database file, using in-memory state:', err);
-      this.isLoaded = true;
+      this.store.save(this.data);
+    } catch (error) {
+      this.store.close();
+      // Fail startup instead of accepting bookings that cannot be persisted.
+      throw error;
     }
   }
 
   private saveToDisk() {
     try {
-      if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true });
-      }
-      const tmpFile = `${DB_FILE}.tmp.${Date.now()}`;
-      fs.writeFileSync(tmpFile, JSON.stringify(this.data, null, 2), 'utf-8');
-      fs.renameSync(tmpFile, DB_FILE);
-    } catch (err) {
-      console.error('[DB] Failed to persist data to disk:', err);
+      this.store.save(this.data);
+    } catch (error) {
+      // Keep the service consistent with the last committed transaction.
+      this.data = this.store.load()!;
+      throw error;
     }
   }
 

@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "node --import tsx tests/system.test.ts && node --import tsx tests/commerce.test.ts && node --import tsx tests/admin.test.ts"
+    "test": "node --import tsx tests/sqlite.test.ts && node --import tsx tests/system.test.ts && node --import tsx tests/commerce.test.ts && node --import tsx tests/admin.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -39,5 +39,8 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   }
 }

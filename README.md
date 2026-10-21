@@ -4,6 +4,8 @@ React/Vite event site with an Express backend, Paystack-hosted checkout, individ
 
 ## Run locally
 
+Requires Node.js 22.13 or newer for built-in SQLite support.
+
 ```sh
 npm ci
 cp .env.example .env # Only if .env does not already exist.
@@ -23,7 +25,7 @@ Open `http://localhost:3000`. Administrator sign-in is at `/admin` or **Organize
 | `ADMIN_USERNAME` | Organizer login username. |
 | `ADMIN_PASSWORD` | Private organizer password. No built-in/default password is accepted. |
 | `ADMIN_SESSION_SECRET` | At least 32 characters; generate with `openssl rand -hex 32`. Sessions expire after eight hours. |
-| `DATA_DIR` | Optional persistent directory containing `db.json`; defaults to the local `data` directory. |
+| `DATA_DIR` | Optional persistent directory containing `db.sqlite`; defaults to the local `data` directory. |
 | `PORT` | Local server port, default `3000`. |
 
 Set the Paystack webhook URL to `https://your-domain/api/paystack/webhook`. The return URL is `/order-confirmation?reference=…`. Both return verification and signed webhooks verify the transaction on the backend before issuing confirmed passes. See [Paystack's checkout guide](https://paystack.com/docs/payments/accept-payments/) and [webhook guide](https://paystack.com/docs/payments/webhooks/).
@@ -57,11 +59,11 @@ All admin lists, mutations and exports require an authenticated bearer session. 
 
 ## Persistence and deployment
 
-This backend currently uses a JSON store intended for **one persistent server process**. Mount a durable disk at `DATA_DIR`, back it up, and keep secrets in the host's environment. Run `npm run build`, then `NODE_ENV=production npm start`.
+This backend uses SQLite (`data/db.sqlite` by default) through Node’s built-in `node:sqlite` module, with transactional writes and WAL journaling. Events, ticket tiers, orders, attendees, menu items and payments have separate tables; nested record fields are retained as JSON payloads. The service keeps an in-memory working copy and is intended for **one persistent server process**. Mount a durable disk at `DATA_DIR`, back it up using SQLite’s backup tooling (or stop the server before copying the database and any journal files), and keep secrets in the host's environment. Run `npm run build`, then `NODE_ENV=production npm start`.
 
 The existing Vercel adapter uses temporary filesystem storage. **Do not use that temporary store for real paid bookings**: it is not durable or shared across instances. A transactional hosted database is required before deploying payment processing to Vercel or multiple backend instances. The included rewrite routes support `/admin`, the Paystack return page and ticket downloads, but do not solve storage persistence.
 
-Existing historical orders, attendees and payments are preserved. Legacy ticket tiers are inactive; historical records remain available to administrators.
+On first startup, an existing `DATA_DIR/db.json` (or the bundled `data/db.json` seed) is imported into SQLite in one transaction. The JSON source is left untouched as a backup and is ignored once SQLite is initialized. Invalid imports or persistence failures raise errors rather than silently falling back to memory. Existing historical orders, attendees and payments are preserved. Legacy ticket tiers are inactive; historical records remain available to administrators.
 
 ## Checks
 
