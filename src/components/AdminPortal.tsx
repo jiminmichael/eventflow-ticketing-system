@@ -64,7 +64,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<
     'overview' | 'attendees' | 'tiers' | 'menu' | 'payments' | 'checkin' | 'settings'
-  >('overview');
+  >('attendees');
 
   // Login form state
   const [loginForm, setLoginForm] = useState({ username: 'admin', password: '' });
@@ -82,7 +82,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Filters for Attendees tab
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState('ALL');
-  const [paymentFilter, setPaymentFilter] = useState('ALL');
+  const [paymentFilter, setPaymentFilter] = useState('verified');
   const [checkinFilter, setCheckinFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState('');
 
@@ -107,9 +107,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     description: '',
     price: 25000,
     availableQuantity: 100,
+    inventoryUnlimited: true,
+    guestsPerTicket: 1,
     maxPerRegistration: 4,
     salesStartDate: '2026-08-01',
-    salesEndDate: '2026-11-13',
+    salesEndDate: '2026-11-28',
     benefits: '',
     isActive: true,
     badge: '',
@@ -171,6 +173,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         fetch('/api/admin/payments', { headers }),
       ]);
 
+      if ([statsRes, attendeesRes, paymentsRes].some(r => r.status === 401)) {
+        onLogout(); setLoginError('Your session expired. Please sign in again.'); return;
+      }
       if (statsRes.ok) setStats(await statsRes.json());
       if (attendeesRes.ok) {
         const attData = await attendeesRes.json();
@@ -303,9 +308,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
 
     const timestamp = new Date().toISOString().slice(0, 10);
-    const filename = `LagosPartyFiesta_Attendees_${type}_${timestamp}.${format}`;
+    const filename = `Hideout_Attendees_${type}_${timestamp}.${format}`;
     const url = `/api/admin/export/${type}?${params.toString()}`;
-    await downloadFile(url, filename, adminToken);
+    const result = await downloadFile(url, filename, adminToken);
+    if (!result.success) alert(result.message || 'Export failed. Please try again.');
   };
 
   const handleSaveTier = async (e: React.FormEvent) => {
@@ -318,6 +324,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       description: tierForm.description.trim(),
       price: Number(tierForm.price),
       availableQuantity: Number(tierForm.availableQuantity),
+      inventoryUnlimited: tierForm.inventoryUnlimited,
+      guestsPerTicket: tierForm.guestsPerTicket,
       maxPerRegistration: Number(tierForm.maxPerRegistration),
       salesStartDate: tierForm.salesStartDate,
       salesEndDate: tierForm.salesEndDate,
@@ -500,7 +508,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-extrabold text-[#0F291E]">Lagos Party Fiesta — Admin & Door Portal</h2>
+                <h2 className="text-lg font-extrabold text-[#0F291E]">The Hideout — Admin & Door Portal</h2>
                 <span className="text-[10px] font-code px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
                   Host Active
                 </span>
@@ -535,6 +543,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             <button
               onClick={onClose}
+              aria-label="Close administrator portal"
               className="p-2 rounded-xl text-[#516E60] hover:text-[#0F291E] hover:bg-[#FAF7F2] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -572,6 +581,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <input
                     type="text"
                     required
+                    aria-label="Administrator username"
+                    autoComplete="username"
                     value={loginForm.username}
                     onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
                     className="w-full bg-[#FAF7F2] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600 font-mono"
@@ -584,21 +595,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </label>
                   <input
                     type="password"
+                    autoComplete="current-password"
+                    aria-label="Administrator password"
                     required
                     placeholder="Enter admin password"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                     className="w-full bg-[#FAF7F2] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#0F291E] focus:outline-none focus:border-emerald-600"
                   />
-                </div>
-
-                {/* Convenience Demo Notice */}
-                <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E5DDD0] text-[11px] text-[#516E60] space-y-1">
-                  <div className="text-emerald-800 font-bold">Standard Credentials (.env.example):</div>
-                  <div className="font-mono text-[#2D4A3E]">
-                    Username: <span className="text-[#0F291E] font-bold">admin</span> | Password:{' '}
-                    <span className="text-[#0F291E] font-bold">Admin@2026!</span>
-                  </div>
                 </div>
 
                 <button
@@ -705,7 +709,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 p-6 overflow-y-auto bg-zinc-950">
+            <div className="flex-1 p-6 overflow-y-auto bg-[#F3EFE6]">
               {/* TAB 1: OVERVIEW & STATS */}
               {activeTab === 'overview' && stats && (
                 <div className="space-y-6">
@@ -713,18 +717,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-zinc-900 to-zinc-900 border border-emerald-500/30 shadow-lg space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-emerald-400" />
-                        <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                        <TrendingUp className="w-5 h-5 text-emerald-800" />
+                        <h4 className="text-sm font-bold text-[#253C3B] uppercase tracking-wider font-mono">
                           Total Verified Revenue: ₦{stats.totalVerifiedRevenue.toLocaleString('en-NG')}
                         </h4>
                       </div>
-                      <span className="text-xs text-zinc-400 font-mono">
+                      <span className="text-xs text-[#52635F] font-mono">
                         Target Goal: ₦10,000,000 (
                         {Math.round((stats.totalVerifiedRevenue / 10000000) * 100)}% achieved)
                       </span>
                     </div>
 
-                    <div className="w-full h-3 rounded-full bg-zinc-950 overflow-hidden border border-zinc-800">
+                    <div className="w-full h-3 rounded-full bg-[#F3EFE6] overflow-hidden border border-[#D5CDC0]">
                       <div
                         className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 rounded-full transition-all duration-500"
                         style={{
@@ -736,74 +740,74 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                   {/* Top Stats Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800">
-                      <div className="flex items-center justify-between text-zinc-400 text-xs font-semibold">
+                    <div className="p-5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
+                      <div className="flex items-center justify-between text-[#52635F] text-xs font-semibold">
                         <span>Total Revenue</span>
-                        <DollarSign className="w-4 h-4 text-emerald-400" />
+                        <DollarSign className="w-4 h-4 text-emerald-800" />
                       </div>
-                      <div className="text-2xl font-extrabold text-emerald-400 font-mono mt-2">
+                      <div className="text-2xl font-extrabold text-emerald-800 font-mono mt-2">
                         ₦{stats.totalVerifiedRevenue.toLocaleString('en-NG')}
                       </div>
-                      <div className="text-[11px] text-zinc-500 mt-1">
+                      <div className="text-[11px] text-[#52635F] mt-1">
                         From {stats.paidOrdersCount} verified Paystack orders
                       </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800">
-                      <div className="flex items-center justify-between text-zinc-400 text-xs font-semibold">
+                    <div className="p-5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
+                      <div className="flex items-center justify-between text-[#52635F] text-xs font-semibold">
                         <span>Confirmed Attendees</span>
-                        <Users className="w-4 h-4 text-amber-400" />
+                        <Users className="w-4 h-4 text-amber-800" />
                       </div>
-                      <div className="text-2xl font-extrabold text-white font-mono mt-2">
+                      <div className="text-2xl font-extrabold text-[#253C3B] font-mono mt-2">
                         {stats.totalConfirmedAttendees}
                       </div>
-                      <div className="text-[11px] text-zinc-500 mt-1">
+                      <div className="text-[11px] text-[#52635F] mt-1">
                         Active UUID passes generated
                       </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800">
-                      <div className="flex items-center justify-between text-zinc-400 text-xs font-semibold">
+                    <div className="p-5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
+                      <div className="flex items-center justify-between text-[#52635F] text-xs font-semibold">
                         <span>Tickets Sold / Inventory</span>
                         <Ticket className="w-4 h-4 text-teal-400" />
                       </div>
                       <div className="text-2xl font-extrabold text-teal-400 font-mono mt-2">
-                        {stats.totalSoldTickets} / {stats.totalAvailableInventory}
+                        {stats.totalSoldTickets} / {tiers.some(t=>t.isActive && t.inventoryUnlimited) ? 'No overall limit set' : stats.totalAvailableInventory}
                       </div>
-                      <div className="text-[11px] text-zinc-500 mt-1">
-                        {Math.round((stats.totalSoldTickets / (stats.totalAvailableInventory || 1)) * 100)}% capacity sold
+                      <div className="text-[11px] text-[#52635F] mt-1">
+                        {tiers.some(t=>t.isActive && t.inventoryUnlimited) ? 'Set capacity per tier in Ticket Tiers.' : `${Math.round((stats.totalSoldTickets / (stats.totalAvailableInventory || 1)) * 100)}% capacity sold`}
                       </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800">
-                      <div className="flex items-center justify-between text-zinc-400 text-xs font-semibold">
+                    <div className="p-5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
+                      <div className="flex items-center justify-between text-[#52635F] text-xs font-semibold">
                         <span>Pending / Failed Orders</span>
-                        <Clock className="w-4 h-4 text-zinc-400" />
+                        <Clock className="w-4 h-4 text-[#52635F]" />
                       </div>
-                      <div className="text-2xl font-extrabold text-zinc-300 font-mono mt-2">
+                      <div className="text-2xl font-extrabold text-[#52635F] font-mono mt-2">
                         {stats.pendingOrdersCount} / {stats.failedOrdersCount}
                       </div>
-                      <div className="text-[11px] text-zinc-500 mt-1">
+                      <div className="text-[11px] text-[#52635F] mt-1">
                         Unconfirmed checkout attempts
                       </div>
                     </div>
                   </div>
 
                   {/* Ticket Tier Breakdown */}
-                  <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-4">
-                    <h3 className="text-base font-bold text-white">Ticket Sales by Category</h3>
+                  <div className="p-6 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] space-y-4">
+                    <h3 className="text-base font-bold text-[#253C3B]">Ticket Sales by Category</h3>
                     <div className="space-y-3.5">
                       {stats.tierBreakdown.map((t) => (
                         <div key={t.id} className="space-y-1.5">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-white">
+                            <span className="font-semibold text-[#253C3B]">
                               {t.name} (₦{t.price.toLocaleString('en-NG')})
                             </span>
-                            <span className="text-zinc-400 font-mono">
-                              {t.sold} / {t.available} sold ({t.percentSold}%) • ₦{t.revenue.toLocaleString('en-NG')}
+                            <span className="text-[#52635F] font-mono">
+                              {t.sold} sold {tiers.find(tier=>tier.id===t.id)?.inventoryUnlimited ? '(no limit set)' : `/ ${t.available} (${t.percentSold}%)`} • ₦{t.revenue.toLocaleString('en-NG')}
                             </span>
                           </div>
-                          <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+                          <div className="w-full h-2 rounded-full bg-[#F3EFE6] overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full"
                               style={{ width: `${Math.min(100, t.percentSold)}%` }}
@@ -815,13 +819,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </div>
 
                   {/* Spreadsheet Export Launch Bar */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-900 to-zinc-950 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-900 to-zinc-950 border border-[#D5CDC0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                        <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                      <h4 className="text-sm font-bold text-[#253C3B] flex items-center gap-2">
+                        <FileSpreadsheet className="w-4 h-4 text-emerald-800" />
                         Spreadsheet Export Hub
                       </h4>
-                      <p className="text-xs text-zinc-400 mt-0.5">
+                      <p className="text-xs text-[#52635F] mt-0.5">
                         Download attendee databases and financial reports with text-formatted UUIDs.
                       </p>
                     </div>
@@ -836,14 +840,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </button>
                       <button
                         onClick={() => handleDownloadExport('paid', 'xlsx')}
-                        className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#F3EFE6] text-[#52635F] hover:bg-[#F3EFE6] transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Paid Attendees</span>
                       </button>
                       <button
                         onClick={() => handleDownloadExport('payments', 'xlsx')}
-                        className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#F3EFE6] text-[#52635F] hover:bg-[#F3EFE6] transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Payment Report</span>
@@ -857,17 +861,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               {activeTab === 'attendees' && (
                 <div className="space-y-4">
                   {/* Filter & Export Bar */}
-                  <div className="p-4 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-3">
+                  <div className="p-4 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                       {/* Search Input */}
                       <div className="relative lg:col-span-2">
-                        <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
+                        <Search className="w-4 h-4 text-[#52635F] absolute left-3 top-3" />
                         <input
                           type="text"
                           placeholder="Search UUID, name, email, phone, order ref..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 bg-zinc-950 border border-zinc-700 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 placeholder:text-zinc-600"
+                          className="w-full pl-9 pr-3 py-2 bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl text-xs text-[#253C3B] focus:outline-none focus:border-amber-500 placeholder:text-zinc-600"
                         />
                       </div>
 
@@ -875,7 +879,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <select
                         value={tierFilter}
                         onChange={(e) => setTierFilter(e.target.value)}
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                        className="bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-xs text-[#253C3B] focus:outline-none"
                       >
                         <option value="ALL">All Ticket Tiers</option>
                         {tiers.map((t) => (
@@ -889,7 +893,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <select
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value)}
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                        className="bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-xs text-[#253C3B] focus:outline-none"
                       >
                         <option value="ALL">All Payment Statuses</option>
                         <option value="verified">Verified (Paid)</option>
@@ -901,7 +905,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <select
                         value={checkinFilter}
                         onChange={(e) => setCheckinFilter(e.target.value)}
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                        className="bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-xs text-[#253C3B] focus:outline-none"
                       >
                         <option value="ALL">All Check-In States</option>
                         <option value="true">Checked In Only</option>
@@ -910,9 +914,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </div>
 
                     {/* Export Actions for Current View */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-800 text-xs">
-                      <div className="text-zinc-400">
-                        Showing <strong className="text-white">{filteredAttendees.length}</strong> of{' '}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#D5CDC0] text-xs">
+                      <div className="text-[#52635F]">
+                        Showing <strong className="text-[#253C3B]">{filteredAttendees.length}</strong> of{' '}
                         {attendees.length} total attendees
                       </div>
 
@@ -926,7 +930,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         </button>
                         <button
                           onClick={() => handleDownloadExport('filtered', 'csv')}
-                          className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#F3EFE6] text-[#52635F] hover:text-[#253C3B] transition-colors flex items-center gap-1.5 cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Export CSV</span>
@@ -936,9 +940,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </div>
 
                   {/* Attendees Table */}
-                  <div className="rounded-3xl bg-zinc-900 border border-zinc-800 overflow-x-auto shadow-xl">
-                    <table className="w-full text-left text-xs text-zinc-300">
-                      <thead className="bg-zinc-950/80 text-zinc-400 font-mono uppercase text-[10px] border-b border-zinc-800">
+                  <div className="rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] overflow-x-auto shadow-xl">
+                    <table className="w-full text-left text-xs text-[#52635F]">
+                      <thead className="bg-[#F3EFE6] text-[#52635F] font-mono uppercase text-[10px] border-b border-[#D5CDC0]">
                         <tr>
                           <th className="p-3.5">Attendee UUID</th>
                           <th className="p-3.5">Name</th>
@@ -953,46 +957,46 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <tbody className="divide-y divide-zinc-800/80 font-normal">
                         {filteredAttendees.length === 0 ? (
                           <tr>
-                            <td colSpan={8} className="p-8 text-center text-zinc-500">
+                            <td colSpan={8} className="p-8 text-center text-[#52635F]">
                               No attendees match your filter criteria.
                             </td>
                           </tr>
                         ) : (
                           filteredAttendees.map((att) => (
-                            <tr key={att.uuid} className="hover:bg-zinc-800/40 transition-colors">
-                              <td className="p-3.5 font-mono text-[11px] text-zinc-400 max-w-[140px] truncate" title={att.uuid}>
+                            <tr key={att.uuid} className="hover:bg-[#F3EFE6] transition-colors">
+                              <td className="p-3.5 font-mono text-[11px] text-[#52635F] min-w-[230px] break-all" title={att.uuid}>
                                 {att.uuid}
                               </td>
-                              <td className="p-3.5 font-semibold text-white">
+                              <td className="p-3.5 font-semibold text-[#253C3B]">
                                 <div>{att.firstName} {att.lastName}</div>
                                 {att.institution && (
-                                  <div className="text-[10px] text-zinc-500">{att.institution}</div>
+                                  <div className="text-[10px] text-[#52635F]">{att.institution}</div>
                                 )}
                               </td>
                               <td className="p-3.5 text-[11px]">
                                 <div>{att.email}</div>
-                                <div className="text-zinc-500 font-mono">{att.phone}</div>
+                                <div className="text-[#52635F] font-mono">{att.phone}</div>
                               </td>
-                              <td className="p-3.5 font-medium text-amber-300">
+                              <td className="p-3.5 font-medium text-amber-800">
                                 <div>{att.ticketTierName}</div>
-                                <div className="text-[10px] text-zinc-500 font-mono">{att.ticketCode}</div>
+                                <div className="text-[10px] text-[#52635F] font-mono">{att.ticketCode}</div>
                               </td>
-                              <td className="p-3.5 font-mono text-[11px] text-zinc-400">
+                              <td className="p-3.5 font-mono text-[11px] text-[#52635F]">
                                 {att.orderReference}
                               </td>
                               <td className="p-3.5">
                                 {att.paymentStatus === 'verified' ? (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-500/30">
                                     <CheckCircle2 className="w-3 h-3" />
                                     Verified
                                   </span>
                                 ) : att.paymentStatus === 'pending' ? (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-950 text-amber-400 border border-amber-500/30">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-500/30">
                                     <Clock className="w-3 h-3" />
                                     Pending
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-950 text-rose-400 border border-rose-500/30">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-800 border border-rose-500/30">
                                     <XCircle className="w-3 h-3" />
                                     Failed
                                   </span>
@@ -1004,8 +1008,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                                   onClick={() => handleToggleCheckin(att.uuid)}
                                   className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer ${
                                     att.checkedIn
-                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-rose-500/20 hover:text-rose-300'
-                                      : 'bg-zinc-800 text-zinc-400 hover:bg-emerald-500 hover:text-zinc-950'
+                                      ? 'bg-emerald-500/20 text-emerald-800 border border-emerald-500/40 hover:bg-rose-500/20 hover:text-rose-800'
+                                      : 'bg-[#F3EFE6] text-[#52635F] hover:bg-emerald-500 hover:text-zinc-950'
                                   }`}
                                   title="Toggle check-in status"
                                 >
@@ -1015,7 +1019,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               <td className="p-3.5 text-right">
                                 <button
                                   onClick={() => setViewingAttendee(att)}
-                                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-lg text-[#52635F] hover:text-[#253C3B] hover:bg-[#F3EFE6] transition-colors cursor-pointer"
                                   title="View Attendee Record"
                                 >
                                   <Eye className="w-4 h-4" />
@@ -1033,13 +1037,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               {/* TAB 3: GATE CHECK-IN SCANNER */}
               {activeTab === 'checkin' && (
                 <div className="max-w-2xl mx-auto space-y-6">
-                  <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 text-center space-y-5">
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+                  <div className="p-8 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] text-center space-y-5">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
                       <QrCode className="w-7 h-7" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-extrabold text-white">Event Entrance Check-In</h3>
-                      <p className="text-xs text-zinc-400 mt-1 max-w-md mx-auto">
+                      <h3 className="text-2xl font-extrabold text-[#253C3B]">Event Entrance Check-In</h3>
+                      <p className="text-xs text-[#52635F] mt-1 max-w-md mx-auto">
                         Scan with physical barcode scanner or paste an attendee Ticket Code (e.g. NVT-VIP-74921) or UUID for admission.
                       </p>
                     </div>
@@ -1051,7 +1055,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         placeholder="Scan or paste Ticket Code or UUID..."
                         value={checkinInput}
                         onChange={(e) => setCheckinInput(e.target.value)}
-                        className="flex-1 bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3.5 text-sm text-white font-mono focus:outline-none focus:border-emerald-500"
+                        className="flex-1 bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-4 py-3.5 text-sm text-[#253C3B] font-mono focus:outline-none focus:border-emerald-500"
                       />
                       <button
                         type="submit"
@@ -1066,32 +1070,32 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <div
                       className={`p-6 rounded-3xl border text-sm space-y-3 ${
                         checkinResult.success
-                          ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
-                          : 'bg-rose-950/60 border-rose-500/40 text-rose-200'
+                          ? 'bg-emerald-50 border-emerald-500/40 text-emerald-800'
+                          : 'bg-rose-50 border-rose-500/40 text-rose-800'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 font-bold text-base">
                         {checkinResult.success ? (
-                          <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                          <CheckCircle2 className="w-6 h-6 text-emerald-800" />
                         ) : (
-                          <XCircle className="w-6 h-6 text-rose-400" />
+                          <XCircle className="w-6 h-6 text-rose-800" />
                         )}
                         <span>{checkinResult.message}</span>
                       </div>
 
                       {checkinResult.attendee && (
-                        <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 text-xs font-mono text-zinc-300 space-y-1.5">
+                        <div className="p-4 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0] text-xs font-mono text-[#52635F] space-y-1.5">
                           <div className="flex justify-between">
                             <span>Name:</span>
-                            <span className="text-white font-bold">{checkinResult.attendee.firstName} {checkinResult.attendee.lastName}</span>
+                            <span className="text-[#253C3B] font-bold">{checkinResult.attendee.firstName} {checkinResult.attendee.lastName}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Tier:</span>
-                            <span className="text-amber-400">{checkinResult.attendee.ticketTierName}</span>
+                            <span className="text-amber-800">{checkinResult.attendee.ticketTierName}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Ticket Code:</span>
-                            <span className="text-white font-bold">{checkinResult.attendee.ticketCode}</span>
+                            <span className="text-[#253C3B] font-bold">{checkinResult.attendee.ticketCode}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Order Ref:</span>
@@ -1109,8 +1113,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-base font-bold text-white">Ticket Tier Configuration</h3>
-                      <p className="text-xs text-zinc-400">
+                      <h3 className="text-base font-bold text-[#253C3B]">Ticket Tier Configuration</h3>
+                      <p className="text-xs text-[#52635F]">
                         Create, edit, or adjust pricing & inventory for all event ticket categories.
                       </p>
                     </div>
@@ -1124,9 +1128,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           description: '',
                           price: 25000,
                           availableQuantity: 100,
+    inventoryUnlimited: true,
+    guestsPerTicket: 1,
                           maxPerRegistration: 4,
                           salesStartDate: '2026-08-01',
-                          salesEndDate: '2026-11-13',
+                          salesEndDate: '2026-11-28',
                           benefits: '',
                           isActive: true,
                           badge: '',
@@ -1144,17 +1150,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     {tiers.map((t) => (
                       <div
                         key={t.id}
-                        className="p-5 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-3"
+                        className="p-5 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-mono font-bold text-amber-400">
+                          <span className="text-xs font-mono font-bold text-amber-800">
                             {t.code} PASS
                           </span>
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
                               t.isActive
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                : 'bg-zinc-800 text-zinc-500'
+                                ? 'bg-emerald-500/20 text-emerald-800 border border-emerald-500/30'
+                                : 'bg-[#F3EFE6] text-[#52635F]'
                             }`}
                           >
                             {t.isActive ? 'Active' : 'Inactive'}
@@ -1162,26 +1168,26 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         </div>
 
                         <div>
-                          <h4 className="text-lg font-bold text-white">{t.name}</h4>
-                          <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2">{t.description}</p>
+                          <h4 className="text-lg font-bold text-[#253C3B]">{t.name}</h4>
+                          <p className="text-xs text-[#52635F] mt-0.5 line-clamp-2">{t.description}</p>
                         </div>
 
-                        <div className="pt-2 border-t border-zinc-800 flex justify-between text-xs">
+                        <div className="pt-2 border-t border-[#D5CDC0] flex justify-between text-xs">
                           <div>
-                            <span className="text-zinc-500 block text-[10px]">Price (NGN)</span>
-                            <span className="font-extrabold text-white font-mono text-sm">
+                            <span className="text-[#52635F] block text-[10px]">Price (NGN)</span>
+                            <span className="font-extrabold text-[#253C3B] font-mono text-sm">
                               ₦{t.price.toLocaleString('en-NG')}
                             </span>
                           </div>
                           <div>
-                            <span className="text-zinc-500 block text-[10px]">Sold / Slots</span>
-                            <span className="font-bold text-emerald-400 font-mono">
-                              {t.soldQuantity} / {t.availableQuantity}
+                            <span className="text-[#52635F] block text-[10px]">Sold / Slots</span>
+                            <span className="font-bold text-emerald-800 font-mono">
+                              {t.soldQuantity} / {t.inventoryUnlimited ? 'No limit set' : t.availableQuantity}
                             </span>
                           </div>
                         </div>
 
-                        <div className="pt-2 flex items-center justify-end gap-2 border-t border-zinc-800/60">
+                        <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#D5CDC0]">
                           <button
                             onClick={() => {
                               setEditingTier(t);
@@ -1191,6 +1197,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                                 description: t.description,
                                 price: t.price,
                                 availableQuantity: t.availableQuantity,
+                                inventoryUnlimited: Boolean(t.inventoryUnlimited),
+                                guestsPerTicket: t.guestsPerTicket || 1,
                                 maxPerRegistration: t.maxPerRegistration,
                                 salesStartDate: t.salesStartDate,
                                 salesEndDate: t.salesEndDate,
@@ -1200,14 +1208,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               });
                               setTierModalOpen(true);
                             }}
-                            className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-[#F3EFE6] hover:bg-[#F3EFE6] text-[#52635F] hover:text-[#253C3B] transition-colors cursor-pointer"
                             title="Edit Tier"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteTier(t.id)}
-                            className="p-2 rounded-xl bg-zinc-800 hover:bg-rose-900/60 text-zinc-400 hover:text-rose-300 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-[#F3EFE6] hover:bg-rose-900/60 text-[#52635F] hover:text-rose-800 transition-colors cursor-pointer"
                             title="Delete or Deactivate"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1224,10 +1232,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-base font-bold text-white">Event Menu Offerings Management</h3>
-                      <p className="text-xs text-zinc-400">
+                      <h3 className="text-base font-bold text-[#253C3B]">Event Menu Offerings Management</h3>
+                      <p className="text-xs text-[#52635F]">
                         Manage food, drinks, and merchandise displayed on the public event page.
-                        <span className="text-amber-300 font-semibold block sm:inline sm:ml-1">
+                        <span className="text-amber-800 font-semibold block sm:inline sm:ml-1">
                           (View-only on frontend — items are strictly non-purchasable online).
                         </span>
                       </p>
@@ -1255,9 +1263,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </button>
                   </div>
 
-                  <div className="rounded-3xl bg-zinc-900 border border-zinc-800 overflow-x-auto shadow-xl">
-                    <table className="w-full text-left text-xs text-zinc-300">
-                      <thead className="bg-zinc-950/80 text-zinc-400 font-mono uppercase text-[10px] border-b border-zinc-800">
+                  <div className="rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] overflow-x-auto shadow-xl">
+                    <table className="w-full text-left text-xs text-[#52635F]">
+                      <thead className="bg-[#F3EFE6] text-[#52635F] font-mono uppercase text-[10px] border-b border-[#D5CDC0]">
                         <tr>
                           <th className="p-3.5">Order</th>
                           <th className="p-3.5">Item Name</th>
@@ -1269,31 +1277,31 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </thead>
                       <tbody className="divide-y divide-zinc-800/80">
                         {menuItems.map((item) => (
-                          <tr key={item.id} className="hover:bg-zinc-800/40 transition-colors">
-                            <td className="p-3.5 font-mono text-zinc-500">{item.displayOrder}</td>
-                            <td className="p-3.5 font-semibold text-white">
+                          <tr key={item.id} className="hover:bg-[#F3EFE6] transition-colors">
+                            <td className="p-3.5 font-mono text-[#52635F]">{item.displayOrder}</td>
+                            <td className="p-3.5 font-semibold text-[#253C3B]">
                               <div className="flex items-center gap-3">
                                 {item.imageUrl ? (
                                   <img
                                     src={item.imageUrl}
                                     alt={item.name}
-                                    className="w-10 h-10 rounded-lg object-cover bg-zinc-800"
+                                    className="w-10 h-10 rounded-lg object-cover bg-[#F3EFE6]"
                                   />
                                 ) : (
-                                  <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-500">
+                                  <div className="w-10 h-10 rounded-lg bg-[#F3EFE6] flex items-center justify-center text-[#52635F]">
                                     <UtensilsCrossed className="w-5 h-5" />
                                   </div>
                                 )}
                                 <div>
                                   <div>{item.name}</div>
-                                  <div className="text-[10px] text-zinc-400 line-clamp-1 max-w-xs font-normal">
+                                  <div className="text-[10px] text-[#52635F] line-clamp-1 max-w-xs font-normal">
                                     {item.description}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="p-3.5 font-mono text-[11px] text-amber-300">{item.category}</td>
-                            <td className="p-3.5 font-mono font-bold text-white">
+                            <td className="p-3.5 font-mono text-[11px] text-amber-800">{item.category}</td>
+                            <td className="p-3.5 font-mono font-bold text-[#253C3B]">
                               ₦{item.price.toLocaleString('en-NG')}
                             </td>
                             <td className="p-3.5">
@@ -1302,8 +1310,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                                 onClick={() => handleToggleMenuAvailability(item)}
                                 className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-colors cursor-pointer ${
                                   item.isAvailable
-                                    ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
-                                    : 'bg-zinc-800 text-zinc-500'
+                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-500/30'
+                                    : 'bg-[#F3EFE6] text-[#52635F]'
                                 }`}
                               >
                                 {item.isAvailable ? 'Available at Event' : 'Currently Unavailable'}
@@ -1325,14 +1333,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                                   });
                                   setMenuModalOpen(true);
                                 }}
-                                className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg bg-[#F3EFE6] hover:bg-[#F3EFE6] text-[#52635F] hover:text-[#253C3B] transition-colors cursor-pointer"
                                 title="Edit Item"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteMenuItem(item.id)}
-                                className="p-1.5 rounded-lg bg-zinc-800 hover:bg-rose-900/60 text-zinc-400 hover:text-rose-300 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg bg-[#F3EFE6] hover:bg-rose-900/60 text-[#52635F] hover:text-rose-800 transition-colors cursor-pointer"
                                 title="Delete Item"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1351,8 +1359,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-base font-bold text-white">Paystack Payment Audit Trail</h3>
-                      <p className="text-xs text-zinc-400">
+                      <h3 className="text-base font-bold text-[#253C3B]">Paystack Payment Audit Trail</h3>
+                      <p className="text-xs text-[#52635F]">
                         Immutable ledger of payment attempts, webhook callbacks, gateway confirmations, and amounts.
                       </p>
                     </div>
@@ -1366,9 +1374,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </button>
                   </div>
 
-                  <div className="rounded-3xl bg-zinc-900 border border-zinc-800 overflow-x-auto shadow-xl">
-                    <table className="w-full text-left text-xs text-zinc-300">
-                      <thead className="bg-zinc-950/80 text-zinc-400 font-mono uppercase text-[10px] border-b border-zinc-800">
+                  <div className="rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] overflow-x-auto shadow-xl">
+                    <table className="w-full text-left text-xs text-[#52635F]">
+                      <thead className="bg-[#F3EFE6] text-[#52635F] font-mono uppercase text-[10px] border-b border-[#D5CDC0]">
                         <tr>
                           <th className="p-3.5">Payment Reference</th>
                           <th className="p-3.5">Order Ref</th>
@@ -1381,26 +1389,26 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </thead>
                       <tbody className="divide-y divide-zinc-800/80 font-mono text-[11px]">
                         {payments.map((p) => (
-                          <tr key={p.id} className="hover:bg-zinc-800/40 transition-colors">
-                            <td className="p-3.5 font-bold text-white">{p.paymentReference}</td>
-                            <td className="p-3.5 text-zinc-400">{p.orderReference}</td>
-                            <td className="p-3.5 font-bold text-emerald-400">
+                          <tr key={p.id} className="hover:bg-[#F3EFE6] transition-colors">
+                            <td className="p-3.5 font-bold text-[#253C3B]">{p.paymentReference}</td>
+                            <td className="p-3.5 text-[#52635F]">{p.orderReference}</td>
+                            <td className="p-3.5 font-bold text-emerald-800">
                               ₦{p.amount.toLocaleString('en-NG')}
                             </td>
-                            <td className="p-3.5 text-zinc-300 uppercase">{p.channel || 'online'}</td>
+                            <td className="p-3.5 text-[#52635F] uppercase">{p.channel || 'online'}</td>
                             <td className="p-3.5">
                               {p.status === 'verified' ? (
-                                <span className="text-emerald-400 font-semibold">VERIFIED</span>
+                                <span className="text-emerald-800 font-semibold">VERIFIED</span>
                               ) : p.status === 'pending' ? (
-                                <span className="text-amber-400 font-semibold">PENDING</span>
+                                <span className="text-amber-800 font-semibold">PENDING</span>
                               ) : (
-                                <span className="text-rose-400 font-semibold">FAILED</span>
+                                <span className="text-rose-800 font-semibold">FAILED</span>
                               )}
                             </td>
-                            <td className="p-3.5 text-zinc-400 max-w-xs truncate" title={p.gatewayResponse}>
+                            <td className="p-3.5 text-[#52635F] max-w-xs truncate" title={p.gatewayResponse}>
                               {p.gatewayResponse || 'Initialized'}
                             </td>
-                            <td className="p-3.5 text-zinc-500">
+                            <td className="p-3.5 text-[#52635F]">
                               {new Date(p.createdAt).toLocaleString()}
                             </td>
                           </tr>
@@ -1415,16 +1423,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               {activeTab === 'settings' && (
                 <div className="max-w-3xl space-y-6">
                   <div>
-                    <h3 className="text-base font-bold text-white">Event Configuration</h3>
-                    <p className="text-xs text-zinc-400">
+                    <h3 className="text-base font-bold text-[#253C3B]">Event Configuration</h3>
+                    <p className="text-xs text-[#52635F]">
                       Update live summit titles, banner visuals, venue location, and contact information.
                     </p>
                   </div>
 
                   <form onSubmit={handleSaveEventSettings} className="space-y-4">
-                    <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-4 text-xs">
+                    <div className="p-6 rounded-3xl bg-[#F3EFE6] border border-[#D5CDC0] space-y-4 text-xs">
                       <div>
-                        <label className="block text-zinc-300 font-semibold mb-1">
+                        <label className="block text-[#52635F] font-semibold mb-1">
                           Summit Title
                         </label>
                         <input
@@ -1434,12 +1442,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           onChange={(e) =>
                             setEventSettingsForm({ ...eventSettingsForm, title: e.target.value })
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-zinc-300 font-semibold mb-1">
+                        <label className="block text-[#52635F] font-semibold mb-1">
                           Summit Theme
                         </label>
                         <input
@@ -1449,37 +1457,37 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           onChange={(e) =>
                             setEventSettingsForm({ ...eventSettingsForm, theme: e.target.value })
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3.5 py-2.5 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-zinc-300 font-semibold mb-1">Dates</label>
+                          <label className="block text-[#52635F] font-semibold mb-1">Dates</label>
                           <input
                             type="text"
                             value={eventSettingsForm.date}
                             onChange={(e) =>
                               setEventSettingsForm({ ...eventSettingsForm, date: e.target.value })
                             }
-                            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                            className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                           />
                         </div>
                         <div>
-                          <label className="block text-zinc-300 font-semibold mb-1">Venue Name</label>
+                          <label className="block text-[#52635F] font-semibold mb-1">Venue Name</label>
                           <input
                             type="text"
                             value={eventSettingsForm.venue}
                             onChange={(e) =>
                               setEventSettingsForm({ ...eventSettingsForm, venue: e.target.value })
                             }
-                            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                            className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-zinc-300 font-semibold mb-1">
+                        <label className="block text-[#52635F] font-semibold mb-1">
                           Banner Image URL
                         </label>
                         <input
@@ -1491,12 +1499,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               bannerImage: e.target.value,
                             })
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-zinc-300 font-semibold mb-1">
+                        <label className="block text-[#52635F] font-semibold mb-1">
                           Full Summit Description
                         </label>
                         <textarea
@@ -1508,7 +1516,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               description: e.target.value,
                             })
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
+                          className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl p-3 text-sm text-[#253C3B] focus:outline-none focus:border-amber-500"
                         />
                       </div>
 
@@ -1529,12 +1537,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* MODAL: VIEW SINGLE ATTENDEE RECORD */}
         {viewingAttendee && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl p-6 text-white space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h4 className="text-base font-bold text-white">Attendee Registration Record</h4>
+            <div className="relative w-full max-w-lg bg-[#F3EFE6] border border-[#D5CDC0] rounded-3xl p-6 text-[#253C3B] space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[#D5CDC0] pb-3">
+                <h4 className="text-base font-bold text-[#253C3B]">Attendee Registration Record</h4>
                 <button
                   onClick={() => setViewingAttendee(null)}
-                  className="p-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1542,39 +1550,39 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
               <div className="space-y-3.5 text-xs">
                 <div>
-                  <span className="text-zinc-500 text-[10px] uppercase font-mono block">
+                  <span className="text-[#52635F] text-[10px] uppercase font-mono block">
                     Attendee Full Name
                   </span>
-                  <div className="text-xl font-extrabold text-white mt-0.5">
+                  <div className="text-xl font-extrabold text-[#253C3B] mt-0.5">
                     {viewingAttendee.firstName} {viewingAttendee.lastName}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
+                <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
                   <div>
-                    <span className="text-zinc-500 text-[10px] block font-mono">Ticket Code</span>
-                    <span className="font-mono font-bold text-white text-sm">
+                    <span className="text-[#52635F] text-[10px] block font-mono">Ticket Code</span>
+                    <span className="font-mono font-bold text-[#253C3B] text-sm">
                       {viewingAttendee.ticketCode}
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-500 text-[10px] block font-mono">Pass Tier</span>
-                    <span className="font-semibold text-amber-300">
+                    <span className="text-[#52635F] text-[10px] block font-mono">Pass Tier</span>
+                    <span className="font-semibold text-amber-800">
                       {viewingAttendee.ticketTierName}
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-500 text-[10px] block font-mono">Email</span>
-                    <span className="text-zinc-300">{viewingAttendee.email}</span>
+                    <span className="text-[#52635F] text-[10px] block font-mono">Email</span>
+                    <span className="text-[#52635F]">{viewingAttendee.email}</span>
                   </div>
                   <div>
-                    <span className="text-zinc-500 text-[10px] block font-mono">Phone</span>
-                    <span className="text-zinc-300">{viewingAttendee.phone}</span>
+                    <span className="text-[#52635F] text-[10px] block font-mono">Phone</span>
+                    <span className="text-[#52635F]">{viewingAttendee.phone}</span>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center text-[10px] text-zinc-400 font-mono mb-1">
+                  <div className="flex justify-between items-center text-[10px] text-[#52635F] font-mono mb-1">
                     <span>UNIQUE BACKEND UUID (SYSTEM KEY)</span>
                     <button
                       type="button"
@@ -1583,23 +1591,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         setCopiedAttendeeUuid(true);
                         setTimeout(() => setCopiedAttendeeUuid(false), 2000);
                       }}
-                      className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer font-sans"
+                      className="text-emerald-800 hover:text-emerald-800 flex items-center gap-1 cursor-pointer font-sans"
                     >
-                      {copiedAttendeeUuid ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedAttendeeUuid ? <Check className="w-3 h-3 text-emerald-800" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedAttendeeUuid ? 'Copied' : 'Copy UUID'}</span>
                     </button>
                   </div>
-                  <div className="p-3 rounded-2xl bg-zinc-900 font-mono text-zinc-300 text-[11px] break-all border border-zinc-800 select-all">
+                  <div className="p-3 rounded-2xl bg-[#F3EFE6] font-mono text-[#52635F] text-[11px] break-all border border-[#D5CDC0] select-all">
                     {viewingAttendee.uuid}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F3EFE6] border border-[#D5CDC0]">
                   <div>
-                    <span className="text-[10px] text-zinc-500 uppercase block font-mono">
+                    <span className="text-[10px] text-[#52635F] uppercase block font-mono">
                       Gate Check-In Status
                     </span>
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-[#253C3B]">
                       {viewingAttendee.checkedIn ? 'Checked In' : 'Not Yet Checked In'}
                     </span>
                   </div>
@@ -1618,14 +1626,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* MODAL: ADD / EDIT TICKET TIER */}
         {tierModalOpen && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-            <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl p-6 text-white space-y-4 shadow-2xl my-6">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h4 className="text-base font-bold text-white">
+            <div className="relative w-full max-w-lg bg-[#F3EFE6] border border-[#D5CDC0] rounded-3xl p-6 text-[#253C3B] space-y-4 shadow-2xl my-6">
+              <div className="flex items-center justify-between border-b border-[#D5CDC0] pb-3">
+                <h4 className="text-base font-bold text-[#253C3B]">
                   {editingTier ? 'Edit Ticket Tier' : 'Add New Ticket Tier'}
                 </h4>
                 <button
                   onClick={() => setTierModalOpen(false)}
-                  className="p-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1633,19 +1641,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
               <form onSubmit={handleSaveTier} className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">Ticket Name *</label>
+                  <label className="block text-[#52635F] font-semibold mb-1">Ticket Name *</label>
                   <input
                     type="text"
                     required
                     value={tierForm.name}
                     onChange={(e) => setTierForm({ ...tierForm, name: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
+                    <label className="block text-[#52635F] font-semibold mb-1">
                       Code / Prefix *
                     </label>
                     <input
@@ -1654,11 +1662,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       placeholder="e.g. VIP, REG, PASS"
                       value={tierForm.code}
                       onChange={(e) => setTierForm({ ...tierForm, code: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white uppercase font-mono"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B] uppercase font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
+                    <label className="block text-[#52635F] font-semibold mb-1">
                       Price in Naira (₦) *
                     </label>
                     <input
@@ -1667,29 +1675,32 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       min={0}
                       value={tierForm.price}
                       onChange={(e) => setTierForm({ ...tierForm, price: Number(e.target.value) })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white font-mono"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B] font-mono"
                     />
                   </div>
                 </div>
 
+                <label className="flex items-center gap-2"><input type="checkbox" checked={tierForm.inventoryUnlimited} onChange={e=>setTierForm({...tierForm,inventoryUnlimited:e.target.checked})}/> No inventory limit set</label>
+                <label className="block">Guests per ticket/package<input type="number" min={1} max={50} required value={tierForm.guestsPerTicket} onChange={e=>setTierForm({...tierForm,guestsPerTicket:Number(e.target.value)})} className="w-full border rounded-xl p-3 mt-2"/></label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
+                    <label className="block text-[#52635F] font-semibold mb-1">
                       Total Inventory *
                     </label>
                     <input
                       type="number"
                       required
                       min={1}
+                      disabled={tierForm.inventoryUnlimited}
                       value={tierForm.availableQuantity}
                       onChange={(e) =>
                         setTierForm({ ...tierForm, availableQuantity: Number(e.target.value) })
                       }
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white font-mono"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B] font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
+                    <label className="block text-[#52635F] font-semibold mb-1">
                       Max Per Registration *
                     </label>
                     <input
@@ -1701,23 +1712,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       onChange={(e) =>
                         setTierForm({ ...tierForm, maxPerRegistration: Number(e.target.value) })
                       }
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white font-mono"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B] font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">Description</label>
+                  <label className="block text-[#52635F] font-semibold mb-1">Description</label>
                   <textarea
                     rows={2}
                     value={tierForm.description}
                     onChange={(e) => setTierForm({ ...tierForm, description: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl p-2.5 text-[#253C3B]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">
+                  <label className="block text-[#52635F] font-semibold mb-1">
                     Benefits / Inclusions (One per line)
                   </label>
                   <textarea
@@ -1725,7 +1736,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     placeholder="Full Summit Access&#10;VIP Lounge Pass&#10;Delegate Welcome Pack"
                     value={tierForm.benefits}
                     onChange={(e) => setTierForm({ ...tierForm, benefits: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-white font-mono"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl p-2.5 text-[#253C3B] font-mono"
                   />
                 </div>
 
@@ -1735,18 +1746,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     id="isActiveTier"
                     checked={tierForm.isActive}
                     onChange={(e) => setTierForm({ ...tierForm, isActive: e.target.checked })}
-                    className="rounded border-zinc-700 text-emerald-500 w-4 h-4 bg-zinc-900 cursor-pointer"
+                    className="rounded border-[#D5CDC0] text-emerald-500 w-4 h-4 bg-[#F3EFE6] cursor-pointer"
                   />
-                  <label htmlFor="isActiveTier" className="text-zinc-300 font-semibold cursor-pointer">
+                  <label htmlFor="isActiveTier" className="text-[#52635F] font-semibold cursor-pointer">
                     Tier is Active & Available for Public Registration
                   </label>
                 </div>
 
-                <div className="pt-3 flex justify-end gap-2 border-t border-zinc-800">
+                <div className="pt-3 flex justify-end gap-2 border-t border-[#D5CDC0]">
                   <button
                     type="button"
                     onClick={() => setTierModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1765,14 +1776,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* MODAL: ADD / EDIT MENU ITEM */}
         {menuModalOpen && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-            <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl p-6 text-white space-y-4 shadow-2xl my-6">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h4 className="text-base font-bold text-white">
+            <div className="relative w-full max-w-lg bg-[#F3EFE6] border border-[#D5CDC0] rounded-3xl p-6 text-[#253C3B] space-y-4 shadow-2xl my-6">
+              <div className="flex items-center justify-between border-b border-[#D5CDC0] pb-3">
+                <h4 className="text-base font-bold text-[#253C3B]">
                   {editingMenuItem ? 'Edit Menu Item' : 'Add View-Only Menu Item'}
                 </h4>
                 <button
                   onClick={() => setMenuModalOpen(false)}
-                  className="p-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer"
+                  className="p-1 rounded-lg text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1780,23 +1791,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
               <form onSubmit={handleSaveMenuItem} className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">Item Name *</label>
+                  <label className="block text-[#52635F] font-semibold mb-1">Item Name *</label>
                   <input
                     type="text"
                     required
                     value={menuForm.name}
                     onChange={(e) => setMenuForm({ ...menuForm, name: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">Category *</label>
+                    <label className="block text-[#52635F] font-semibold mb-1">Category *</label>
                     <select
                       value={menuForm.category}
                       onChange={(e) => setMenuForm({ ...menuForm, category: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B]"
                     >
                       <option value="Food">Food</option>
                       <option value="Drinks">Drinks</option>
@@ -1806,7 +1817,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-zinc-300 font-semibold mb-1">
+                    <label className="block text-[#52635F] font-semibold mb-1">
                       Displayed Price (₦)
                     </label>
                     <input
@@ -1815,41 +1826,41 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       min={0}
                       value={menuForm.price}
                       onChange={(e) => setMenuForm({ ...menuForm, price: Number(e.target.value) })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white font-mono"
+                      className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B] font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">Description *</label>
+                  <label className="block text-[#52635F] font-semibold mb-1">Description *</label>
                   <textarea
                     rows={2}
                     required
                     value={menuForm.description}
                     onChange={(e) => setMenuForm({ ...menuForm, description: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl p-2.5 text-[#253C3B]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">Image URL</label>
+                  <label className="block text-[#52635F] font-semibold mb-1">Image URL</label>
                   <input
                     type="url"
                     value={menuForm.imageUrl}
                     onChange={(e) => setMenuForm({ ...menuForm, imageUrl: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-zinc-300 font-semibold mb-1">
+                  <label className="block text-[#52635F] font-semibold mb-1">
                     Special Tag (e.g. Chef Special, Spicy, Halal)
                   </label>
                   <input
                     type="text"
                     value={menuForm.dietaryOrTag}
                     onChange={(e) => setMenuForm({ ...menuForm, dietaryOrTag: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-[#F3EFE6] border border-[#D5CDC0] rounded-xl px-3 py-2 text-[#253C3B]"
                   />
                 </div>
 
@@ -1859,18 +1870,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     id="isAvailableItem"
                     checked={menuForm.isAvailable}
                     onChange={(e) => setMenuForm({ ...menuForm, isAvailable: e.target.checked })}
-                    className="rounded border-zinc-700 text-amber-500 w-4 h-4 bg-zinc-900 cursor-pointer"
+                    className="rounded border-[#D5CDC0] text-amber-500 w-4 h-4 bg-[#F3EFE6] cursor-pointer"
                   />
-                  <label htmlFor="isAvailableItem" className="text-zinc-300 font-semibold cursor-pointer">
+                  <label htmlFor="isAvailableItem" className="text-[#52635F] font-semibold cursor-pointer">
                     Mark as "Available at the Event"
                   </label>
                 </div>
 
-                <div className="pt-3 flex justify-end gap-2 border-t border-zinc-800">
+                <div className="pt-3 flex justify-end gap-2 border-t border-[#D5CDC0]">
                   <button
                     type="button"
                     onClick={() => setMenuModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-[#52635F] hover:text-[#253C3B] cursor-pointer"
                   >
                     Cancel
                   </button>

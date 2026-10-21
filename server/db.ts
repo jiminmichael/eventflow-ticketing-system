@@ -1,3 +1,4 @@
+import { fallbackEvent, fallbackTicketTiers, fallbackMenuItems } from '../src/fallbackData.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -27,290 +28,16 @@ const SEED_DB_FILE = path.join(SEED_DATA_DIR, 'db.json');
 
 // In serverless environments like Vercel, the root filesystem is read-only.
 // Use temporary directory for writes when running in Vercel or serverless.
-const DATA_DIR = process.env.VERCEL
+const DATA_DIR = process.env.DATA_DIR || (process.env.VERCEL
   ? path.join(os.tmpdir(), 'eventflow_data')
-  : path.resolve(process.cwd(), 'data');
+  : path.resolve(process.cwd(), 'data'));
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 // Default Seed Data for Party Platform
-const initialEvent: EventDetails = {
-  id: 'evt-naijavibe-party-2026',
-  title: 'Lagos Party Fiesta 2026: The Ultimate Afrobeats & Food Fest',
-  subtitle: 'The Epicenter of Great Music, Delicious Chops, Cocktails & Unmatched Energy',
-  theme: 'Afrobeats, Fire Grills, Cocktails & Non-Stop Good Vibes',
-  description:
-    'Welcome to the official party portal! Secure your entry passes, view our mouthwatering party menu of food and drinks available at the venue, and get your unique digital pass. Organizers can easily monitor payments and export the complete guestlist of everyone who has paid.',
-  date: 'November 14, 2026',
-  endDate: 'November 15, 2026',
-  startTime: '06:00 PM (WAT)',
-  endTime: '04:00 AM (WAT)',
-  venue: 'The Waterfront Pavilion & Terrace, Landmark Beach',
-  address: 'Water Corporation Drive, Victoria Island',
-  city: 'Lagos',
-  country: 'Nigeria',
-  bannerImage:
-    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1600&q=80',
-  logoImage:
-    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400&q=80',
-  organizerName: 'Lagos Party Collective & NaijaVibe Events',
-  organizerEmail: 'party@naijavibe.africa',
-  organizerPhone: '+234 (0) 803 555 0192',
-  socialLinks: {
-    twitter: 'https://twitter.com/lagospartyfiesta',
-    instagram: 'https://instagram.com/lagospartyfiesta',
-    linkedin: 'https://linkedin.com/company/lagospartyfiesta',
-    website: 'https://lagosparty.ng',
-  },
-  schedule: [
-    {
-      time: '06:00 PM – 07:30 PM',
-      title: 'Red Carpet, Photo Ops & Welcome Cocktails',
-      stage: 'Beachside Foyer',
-      description: 'Arrive in style, get your entry pass scanned, grab your customized party cup, and enjoy complimentary welcome cocktails.',
-    },
-    {
-      time: '07:30 PM – 09:00 PM',
-      title: 'Warmup DJ Set: Smooth Afrobeats & Amapiano Vibes',
-      speaker: 'DJ CrowdKontroller & Special Guests',
-      stage: 'Main Party Arena',
-      description: 'Chilled tunes, sunset views over the Atlantic, networking, and pre-game social energy.',
-    },
-    {
-      time: '09:00 PM – 10:30 PM',
-      title: 'The Food Fest: Grills, Asun & Small Chops Tasting',
-      stage: 'Food & BBQ Courtyard',
-      description: 'Enjoy delicious party jollof, smoky suya skewers, spicy asun, and signature Lagos small chops from our party food vendors.',
-    },
-    {
-      time: '10:30 PM – 12:00 AM',
-      title: 'Peak Energy Live DJ Battle & Hypeman Showcase',
-      speaker: 'Top Lagos DJs & Guest Artists',
-      stage: 'Main Party Arena',
-      description: 'High-octane Afrobeats, dance battles, club bangers, and special celebrity guest appearances.',
-    },
-    {
-      time: '12:00 AM – 01:00 AM',
-      title: 'Midnight Fireworks, Light Show & VIP Champagne Toast',
-      stage: 'Ocean Terrace',
-      description: 'Epic midnight countdown, laser light show, and bottle sparklers for VIP & VVIP tables.',
-    },
-    {
-      time: '01:00 AM – 04:00 AM',
-      title: 'After-Hours Rave: Lagos Nightlife Anthem Marathon',
-      speaker: 'Resident Nightlife DJs',
-      stage: 'Lakeside VIP Club',
-      description: 'Non-stop underground sounds, amapiano grooves, and dancefloor anthems until dawn.',
-    },
-  ],
-  faqs: [
-    {
-      question: 'How do I pay for my party ticket or table?',
-      answer:
-        'You can pay securely with Paystack using your Debit Card (Mastercard, Visa, Verve), Bank Transfer, or USSD. Your entry pass is activated immediately upon successful payment confirmation.',
-    },
-    {
-      question: 'How can the party organizer export the list of people who have paid?',
-      answer:
-        'Organizers can click the "Export Paid Guestlist" button in the navigation bar or access the Admin Portal. You can download an Excel (.xlsx) spreadsheet or CSV file of all verified paid guests in one click, including their names, ticket tier, phone numbers, payment reference, and unique UUIDs.',
-    },
-    {
-      question: 'Can I buy food or drinks online beforehand?',
-      answer:
-        'No. The party menu on this website is for viewing only so guests know what food and drinks are available. All food, grills, and drinks are purchased on-site at the party food stalls.',
-    },
-    {
-      question: 'Do group or table bookings get individual passes?',
-      answer:
-        'Yes! For group tickets or tables, every individual person receives their own unique backend UUID and QR code pass so guests can arrive together or separately.',
-    },
-    {
-      question: 'What is the dress code for the party?',
-      answer:
-        'Stylish Smart Casual, Chic Afrobeats Streetwear, or High Fashion Party Glam. Come ready to dance and look great!',
-    },
-  ],
-};
+const initialEvent = fallbackEvent;
+const initialTicketTiers = fallbackTicketTiers;
+const initialMenuItems = fallbackMenuItems;
 
-const initialTicketTiers: TicketTier[] = [
-  {
-    id: 'tier-early-bird',
-    name: 'Early Bird Party Pass',
-    code: 'EARLY',
-    description: 'Limited discounted tickets for early guests. Includes party entry, welcome shot & custom cup.',
-    price: 8000,
-    availableQuantity: 100,
-    soldQuantity: 34,
-    maxPerRegistration: 4,
-    salesStartDate: '2026-08-01',
-    salesEndDate: '2026-11-01',
-    benefits: [
-      'Full Party Access to Main Arena & Beach Terrace',
-      'Complimentary Welcome Shot & Party Cup',
-      'Access to Food Pavilion & Outdoor Bar',
-      'All-Night Dancefloor & Live DJ Sets',
-    ],
-    isActive: true,
-    badge: 'Limited Slots',
-  },
-  {
-    id: 'tier-regular',
-    name: 'Regular Party Pass',
-    code: 'PARTY',
-    description: 'Standard party entry pass with drink voucher and party pack.',
-    price: 15000,
-    availableQuantity: 300,
-    soldQuantity: 86,
-    maxPerRegistration: 5,
-    salesStartDate: '2026-08-01',
-    salesEndDate: '2026-11-14',
-    benefits: [
-      'All-Night Access to Main Stage & Beachfront Arena',
-      '1 Free Drink Voucher at the Main Bar',
-      'Complimentary Lagos Small Chops Box',
-      'Official Party Glow Wristband & Cup',
-      'Access to Photo Booths & 360 Video Spin',
-    ],
-    isActive: true,
-    badge: 'Most Popular',
-  },
-  {
-    id: 'tier-vip',
-    name: 'VIP Party Pass',
-    code: 'VIP',
-    description: 'Elevated luxury experience with VIP lounge access and complimentary cocktails.',
-    price: 35000,
-    availableQuantity: 80,
-    soldQuantity: 28,
-    maxPerRegistration: 4,
-    salesStartDate: '2026-08-01',
-    salesEndDate: '2026-11-14',
-    benefits: [
-      'Express VIP Red Carpet Check-In Queue',
-      'Elevated Air-conditioned VIP Terrace Access',
-      'Open Cocktail Bar (First 2 Drinks Included)',
-      'Complimentary Gourmet Suya & Grill Platter',
-      'Prime Views of DJ Stage & Celebrity Area',
-      'Dedicated VIP Restrooms & Valet Parking Access',
-    ],
-    isActive: true,
-    badge: 'VIP Perks',
-  },
-  {
-    id: 'tier-vvip',
-    name: 'VVIP Cabana Table (Group of 5)',
-    code: 'TABLE',
-    description: 'Exclusive private party table for 5 with premium bottle service & hostess.',
-    price: 120000,
-    availableQuantity: 20,
-    soldQuantity: 8,
-    maxPerRegistration: 2,
-    salesStartDate: '2026-08-01',
-    salesEndDate: '2026-11-14',
-    benefits: [
-      'Entry for 5 People (5 Individual UUID Passes)',
-      'Reserved Private Oceanfront Cabana Table',
-      '1 Premium Spirit Bottle + 2 Mixers Included',
-      'Gourmet Meat Platter (Asun, Suya, Grilled Turkey)',
-      'Dedicated Table Hostess & Security',
-      'Sparkler Bottle Service during Midnight Countdown',
-    ],
-    isActive: true,
-    badge: 'Cabana Table',
-  },
-];
-
-const initialMenuItems: MenuItem[] = [
-  {
-    id: 'menu-1',
-    name: 'Hot Party Jollof Rice & Peppered Chicken',
-    description: 'Authentic firewood-smoked Nigerian party jollof served with crispy fried plantain (dodo) and spicy peppered chicken.',
-    category: 'Food',
-    price: 4000,
-    isAvailable: true,
-    displayOrder: 1,
-    imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Party Special',
-  },
-  {
-    id: 'menu-2',
-    name: 'Charcoal Grilled Beef & Chicken Suya Platter',
-    description: 'Tender beef and chicken char-grilled with authentic northern yaji spice, served with sweet red onions and cabbage.',
-    category: 'Food',
-    price: 4500,
-    isAvailable: true,
-    displayOrder: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Hot & Spicy',
-  },
-  {
-    id: 'menu-3',
-    name: 'Smoky Peppered Goat Meat (Asun)',
-    description: 'Traditional slow-roasted goat meat diced and tossed in fiery habanero peppers and onions.',
-    category: 'Food',
-    price: 4000,
-    isAvailable: true,
-    displayOrder: 3,
-    imageUrl: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Lagos Classic',
-  },
-  {
-    id: 'menu-4',
-    name: 'Lagos Small Chops Pack (Spring Rolls, Samosa, Puff-Puff)',
-    description: 'Golden fried puff-puff, crunchy beef samosas, crispy chicken spring rolls, and peppered gizzard.',
-    category: 'Refreshments',
-    price: 2500,
-    isAvailable: true,
-    displayOrder: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Party Favorite',
-  },
-  {
-    id: 'menu-5',
-    name: 'Signature Chilled Zobo Royale',
-    description: 'Cold-brewed Nigerian hibiscus infusion with ginger, cloves, citrus zest, and mint.',
-    category: 'Drinks',
-    price: 1800,
-    isAvailable: true,
-    displayOrder: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Non-Alcoholic',
-  },
-  {
-    id: 'menu-6',
-    name: 'Classic Nigerian Chapman Cocktail / Punch',
-    description: 'The ultimate celebratory drink with Angostura bitters, Fanta, Sprite, cucumber, lime, and grenadine.',
-    category: 'Drinks',
-    price: 2200,
-    isAvailable: true,
-    displayOrder: 6,
-    imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Popular Punch',
-  },
-  {
-    id: 'menu-7',
-    name: 'Premium Spirits & Energy Mixers',
-    description: 'Chilled premium vodka, tequila shots, Hennessy cocktails, or Red Bull mixes served by our professional mixologists.',
-    category: 'Drinks',
-    price: 4500,
-    isAvailable: true,
-    displayOrder: 7,
-    imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Bar Special',
-  },
-  {
-    id: 'menu-8',
-    name: 'Glow Sticks, LED Glasses & Party Merch Kit',
-    description: 'High-intensity LED rave foam sticks, neon sunglasses, and commemorative party merch pack.',
-    category: 'Merchandise',
-    price: 2000,
-    isAvailable: true,
-    displayOrder: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80',
-    dietaryOrTag: 'Party Merch',
-  },
-];
-
-// Seed realistic sample party orders & paid guests for immediate rich reporting
 const initialOrders: Order[] = [
   {
     id: 'ord-seed-001',
@@ -641,6 +368,7 @@ class DatabaseService {
       price: Math.max(0, Number(tierData.price) || 0),
       maxPerRegistration: Math.max(1, Number(tierData.maxPerRegistration) || 1),
       isActive: tierData.isActive ?? true,
+      guestsPerTicket: Math.max(1, Math.min(50, Math.floor(Number(tierData.guestsPerTicket) || 1))),
       benefits: Array.isArray(tierData.benefits) ? tierData.benefits : [],
     };
     this.data.ticketTiers.push(newTier);
@@ -657,6 +385,8 @@ class DatabaseService {
       ...current,
       ...updates,
       id: current.id, // immutable ID
+      soldQuantity: current.soldQuantity,
+      guestsPerTicket: updates.guestsPerTicket === undefined ? current.guestsPerTicket : Math.max(1, Math.min(50, Math.floor(Number(updates.guestsPerTicket) || 1))),
       price: updates.price !== undefined ? Math.max(0, Number(updates.price)) : current.price,
       availableQuantity:
         updates.availableQuantity !== undefined
@@ -714,7 +444,7 @@ class DatabaseService {
     }
 
     const availableSlots = tier.availableQuantity - tier.soldQuantity;
-    if (params.quantity > availableSlots) {
+    if (!tier.inventoryUnlimited && params.quantity > availableSlots) {
       throw new Error(
         `Insufficient ticket inventory. Only ${availableSlots} ticket${availableSlots === 1 ? '' : 's'} remaining.`
       );
@@ -723,10 +453,18 @@ class DatabaseService {
       throw new Error(`Maximum tickets allowed per registration is ${tier.maxPerRegistration}.`);
     }
 
+    if (!Number.isInteger(params.quantity) || params.quantity < 1) throw new Error('Quantity must be a positive integer.');
+    const guestCount = params.quantity * (tier.guestsPerTicket || 1);
+    if (params.attendees.length !== guestCount || params.attendees.some(a =>
+      typeof a.firstName !== 'string' || !a.firstName.trim() || typeof a.lastName !== 'string' || !a.lastName.trim() ||
+      typeof a.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.email) || typeof a.phone !== 'string' || a.phone.trim().length < 8)) {
+      throw new Error(`Provide valid names and contact details for all ${guestCount} guests.`);
+    }
+
     // 2. Server calculates price: never trust frontend
     const unitPrice = tier.price;
     const totalAmount = unitPrice * params.quantity;
-    const orderRef = `ORD-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+    const orderRef = `ORD-${uuidv4()}`;
     const orderId = `ord-${uuidv4()}`;
     const timestamp = new Date().toISOString();
 
@@ -735,7 +473,7 @@ class DatabaseService {
     const attendeeUuids: string[] = [];
 
     // Ensure we have an entry for each ticket quantity requested
-    for (let i = 0; i < params.quantity; i++) {
+    for (let i = 0; i < guestCount; i++) {
       const attendeeInput = params.attendees[i] || {
         firstName: params.purchaser.firstName,
         lastName: params.purchaser.lastName,
@@ -746,7 +484,7 @@ class DatabaseService {
 
       const attendeeUuid = uuidv4();
       attendeeUuids.push(attendeeUuid);
-      const ticketCode = `NVT-${tier.code}-${Math.floor(10000 + Math.random() * 90000)}`;
+      const ticketCode = `HID-${tier.code}-${uuidv4().slice(0, 8).toUpperCase()}`;
 
       const attendeeRecord: Attendee = {
         uuid: attendeeUuid,
@@ -755,7 +493,7 @@ class DatabaseService {
         orderId,
         ticketTierId: tier.id,
         ticketTierName: tier.name,
-        unitPrice,
+        unitPrice: unitPrice / (tier.guestsPerTicket || 1),
         firstName: attendeeInput.firstName.trim(),
         lastName: attendeeInput.lastName.trim(),
         email: attendeeInput.email.trim().toLowerCase(),
@@ -847,6 +585,11 @@ class DatabaseService {
     }
 
     const timestamp = new Date().toISOString();
+
+    if (order.paymentStatus === 'failed' || order.paymentStatus === 'abandoned') {
+      const tier = this.getTicketTierById(order.ticketTierId);
+      if (tier) tier.soldQuantity += order.ticketQuantity;
+    }
 
     // Mark order as verified
     order.paymentStatus = 'verified';

@@ -30,7 +30,7 @@ function MainApp() {
 
   // Selected ticket tier for registration
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(() => {
-    return fallbackTicketTiers.find((t) => t.isActive && t.soldQuantity < t.availableQuantity) || null;
+    return fallbackTicketTiers.find((t) => t.isActive && (t.inventoryUnlimited || t.soldQuantity < t.availableQuantity)) || null;
   });
 
   // Registration & Payment state
@@ -46,6 +46,7 @@ function MainApp() {
     customerEmail: string;
     isSandboxMode?: boolean;
     publicKey?: string;
+    authorizationUrl?: string;
   } | null>(null);
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
 
@@ -61,10 +62,24 @@ function MainApp() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Admin Portal state
-  const [adminOpen, setAdminOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(() => window.location.pathname === '/admin');
   const [adminToken, setAdminToken] = useState<string | null>(() => {
-    return localStorage.getItem('naijavibe_admin_token');
+    return sessionStorage.getItem('hideout_admin_token');
   });
+
+  // Paystack redirects back with a reference; only the server can confirm payment.
+  useEffect(() => {
+    const reference = new URLSearchParams(window.location.search).get('reference');
+    if (!reference || window.location.pathname !== '/order-confirmation') return;
+    fetch(`/api/orders/${encodeURIComponent(reference)}`).then(async response => {
+      if (!response.ok) throw new Error('Payment reference not found. Use Find my pass or contact support.');
+      const { order } = await response.json();
+      setCheckoutData({ orderReference: order.orderReference, paymentReference: reference,
+        totalAmount: order.totalAmount, customerEmail: order.customerEmail, isSandboxMode: false });
+      setCheckoutModalOpen(true);
+      await handleConfirmVerification('success', reference);
+    }).catch(error => showToast(error.message, 'error'));
+  }, []);
 
   // Load public data on mount
   useEffect(() => {
@@ -88,7 +103,7 @@ function MainApp() {
         const trs: TicketTier[] = await tiersRes.json();
         if (Array.isArray(trs) && trs.length > 0) {
           setTiers(trs);
-          const activeOne = trs.find((t) => t.isActive && t.soldQuantity < t.availableQuantity);
+          const activeOne = trs.find((t) => t.isActive && (t.inventoryUnlimited || t.soldQuantity < t.availableQuantity));
           if (activeOne) setSelectedTier(activeOne);
         }
       }
@@ -110,14 +125,14 @@ function MainApp() {
     showToast(`Selected ${tier.name} (₦${tier.price.toLocaleString('en-NG')})`);
     const regSection = document.getElementById('register');
     if (regSection) {
-      regSection.scrollIntoView({ behavior: 'smooth' });
+      regSection.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   };
 
   const handleNavigateSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   };
 
@@ -163,6 +178,7 @@ function MainApp() {
         customerEmail: orderData.purchaser.email,
         isSandboxMode: data.isSandboxMode,
         publicKey: data.publicKey,
+        authorizationUrl: data.paystack?.authorization_url,
       });
 
       showToast('Order initialized. Opening Paystack checkout...', 'info');
@@ -176,16 +192,18 @@ function MainApp() {
   };
 
   // 2. Complete Server-Side Payment Verification (Never trust browser alone)
-  const handleConfirmVerification = async (action: 'success' | 'failed') => {
-    if (!checkoutData) return;
+  const handleConfirmVerification = async (action: 'success' | 'failed', returnedReference?: string) => {
+    const reference = returnedReference || checkoutData?.paymentReference;
+    if (!reference) return;
     setIsVerifyingPayment(true);
+    setRegistrationError(null);
 
     try {
       const res = await fetch('/api/orders/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reference: checkoutData.paymentReference,
+          reference,
           sandboxAction: action,
         }),
       });
@@ -197,7 +215,7 @@ function MainApp() {
       }
 
       // Fetch confirmed order with generated QR SVGs
-      const orderFetch = await fetch(`/api/orders/${checkoutData.paymentReference}`);
+      const orderFetch = await fetch(`/api/orders/${encodeURIComponent(reference)}`);
       if (orderFetch.ok) {
         const fullOrder = await orderFetch.json();
         setConfirmedOrder(fullOrder.order);
@@ -219,7 +237,7 @@ function MainApp() {
         .catch(() => {});
     } catch (err: any) {
       showToast(`Payment Error: ${err.message}`, 'error');
-      alert(`Payment Error: ${err.message}`);
+      setRegistrationError(err.message || 'Payment verification is pending. Please retry.');
     } finally {
       setIsVerifyingPayment(false);
     }
@@ -227,13 +245,14 @@ function MainApp() {
 
   const handleLoginSuccess = (token: string) => {
     setAdminToken(token);
-    localStorage.setItem('naijavibe_admin_token', token);
+    sessionStorage.setItem('hideout_admin_token', token);
     showToast('Signed in as Administrator', 'success');
   };
 
   const handleLogout = () => {
+    if (adminToken) void fetch('/api/admin/logout', {method:'POST', headers:{Authorization:`Bearer ${adminToken}`}});
     setAdminToken(null);
-    localStorage.removeItem('naijavibe_admin_token');
+    sessionStorage.removeItem('hideout_admin_token');
     showToast('Admin session logged out', 'info');
   };
 
@@ -251,7 +270,7 @@ function MainApp() {
           <Ticket className="w-6 h-6" />
         </div>
         <div className="text-lg font-bold text-[#0F291E]">
-          Lagos Party Fiesta Portal
+          The Hideout — Pool Edition
         </div>
         <p className="text-sm text-[#40584D] max-w-md">
           Unable to connect to the event servers. Please check your connection and retry.
@@ -267,7 +286,7 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#0F291E] font-sans selection:bg-emerald-600 selection:text-white">
+    <div className="min-h-screen hideout-app">
       {/* 1. Header / Navbar */}
       <Navbar
         onOpenAdmin={() => setAdminOpen(true)}
@@ -306,17 +325,17 @@ function MainApp() {
         />
 
         {/* Step 4: Attendee registration form */}
-        <RegistrationForm
+        {tiers.some(t => t.isActive) && <RegistrationForm
           tiers={tiers}
           selectedTier={selectedTier}
           onSelectTier={setSelectedTier}
           onInitializePayment={handleInitializePayment}
           isLoading={isInitializingPayment}
           errorMessage={registrationError}
-        />
+        />}
 
         {/* Step 6: Available Event Menu (STRICT REQUIREMENT: Displayed directly below ticket registration and payment section) */}
-        <EventMenuSection menuItems={menuItems} />
+        {menuItems.length > 0 && <EventMenuSection menuItems={menuItems} />}
 
         {/* Step 7: Contact information, FAQs, and footer */}
         <FaqAndContact
@@ -336,6 +355,8 @@ function MainApp() {
           totalAmount={checkoutData.totalAmount}
           customerEmail={checkoutData.customerEmail}
           isSandboxMode={checkoutData.isSandboxMode}
+          authorizationUrl={checkoutData.authorizationUrl}
+          errorMessage={registrationError}
           onConfirmVerification={handleConfirmVerification}
           isVerifying={isVerifyingPayment}
         />
@@ -373,7 +394,7 @@ function MainApp() {
       {adminOpen && (
         <AdminPortal
           isOpen={adminOpen}
-          onClose={() => setAdminOpen(false)}
+          onClose={() => { setAdminOpen(false); void fetchInitialData(); }}
           adminToken={adminToken}
           onLoginSuccess={handleLoginSuccess}
           onLogout={handleLogout}

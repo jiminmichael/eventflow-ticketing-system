@@ -13,7 +13,9 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 3000;
 
   // Middleware
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '1mb', verify: (req, _res, buffer) => {
+    (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
+  } }));
   app.use(express.urlencoded({ extended: true }));
 
   // API router
@@ -45,7 +47,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Lagos Party Fiesta Portal running at http://localhost:${PORT}`);
+    console.log(`🚀 The Hideout running at http://localhost:${PORT}`);
   });
 }
 

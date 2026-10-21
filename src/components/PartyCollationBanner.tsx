@@ -60,8 +60,8 @@ export const PartyCollationBanner: React.FC<PartyCollationBannerProps> = ({
     setDownloadSuccess(false);
     try {
       const timestamp = new Date().toISOString().slice(0, 10);
-      const url = `/api/export/paid-guestlist?format=xlsx&token=${encodeURIComponent(adminToken)}`;
-      const filename = `LagosPartyFiesta_Paid_Guestlist_${timestamp}.xlsx`;
+      const url = `/api/export/paid-guestlist?format=xlsx`;
+      const filename = `Hideout_Paid_Guestlist_${timestamp}.xlsx`;
       const result = await downloadFile(url, filename, adminToken);
 
       if (result.success) {

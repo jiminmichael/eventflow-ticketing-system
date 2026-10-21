@@ -1,124 +1,72 @@
-# NaijaVibe Tech & Culture Summit 2026
-## Event Ticketing, Paystack Payment, Registration & Admin Management System
+# The Hideout — Pool Edition
 
-A production-ready event ticketing, Paystack payment processing, view-only event menu, attendee registration, and secure administrative management platform.
+React/Vite event site with an Express backend, Paystack-hosted checkout, individual guest UUIDs/QR passes, administrator login and Excel/CSV exports.
 
----
+## Run locally
 
-## 🌟 Key Features
-
-### 1. Public Event Website
-- **Event Landing Page**: Rich summit branding, banner visuals, dates (November 14–15, 2026), Landmark Centre VI Lagos venue details, and live countdown timer.
-- **Summit Programme**: Interactive 2-day session schedule filterable by stages (Main Plenary Hall, Tech Stage A, Culture Stage B).
-- **Dynamic Ticket Tiers**: Configurable ticket categories (Early Bird Pass, Regular Attendee, VIP Delegate, VVIP Executive) with prices in Nigerian Naira (₦), real-time inventory tracking, and benefits breakdown.
-- **Attendee Registration**: Group or individual registrations with purchaser info and individual ticket holder details.
-- **Unique Backend UUIDs**: Every single ticket holder is assigned a backend-generated UUID v4 and human-readable ticket code.
-- **Paystack Payment Integration**:
-  - Server-calculated totals (client-side prices are never trusted).
-  - Safe transactional inventory reservation.
-  - Strict server-side verification using Paystack Secret Key.
-  - Idempotent payment confirmation preventing duplicate issuance.
-  - Webhook endpoint (`/api/paystack/webhook`) with HMAC SHA-512 signature validation.
-  - Built-in test sandbox checkout supporting simulated debit cards, bank transfers, and USSD dial codes.
-- **Printable Delegate Pass**: Confirmation card with attendee details, order reference, Paystack verified badge, and clean SVG QR Code for physical gate entrance scanning.
-
-### 2. Available Event Menu (View-Only)
-- Displayed **directly below the ticket registration and payment section** as required.
-- Features authentic Nigerian cuisines (Smoky Party Jollof, Suya Platter, Shawarma), beverages (Signature Zobo Royale, Chapman Punch), and official summit merchandise.
-- Displayed prices in Nigerian Naira (₦) and availability badges ("Available at Event" vs "Currently Unavailable").
-- **Strictly informational**: No add-to-cart, no shopping carts, no checkout buttons, and zero linkage to ticket order totals.
-
-### 3. Secure Admin Management Portal
-- Protected behind authentication (`/api/admin/login`). Default credentials: `admin` / `Admin@2026!`.
-- **Live Statistics Overview**: Total revenue in ₦, confirmed attendees, paid orders, pending/failed counts, inventory gauges, and recent activity.
-- **Searchable & Filterable Attendees**: Live search across UUID, name, email, phone, order reference, and filters by ticket tier, payment status, and check-in status.
-- **Entrance Gate Check-In**: Instant lookup and check-in scanner for attendees at the door with real timestamps.
-- **Real Spreadsheet Exports**:
-  - Export All Attendees (`.xlsx` & `.csv`)
-  - Export Paid Attendees (`.xlsx` & `.csv`)
-  - Export by Ticket Tier (`.xlsx` & `.csv`)
-  - Export Current Filtered Records (`.xlsx` & `.csv`)
-  - Export Payment Audit & Revenue Report (`.xlsx`)
-  - Formatted with frozen header row, column widths, text-formatted UUIDs, and CSV/Excel formula injection sanitization.
-- **Ticket Tier CRUD**: Create, update, or deactivate ticket tiers without touching code.
-- **Event Menu Management**: Add, edit, delete, toggle availability, and reorder view-only menu items.
-- **Event Settings**: Live editing of summit title, theme, date, venue, banner image, and FAQs.
-
----
-
-## 🛠️ Technology Stack
-
-- **Frontend**: React 19, TypeScript, Tailwind CSS, Lucide Icons, Motion.
-- **Backend**: Node.js & Express with TypeScript (`server.ts`).
-- **Database & Persistence**: Persistent file-backed transactional database (`data/db.json`) with atomic writes, UUID v4 keys, and mutex inventory safety.
-- **Payment Processing**: Paystack API (Test Mode & Live Mode support).
-- **Spreadsheet Generation**: SheetJS (`xlsx`) for `.xlsx` workbooks and RFC 4180 CSV generation.
-- **QR Codes**: Server and client-side vector SVG QR generation (`qrcode`).
-
----
-
-## ⚙️ Environment Variables
-
-Configure these in `.env` (refer to `.env.example`):
-
-| Variable | Description | Default / Example |
-|---|---|---|
-| `PAYSTACK_SECRET_KEY` | Paystack secret key from your dashboard | `sk_test_...` or leave empty for sandbox mode |
-| `PAYSTACK_PUBLIC_KEY` | Paystack public key for client integration | `pk_test_...` |
-| `ADMIN_USERNAME` | Administrative username | `admin` |
-| `ADMIN_PASSWORD` | Administrative password | `Admin@2026!` |
-| `ADMIN_SESSION_SECRET` | Secret token for admin sessions | `naijavibe_admin_token_2026_secure` |
-| `APP_URL` | Public application URL | `http://localhost:3000` |
-| `PORT` | Web server listening port | `3000` |
-
----
-
-## 🚀 Setup & Execution Instructions
-
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Start the Development Server
-```bash
+```sh
+npm ci
+cp .env.example .env # Only if .env does not already exist.
+# Configure the environment values below.
 npm run dev
 ```
-The dev server launches on `http://localhost:3000`.
 
-### 3. Run Automated Tests
-```bash
+Open `http://localhost:3000`. Administrator sign-in is at `/admin` or **Organizer access** in the footer. A unique local administrator password and session secret have been generated in the ignored `.env` for this workspace. Do not commit that file.
+
+## Configuration
+
+| Variable | Purpose |
+| --- | --- |
+| `APP_URL` | Public origin used for the Paystack return URL; use HTTPS on the deployed site. |
+| `PAYSTACK_SECRET_KEY` | Paystack `sk_test_…` or `sk_live_…` secret, used only on the server. Hosted checkout does not require a public key. |
+| `PAYSTACK_SANDBOX` | Explicit local simulation when `true`; disabled in production. Defaults to `false`. |
+| `ADMIN_USERNAME` | Organizer login username. |
+| `ADMIN_PASSWORD` | Private organizer password. No built-in/default password is accepted. |
+| `ADMIN_SESSION_SECRET` | At least 32 characters; generate with `openssl rand -hex 32`. Sessions expire after eight hours. |
+| `DATA_DIR` | Optional persistent directory containing `db.json`; defaults to the local `data` directory. |
+| `PORT` | Local server port, default `3000`. |
+
+Set the Paystack webhook URL to `https://your-domain/api/paystack/webhook`. The return URL is `/order-confirmation?reference=…`. Both return verification and signed webhooks verify the transaction on the backend before issuing confirmed passes. See [Paystack's checkout guide](https://paystack.com/docs/payments/accept-payments/) and [webhook guide](https://paystack.com/docs/payments/webhooks/).
+
+Without a Paystack secret, real checkout reports that payments are not configured; it does not silently approve payments. Use a Paystack test key to exercise provider checkout before adding a live key. Local simulation is explicitly labelled and never collects card details.
+
+## Tickets and guests
+
+| Ticket/package | Price | Registered people |
+| --- | ---: | --- |
+| With your PVC | ₦15,000 | One guest per ticket |
+| Access | ₦25,000 | One guest per ticket |
+| Couple | ₦45,000 | Two guests per package |
+| VIP · Table of 2 | ₦100,000 | Two guests per package |
+| VVIP | ₦250,000 | Booking contact; team follows up on guest arrangements |
+| Cabana | ₦1,000,000 | Booking contact; team follows up on guest arrangements |
+
+Every registered person/contact has a distinct backend UUID. Couple and VIP packages collect both guests' details and issue two passes for one package price. VVIP and Cabana confirmations explain the required team follow-up; the contact record is not a promise about package capacity.
+
+No inventory limits have been provided. The six Hideout tiers have **No inventory limit set** enabled. Organizers can disable that option and set capacity, price, guest count and active status under **Ticket Tiers**. Quantity is measured in tickets/packages, not guests. The default per-order limit is five.
+
+The restored eight-item menu is display-only, below registration. It has no checkout/cart controls and cannot add items to a ticket payment.
+
+## Administration and exports
+
+The admin dashboard opens on **Attendees & UUIDs**, filtered to verified payments. It displays names, full UUIDs, email/phone, tier, payment status, reference and check-in state. Search and filter the list, then export the filtered selection as XLSX or CSV. The overview and paid-guest export also provide paid-only downloads. VVIP/Cabana rows supply booking contacts for team follow-up.
+
+All admin lists, mutations and exports require an authenticated bearer session. Passwords and known demo strings are not accepted as tokens. Exports use authorization headers, not URL credentials. Logout revokes the session on the running backend; session revocations and login throttling are process-local.
+
+## Persistence and deployment
+
+This backend currently uses a JSON store intended for **one persistent server process**. Mount a durable disk at `DATA_DIR`, back it up, and keep secrets in the host's environment. Run `npm run build`, then `NODE_ENV=production npm start`.
+
+The existing Vercel adapter uses temporary filesystem storage. **Do not use that temporary store for real paid bookings**: it is not durable or shared across instances. A transactional hosted database is required before deploying payment processing to Vercel or multiple backend instances. The included rewrite routes support `/admin` and the Paystack return page, but do not solve storage persistence.
+
+Existing historical orders, attendees and payments are preserved. Legacy ticket tiers are inactive; historical records remain available to administrators.
+
+## Checks
+
+```sh
+npm run lint
+npm run build
 npm test
 ```
-Verifies backend inventory locking, UUID generation, Paystack server verification, view-only menu isolation, and spreadsheet export generation.
 
-### 4. Build for Production
-```bash
-npm run build
-npm start
-```
-
----
-
-## 📋 API Endpoints Summary
-
-- `GET /api/event`: Fetch live event details, schedule, and FAQs.
-- `PUT /api/event`: Admin update summit configuration.
-- `GET /api/tickets`: Fetch ticket tiers, prices (₦), and available inventory.
-- `POST /api/tickets`: Admin create new ticket tier.
-- `PUT /api/tickets/:id`: Admin update ticket tier.
-- `DELETE /api/tickets/:id`: Admin deactivate/delete ticket tier.
-- `GET /api/menu`: Fetch view-only event menu offerings.
-- `POST /api/menu`: Admin create menu item.
-- `PUT /api/menu/:id`: Admin update menu item.
-- `DELETE /api/menu/:id`: Admin delete menu item.
-- `POST /api/orders/initialize`: Validate input, reserve inventory, generate backend UUIDs, and initialize Paystack transaction.
-- `POST /api/orders/verify`: Strictly verify transaction with Paystack on server, activate UUIDs, and confirm order.
-- `GET /api/orders/:reference`: Retrieve verified ticket pass with vector QR code SVG.
-- `POST /api/paystack/webhook`: Paystack charge webhook listener.
-- `POST /api/admin/login`: Authenticate admin credentials and issue session token.
-- `GET /api/admin/stats`: Real-time dashboard statistics and revenue breakdown.
-- `GET /api/admin/attendees`: Search, filter, and paginate attendee database.
-- `POST /api/admin/attendees/:uuid/checkin`: Toggle attendee check-in status at the entrance gate.
-- `GET /api/admin/payments`: Immutable payment audit log.
-- `GET /api/admin/export/:type`: Download fresh Excel (`.xlsx`) or CSV spreadsheets (`all`, `paid`, `tier`, `filtered`, `payments`).
+Tests use temporary databases and mocked Paystack API responses; they do not charge money or mutate the organizer's records. Coverage includes server pricing, package guest counts and UUIDs, pending/mismatched payment rejection, signed raw-body webhooks, repeated verification, paid-only XLSX/CSV, auth bypass rejection, logout and failed initialization inventory recovery. A real Paystack transaction still requires configured credentials and provider testing.

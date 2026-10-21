@@ -1,94 +1,163 @@
 {
   "event": {
-    "id": "evt-naijavibe-party-2026",
-    "title": "Lagos Party Fiesta 2026: The Ultimate Afrobeats & Food Fest",
-    "subtitle": "The Epicenter of Great Music, Delicious Chops, Cocktails & Unmatched Energy",
-    "theme": "Afrobeats, Fire Grills, Cocktails & Non-Stop Good Vibes",
-    "description": "Welcome to the official party portal! Secure your entry passes, view our mouthwatering party menu of food and drinks available at the venue, and get your unique digital pass. Organizers can easily monitor payments and export the complete guestlist of everyone who has paid.",
-    "date": "November 14, 2026",
-    "endDate": "November 15, 2026",
-    "startTime": "06:00 PM (WAT)",
-    "endTime": "04:00 AM (WAT)",
-    "venue": "The Waterfront Pavilion & Terrace, Landmark Beach",
-    "address": "Water Corporation Drive, Victoria Island",
-    "city": "Lagos",
+    "id": "evt-hideout-pool-2026",
+    "title": "The Hideout — Pool Edition",
+    "subtitle": "The hilltop sunset pool party",
+    "theme": "Pool · Music · Fun games · Networking · Sunset",
+    "description": "An afternoon by the pool. Music in the air. A sunset worth staying for. Join The Vybecheck with Bama for The Hideout, Pool Edition.",
+    "date": "November 28, 2026",
+    "startTime": "2 PM",
+    "endTime": "Late",
+    "venue": "Venue to be announced",
+    "address": "Call the organizers for venue details.",
+    "city": "",
     "country": "Nigeria",
-    "bannerImage": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1600&q=80",
-    "logoImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400&q=80",
-    "organizerName": "Lagos Party Collective & NaijaVibe Events",
-    "organizerEmail": "party@naijavibe.africa",
-    "organizerPhone": "+234 (0) 803 555 0192",
+    "bannerImage": "/images/hideout-pool-edition.png",
+    "organizerName": "The Vybecheck with Bama",
+    "organizerEmail": "",
+    "organizerPhone": "+2349030064744",
+    "organizerPhoneSecondary": "+2348131173415",
     "socialLinks": {
-      "twitter": "https://twitter.com/lagospartyfiesta",
-      "instagram": "https://instagram.com/lagospartyfiesta",
-      "linkedin": "https://linkedin.com/company/lagospartyfiesta",
-      "website": "https://lagosparty.ng"
+      "instagram": "https://www.instagram.com/vybecheckGlobal/",
+      "hostInstagram": "https://www.instagram.com/iam_Bama/"
     },
     "schedule": [
       {
-        "time": "06:00 PM – 07:30 PM",
-        "title": "Red Carpet, Photo Ops & Welcome Cocktails",
-        "stage": "Beachside Foyer",
-        "description": "Arrive in style, get your entry pass scanned, grab your customized party cup, and enjoy complimentary welcome cocktails."
-      },
-      {
-        "time": "07:30 PM – 09:00 PM",
-        "title": "Warmup DJ Set: Smooth Afrobeats & Amapiano Vibes",
-        "speaker": "DJ CrowdKontroller & Special Guests",
-        "stage": "Main Party Arena",
-        "description": "Chilled tunes, sunset views over the Atlantic, networking, and pre-game social energy."
-      },
-      {
-        "time": "09:00 PM – 10:30 PM",
-        "title": "The Food Fest: Grills, Asun & Small Chops Tasting",
-        "stage": "Food & BBQ Courtyard",
-        "description": "Enjoy delicious party jollof, smoky suya skewers, spicy asun, and signature Lagos small chops from our party food vendors."
-      },
-      {
-        "time": "10:30 PM – 12:00 AM",
-        "title": "Peak Energy Live DJ Battle & Hypeman Showcase",
-        "speaker": "Top Lagos DJs & Guest Artists",
-        "stage": "Main Party Arena",
-        "description": "High-octane Afrobeats, dance battles, club bangers, and special celebrity guest appearances."
-      },
-      {
-        "time": "12:00 AM – 01:00 AM",
-        "title": "Midnight Fireworks, Light Show & VIP Champagne Toast",
-        "stage": "Ocean Terrace",
-        "description": "Epic midnight countdown, laser light show, and bottle sparklers for VIP & VVIP tables."
-      },
-      {
-        "time": "01:00 AM – 04:00 AM",
-        "title": "After-Hours Rave: Lagos Nightlife Anthem Marathon",
-        "speaker": "Resident Nightlife DJs",
-        "stage": "Lakeside VIP Club",
-        "description": "Non-stop underground sounds, amapiano grooves, and dancefloor anthems until dawn."
+        "time": "2 PM – Late",
+        "title": "Pool, music & good company",
+        "description": "Pool, music, fun games, networking and sunset. The detailed programme will be announced by the organizers."
       }
     ],
     "faqs": [
       {
-        "question": "How do I pay for my party ticket or table?",
-        "answer": "You can pay securely with Paystack using your Debit Card (Mastercard, Visa, Verve), Bank Transfer, or USSD. Your entry pass is activated immediately upon successful payment confirmation."
+        "question": "When is The Hideout?",
+        "answer": "Saturday, 28 November 2026, from 2 PM until late."
       },
       {
-        "question": "How can the party organizer export the list of people who have paid?",
-        "answer": "Organizers can click the \"Export Paid Guestlist\" button in the navigation bar or access the Admin Portal. You can download an Excel (.xlsx) spreadsheet or CSV file of all verified paid guests in one click, including their names, ticket tier, phone numbers, payment reference, and unique UUIDs."
+        "question": "Where is the party?",
+        "answer": "The poster does not list an exact venue. Call +2349030064744 or +2348131173415 for location details."
       },
       {
-        "question": "Can I buy food or drinks online beforehand?",
-        "answer": "No. The party menu on this website is for viewing only so guests know what food and drinks are available. All food, grills, and drinks are purchased on-site at the party food stalls."
+        "question": "How do I book a table or cabana?",
+        "answer": "All packages can be booked online. Couple and VIP table of 2 each include two individual passes. For VVIP and Cabana, our team will contact the booking contact after payment to confirm guest arrangements."
       },
       {
-        "question": "Do group or table bookings get individual passes?",
-        "answer": "Yes! For group tickets or tables, every individual person receives their own unique backend UUID and QR code pass so guests can arrive together or separately."
+        "question": "What is the PVC ticket?",
+        "answer": "The poster lists “With your PVC” at ₦15,000. Contact the organizers to confirm eligibility and what to bring before booking."
       },
       {
-        "question": "What is the dress code for the party?",
-        "answer": "Stylish Smart Casual, Chic Afrobeats Streetwear, or High Fashion Party Glam. Come ready to dance and look great!"
+        "question": "Who can I contact for sponsorship?",
+        "answer": "Call +2349030064744 or +2348131173415. Follow @vybecheckGlobal and @iam_Bama on Instagram for updates."
+      },
+      {
+        "question": "Can I buy food or drinks online?",
+        "answer": "The menu is for display only. Food and drinks are purchased at the venue and are not added to your ticket payment."
       }
     ]
   },
   "ticketTiers": [
+    {
+      "id": "hideout-pvc",
+      "name": "With your PVC",
+      "code": "PVC",
+      "description": "Individual entry to The Hideout. Bring your PVC for this ticket.",
+      "price": 15000,
+      "availableQuantity": 0,
+      "soldQuantity": 0,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 1
+    },
+    {
+      "id": "hideout-access",
+      "name": "Access",
+      "code": "ACCESS",
+      "description": "Individual entry to The Hideout — Pool Edition.",
+      "price": 25000,
+      "availableQuantity": 0,
+      "soldQuantity": 1,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 1
+    },
+    {
+      "id": "hideout-couple",
+      "name": "Couple",
+      "code": "COUPLE",
+      "description": "Includes two individual guest passes.",
+      "price": 45000,
+      "availableQuantity": 0,
+      "soldQuantity": 0,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 2
+    },
+    {
+      "id": "hideout-vip",
+      "name": "VIP · Table of 2",
+      "code": "VIP",
+      "description": "Includes two individual guest passes.",
+      "price": 100000,
+      "availableQuantity": 0,
+      "soldQuantity": 0,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 2
+    },
+    {
+      "id": "hideout-vvip",
+      "name": "VVIP",
+      "code": "VVIP",
+      "description": "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "price": 250000,
+      "availableQuantity": 0,
+      "soldQuantity": 0,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 1
+    },
+    {
+      "id": "hideout-cabana",
+      "name": "Cabana",
+      "code": "CABANA",
+      "description": "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "price": 1000000,
+      "availableQuantity": 0,
+      "soldQuantity": 0,
+      "maxPerRegistration": 5,
+      "salesStartDate": "2026-10-01",
+      "salesEndDate": "2026-11-28",
+      "benefits": [],
+      "isActive": true,
+      "bookingOnly": false,
+      "inventoryUnlimited": true,
+      "guestsPerTicket": 1
+    },
     {
       "id": "tier-early-bird",
       "name": "Early Bird Party Pass",
@@ -106,7 +175,7 @@
         "Access to Food Pavilion & Outdoor Bar",
         "All-Night Dancefloor & Live DJ Sets"
       ],
-      "isActive": true,
+      "isActive": false,
       "badge": "Limited Slots"
     },
     {
@@ -127,7 +196,7 @@
         "Official Party Glow Wristband & Cup",
         "Access to Photo Booths & 360 Video Spin"
       ],
-      "isActive": true,
+      "isActive": false,
       "badge": "Most Popular"
     },
     {
@@ -149,7 +218,7 @@
         "Prime Views of DJ Stage & Celebrity Area",
         "Dedicated VIP Restrooms & Valet Parking Access"
       ],
-      "isActive": true,
+      "isActive": false,
       "badge": "VIP Perks"
     },
     {
@@ -171,7 +240,7 @@
         "Dedicated Table Hostess & Security",
         "Sparkler Bottle Service during Midnight Countdown"
       ],
-      "isActive": true,
+      "isActive": false,
       "badge": "Cabana Table"
     }
   ],
@@ -461,6 +530,34 @@
         }
       ],
       "verifiedAt": "2026-10-18T14:27:31.844Z"
+    },
+    {
+      "id": "ord-72e5644e-0925-48c9-93b1-70e4641157a2",
+      "orderReference": "ORD-907da952-91cb-4289-9dbe-9df5fef601f1",
+      "customerFirstName": "hey",
+      "customerLastName": "jeay",
+      "customerEmail": "ya@gmail.com",
+      "customerPhone": "08074910764",
+      "institution": "",
+      "ticketTierId": "hideout-access",
+      "ticketTierName": "Access",
+      "ticketQuantity": 1,
+      "unitPrice": 25000,
+      "totalAmount": 25000,
+      "currency": "NGN",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c",
+      "createdAt": "2026-10-21T09:41:07.088Z",
+      "attendeeUuids": [
+        "b77461c2-9807-4e63-bbed-329ab93039fc"
+      ],
+      "paymentAuditLog": [
+        {
+          "timestamp": "2026-10-21T09:41:07.088Z",
+          "action": "ORDER_INITIALIZED",
+          "details": "Order initialized for 1 Access ticket(s) totaling ₦25,000 (Ref: HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c)."
+        }
+      ]
     }
   ],
   "attendees": [
@@ -803,6 +900,25 @@
       "paymentReference": "EVT-TEST-1792333651768",
       "checkedIn": false,
       "createdAt": "2026-10-18T14:27:31.774Z"
+    },
+    {
+      "uuid": "b77461c2-9807-4e63-bbed-329ab93039fc",
+      "ticketCode": "HID-ACCESS-9401224B",
+      "orderReference": "ORD-907da952-91cb-4289-9dbe-9df5fef601f1",
+      "orderId": "ord-72e5644e-0925-48c9-93b1-70e4641157a2",
+      "ticketTierId": "hideout-access",
+      "ticketTierName": "Access",
+      "unitPrice": 25000,
+      "firstName": "hey",
+      "lastName": "jeay",
+      "email": "ya@gmail.com",
+      "phone": "08074910764",
+      "institution": "",
+      "additionalNotes": "",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c",
+      "checkedIn": false,
+      "createdAt": "2026-10-21T09:41:07.088Z"
     }
   ],
   "menuItems": [
@@ -1032,6 +1148,20 @@
       "verifiedAt": "2026-10-18T14:27:31.844Z",
       "channel": "card",
       "gatewayResponse": "Approved"
+    },
+    {
+      "id": "pay-f10985e7-4ffe-4308-bf3f-b315f44c8d3c",
+      "orderReference": "ORD-907da952-91cb-4289-9dbe-9df5fef601f1",
+      "paymentReference": "HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c",
+      "amount": 25000,
+      "currency": "NGN",
+      "status": "pending",
+      "createdAt": "2026-10-21T09:41:07.088Z",
+      "metadata": {
+        "purchaser": "hey jeay",
+        "tier": "Access",
+        "quantity": 1
+      }
     }
   ]
 }

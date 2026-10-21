@@ -64,7 +64,7 @@ export const EventMenuSection: React.FC<EventMenuSectionProps> = ({ menuItems })
         <div className="max-w-4xl mx-auto mb-10 p-5 rounded-3xl bg-emerald-50/90 border border-emerald-300 text-emerald-950 text-xs sm:text-sm flex items-start gap-3.5 shadow-sm">
           <Info className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <div className="font-extrabold text-[#0F291E] flex items-center gap-2 text-sm">
+            <div className="font-extrabold text-[#0F291E] flex flex-wrap items-center gap-2 text-sm">
               <span>View-Only Menu • Ordered & Paid At Venue Stalls</span>
               <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-code uppercase font-bold border border-emerald-300">
                 On-Site Food & Drinks

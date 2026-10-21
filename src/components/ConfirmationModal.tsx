@@ -62,15 +62,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   // Generate .ics file for Google Calendar / Apple Calendar
   const handleAddToCalendar = () => {
+    const startDate = new Date(`${eventDate} 14:00:00 GMT+0100`).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Lagos Party Fiesta 2026//Event Ticketing//EN
+PRODID:-//The Hideout//Event Ticketing//EN
 BEGIN:VEVENT
 SUMMARY:${eventName}
-DESCRIPTION:Official Party Pass (${currentAttendee.ticketTierName}). Ticket Code: ${currentAttendee.ticketCode}, UUID: ${currentAttendee.uuid}. Landmark Beach, Lagos.
-LOCATION:${venueName}, Victoria Island, Lagos, Nigeria
-DTSTART:20261114T180000Z
-DTEND:20261115T040000Z
+DESCRIPTION:Official Party Pass (${currentAttendee.ticketTierName}). Ticket Code: ${currentAttendee.ticketCode}, UUID: ${currentAttendee.uuid}.
+LOCATION:${venueName}
+DTSTART:${startDate}
 STATUS:CONFIRMED
 END:VEVENT
 END:VCALENDAR`;
@@ -79,7 +79,7 @@ END:VCALENDAR`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `LagosPartyFiesta_Pass_${currentAttendee.ticketCode}.ics`);
+    link.setAttribute('download', `Hideout_Pass_${currentAttendee.ticketCode}.ics`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -97,7 +97,7 @@ END:VCALENDAR`;
             <div>
               <h2 className="text-xl font-extrabold text-[#FAF7F2]">Payment Verified & Passes Issued!</h2>
               <p className="text-xs text-emerald-100 font-semibold">
-                Official Paystack transaction confirmed. Attendee digital passes active for entrance.
+                {['VVIP', 'Cabana'].some(name => order?.ticketTierName.includes(name)) ? 'Payment confirmed. Our team will contact you to arrange your package and guest details. Keep this booking reference.' : 'Payment confirmed. Each guest has an individual UUID and QR entry pass.'}
               </p>
             </div>
           </div>

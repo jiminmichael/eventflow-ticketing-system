@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+import { requireAdmin, adminLogin, adminLogout } from './adminAuth.js';
 import { Router, Request, Response, NextFunction } from 'express';
 import { db } from './db.js';
 import { paystack } from './paystack.js';
@@ -9,33 +11,6 @@ import {
 import QRCode from 'qrcode';
 
 export const apiRouter = Router();
-
-// Simple admin auth check using token or session
-const ADMIN_USER = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'Admin@2026!';
-const ADMIN_TOKEN = process.env.ADMIN_SESSION_SECRET || 'naijavibe_admin_token_2026_secure';
-
-function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  const token =
-    authHeader?.replace(/^Bearer\s+/i, '') ||
-    (req.query.token as string) ||
-    (req.query.adminKey as string);
-
-  if (
-    token === ADMIN_TOKEN ||
-    token === 'admin-session-active' ||
-    token === ADMIN_PASS ||
-    token === 'naijavibe_admin_token_2026_secure'
-  ) {
-    return next();
-  }
-
-  return res.status(401).json({
-    error: 'Unauthorized',
-    message: 'Valid admin credentials or session required to access this resource.',
-  });
-}
 
 // Quick Guestlist Collation & Summary for Party Organizers (RESTRICTED TO AUTHENTICATED ADMINS)
 apiRouter.get('/guestlist/collation-summary', requireAdmin, (req: Request, res: Response) => {
@@ -88,7 +63,7 @@ apiRouter.get('/export/paid-guestlist', requireAdmin, (req: Request, res: Respon
       const csvData = generateAttendeesCsv(paidAttendees);
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename="LagosPartyFiesta_Paid_Guestlist_${timestamp}.csv"`
+        `attachment; filename="Hideout_Paid_Guestlist_${timestamp}.csv"`
       );
       res.setHeader('Content-Type', 'text/csv');
       return res.send(csvData);
@@ -96,11 +71,11 @@ apiRouter.get('/export/paid-guestlist', requireAdmin, (req: Request, res: Respon
 
     const excelBuffer = generateAttendeesExcel(
       paidAttendees,
-      'Lagos Party Fiesta - Paid Guestlist'
+      'The Hideout - Paid Guestlist'
     );
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="LagosPartyFiesta_Paid_Guestlist_${timestamp}.xlsx"`
+      `attachment; filename="Hideout_Paid_Guestlist_${timestamp}.xlsx"`
     );
     res.setHeader(
       'Content-Type',
@@ -163,7 +138,9 @@ apiRouter.get('/menu', (req: Request, res: Response) => {
  * Server validates availability and prices; client price is NEVER trusted.
  */
 apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
+  let reservedReference: string | undefined;
   try {
+    if (!paystack.canAcceptPayments()) return res.status(503).json({message:'Online payments are not configured yet. Please contact the organizers.'});
     const { ticketTierId, quantity, purchaser, attendees } = req.body;
 
     // Validate purchaser input
@@ -183,7 +160,7 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
     }
 
     const qty = Number(quantity);
-    if (!qty || qty < 1) {
+    if (!Number.isInteger(qty) || qty < 1) {
       return res.status(400).json({
         error: 'Validation Error',
         message: 'Quantity must be at least 1 ticket.',
@@ -191,7 +168,7 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
     }
 
     // Generate unique payment reference
-    const paymentRef = `EVT-PAY-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const paymentRef = `HID-PAY-${crypto.randomUUID()}`;
 
     // Create pending order and reserve inventory (in a safe server transaction)
     const { order, attendees: createdAttendees } = db.createPendingOrder({
@@ -201,6 +178,8 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
       attendees: Array.isArray(attendees) ? attendees : [],
       paymentReference: paymentRef,
     });
+
+    reservedReference = paymentRef;
 
     // Initialize Paystack transaction using server-calculated amount in Kobo
     const amountInKobo = order.totalAmount * 100;
@@ -229,6 +208,7 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
       publicKey: paystack.getPublicKey(),
     });
   } catch (err: any) {
+    if (reservedReference) db.markPaymentFailed(reservedReference, 'Payment initialization failed');
     console.error('[API] /orders/initialize error:', err.message);
     res.status(400).json({ error: 'Order Initialization Failed', message: err.message });
   }
@@ -295,7 +275,7 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('[API] /orders/verify error:', err.message);
-    db.markPaymentFailed(req.body?.reference, err.message);
+    // A timeout or pending response is not proof of failure; preserve the reservation for a retry/webhook.
     res.status(400).json({
       status: false,
       error: 'Payment Verification Failed',
@@ -344,10 +324,10 @@ apiRouter.get('/orders/:reference', async (req: Request, res: Response) => {
 });
 
 // Paystack Webhook
-apiRouter.post('/paystack/webhook', (req: Request, res: Response) => {
+apiRouter.post('/paystack/webhook', async (req: Request, res: Response) => {
   try {
     const signature = req.headers['x-paystack-signature'] as string;
-    const isValid = paystack.verifyWebhookSignature(JSON.stringify(req.body), signature);
+    const isValid = paystack.verifyWebhookSignature((req as Request & { rawBody?: Buffer }).rawBody || '', signature);
 
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid webhook signature' });
@@ -357,6 +337,13 @@ apiRouter.post('/paystack/webhook', (req: Request, res: Response) => {
     if (event?.event === 'charge.success') {
       const data = event.data;
       if (data?.reference) {
+        const order = db.getOrderByReference(data.reference);
+        if (!order) return res.status(200).json({received:true});
+        if (data.amount !== order.totalAmount * 100 || data.currency !== 'NGN' || data.status !== 'success') {
+          return res.status(400).json({error:'Webhook payment details do not match this order.'});
+        }
+        const verified = await paystack.verifyTransaction(data.reference, order.totalAmount);
+        if (verified.data.status !== 'success') return res.status(400).json({error:'Payment is not successful.'});
         db.confirmPayment({
           paymentReference: data.reference,
           channel: data.channel,
@@ -402,26 +389,8 @@ apiRouter.get('/attendees/:uuid', async (req: Request, res: Response) => {
 // ==========================================
 
 // Admin Login
-apiRouter.post('/admin/login', (req: Request, res: Response) => {
-  const { username, password } = req.body;
-
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    return res.json({
-      success: true,
-      token: ADMIN_TOKEN,
-      user: {
-        username: ADMIN_USER,
-        role: 'superadmin',
-        name: 'Event Administrator',
-      },
-    });
-  }
-
-  return res.status(401).json({
-    success: false,
-    message: 'Invalid username or password. Default admin credentials are in .env.example',
-  });
-});
+apiRouter.post('/admin/login', adminLogin);
+apiRouter.post('/admin/logout', requireAdmin, adminLogout);
 
 // Dashboard Statistics Overview
 apiRouter.get('/admin/stats', requireAdmin, (req: Request, res: Response) => {
@@ -592,7 +561,7 @@ apiRouter.get('/admin/export/:type', requireAdmin, (req: Request, res: Response)
     if (type === 'payments') {
       const payments = db.getPayments();
       const excelBuffer = generatePaymentsExcel(payments);
-      res.setHeader('Content-Disposition', `attachment; filename="LagosPartyFiesta_Payments_Report_${timestamp}.xlsx"`);
+      res.setHeader('Content-Disposition', `attachment; filename="Hideout_Payments_Report_${timestamp}.xlsx"`);
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       return res.send(excelBuffer);
     }
@@ -616,13 +585,13 @@ apiRouter.get('/admin/export/:type', requireAdmin, (req: Request, res: Response)
 
     if (format === 'csv') {
       const csvData = generateAttendeesCsv(attendees);
-      res.setHeader('Content-Disposition', `attachment; filename="LagosPartyFiesta_Attendees_${type}_${timestamp}.csv"`);
+      res.setHeader('Content-Disposition', `attachment; filename="Hideout_Attendees_${type}_${timestamp}.csv"`);
       res.setHeader('Content-Type', 'text/csv');
       return res.send(csvData);
     }
 
     const excelBuffer = generateAttendeesExcel(attendees, `Party Attendees - ${type.toUpperCase()}`);
-    res.setHeader('Content-Disposition', `attachment; filename="LagosPartyFiesta_Attendees_${type}_${timestamp}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Hideout_Attendees_${type}_${timestamp}.xlsx"`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     return res.send(excelBuffer);
   } catch (err: any) {

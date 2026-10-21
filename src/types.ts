@@ -21,9 +21,11 @@ export interface EventDetails {
   organizerName: string;
   organizerEmail: string;
   organizerPhone: string;
+  organizerPhoneSecondary?: string;
   socialLinks: {
     twitter?: string;
     instagram?: string;
+    hostInstagram?: string;
     linkedin?: string;
     website?: string;
   };
@@ -54,6 +56,9 @@ export interface TicketTier {
   benefits: string[];
   isActive: boolean;
   badge?: string;
+  bookingOnly?: boolean;
+  inventoryUnlimited?: boolean;
+  guestsPerTicket?: number;
 }
 
 export type PaymentStatus = 'pending' | 'verified' | 'failed' | 'abandoned';

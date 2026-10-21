@@ -70,7 +70,7 @@ export const TicketLookupModal: React.FC<TicketLookupModalProps> = ({
             <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center border border-emerald-300">
               <Ticket className="w-4 h-4" />
             </div>
-            <h4 className="text-base font-bold text-[#0F291E]">Find My Fiesta Pass</h4>
+            <h4 className="text-base font-bold text-[#0F291E]">Find My Hideout Pass</h4>
           </div>
 
           <button

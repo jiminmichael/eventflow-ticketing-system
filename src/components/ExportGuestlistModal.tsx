@@ -150,7 +150,7 @@ export const ExportGuestlistModal: React.FC<ExportGuestlistModalProps> = ({
         const lData = await listRes.json();
         if (Array.isArray(lData.attendees)) {
           const paidGuests: PaidGuest[] = lData.attendees
-            .filter((a: any) => a.paymentStatus === 'PAID')
+            .filter((a: any) => a.paymentStatus === 'verified')
             .map((a: any) => ({
               uuid: a.uuid,
               ticketCode: a.ticketCode,
@@ -181,12 +181,12 @@ export const ExportGuestlistModal: React.FC<ExportGuestlistModalProps> = ({
     setExportMessage(null);
     try {
       const timestamp = new Date().toISOString().slice(0, 10);
-      let downloadUrl = `/api/export/paid-guestlist?format=${format}&token=${encodeURIComponent(adminToken)}`;
+      let downloadUrl = `/api/export/paid-guestlist?format=${format}`;
       if (tierId !== 'ALL') {
         downloadUrl += `&tierId=${encodeURIComponent(tierId)}`;
       }
 
-      const filename = `LagosPartyFiesta_Paid_Guestlist_${timestamp}.${format}`;
+      const filename = `Hideout_Paid_Guestlist_${timestamp}.${format}`;
       const result = await downloadFile(downloadUrl, filename, adminToken);
 
       if (result.success) {
@@ -322,8 +322,7 @@ export const ExportGuestlistModal: React.FC<ExportGuestlistModalProps> = ({
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E5DDD0] text-[11px] text-[#516E60]">
-                  <span className="text-emerald-800 font-bold">Standard Credentials: </span>
-                  <span className="font-mono text-[#0F291E] font-bold">admin</span> / <span className="font-mono text-[#0F291E] font-bold">Admin@2026!</span>
+                  Use your organizer username and password.
                 </div>
 
                 <button

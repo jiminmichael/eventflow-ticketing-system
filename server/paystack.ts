@@ -57,8 +57,12 @@ export class PaystackService {
       (this.secretKey.startsWith('sk_test_') || this.secretKey.startsWith('sk_live_'));
   }
 
+  canAcceptPayments(): boolean {
+    return this.isConfigured || (process.env.PAYSTACK_SANDBOX === 'true' && process.env.NODE_ENV !== 'production');
+  }
+
   getPublicKey(): string {
-    return this.publicKey || 'pk_test_demo_public_key_naijavibe';
+    return this.publicKey;
   }
 
   getMode(): 'live' | 'test' | 'sandbox' {
@@ -77,6 +81,7 @@ export class PaystackService {
       try {
         const response = await fetch('https://api.paystack.co/transaction/initialize', {
           method: 'POST',
+          signal: AbortSignal.timeout(15000),
           headers: {
             Authorization: `Bearer ${this.secretKey}`,
             'Content-Type': 'application/json',
@@ -102,7 +107,9 @@ export class PaystackService {
       }
     }
 
-    // High-fidelity Built-in Sandbox Mode:
+    if (!this.canAcceptPayments()) throw new Error('Paystack is not configured.');
+
+    // Explicit development-only simulation:
     // Enables testing all flows (card, bank transfer, USSD, success, simulated failure)
     // without requiring users to input their real credit cards or external credentials.
     return {
@@ -134,6 +141,7 @@ export class PaystackService {
           `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
           {
             method: 'GET',
+            signal: AbortSignal.timeout(15000),
             headers: {
               Authorization: `Bearer ${this.secretKey}`,
               'Content-Type': 'application/json',
@@ -148,6 +156,7 @@ export class PaystackService {
 
         // Enforce strict security validations:
         const expectedKobo = expectedAmountInNaira * 100;
+        if (data.data.reference !== reference) throw new Error('Payment reference mismatch.');
         if (data.data.amount !== expectedKobo) {
           throw new Error(
             `Payment amount mismatch! Expected ${expectedKobo} kobo, received ${data.data.amount} kobo.`
@@ -156,6 +165,7 @@ export class PaystackService {
         if (data.data.currency !== 'NGN') {
           throw new Error(`Invalid currency! Expected NGN, received ${data.data.currency}.`);
         }
+        if (data.data.status === 'failed' || data.data.status === 'abandoned') return {...data, isSandboxMode:false};
         if (data.data.status !== 'success') {
           throw new Error(`Payment verification status is not successful: ${data.data.status}`);
         }
@@ -166,6 +176,8 @@ export class PaystackService {
         throw err;
       }
     }
+
+    if (!this.canAcceptPayments()) throw new Error('Paystack is not configured.');
 
     // Sandbox Verification:
     if (sandboxAction === 'failed') {
@@ -204,14 +216,14 @@ export class PaystackService {
   /**
    * Validates Paystack webhook HMAC SHA-512 signature.
    */
-  verifyWebhookSignature(rawBody: string, signature: string): boolean {
-    if (!this.secretKey) return true; // in sandbox accept
+  verifyWebhookSignature(rawBody: string | Buffer, signature: string): boolean {
+    if (!this.isConfigured || typeof signature !== 'string' || !/^[a-f0-9]{128}$/i.test(signature)) return false;
     try {
       const hash = crypto
         .createHmac('sha512', this.secretKey)
         .update(rawBody)
         .digest('hex');
-      return hash === signature;
+      return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(signature, 'hex'));
     } catch {
       return false;
     }

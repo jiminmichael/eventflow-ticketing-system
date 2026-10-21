@@ -4,7 +4,9 @@ import { apiRouter } from '../server/routes.js';
 
 const app = express();
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb', verify: (req, _res, buffer) => {
+    (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
+  } }));
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
