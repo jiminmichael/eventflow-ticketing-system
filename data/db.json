@@ -63,7 +63,7 @@
       "description": "Individual entry to The Hideout. Bring your PVC for this ticket.",
       "price": 15000,
       "availableQuantity": 0,
-      "soldQuantity": 0,
+      "soldQuantity": 2,
       "maxPerRegistration": 5,
       "salesStartDate": "2026-10-01",
       "salesEndDate": "2026-11-28",
@@ -558,6 +558,62 @@
           "details": "Order initialized for 1 Access ticket(s) totaling ₦25,000 (Ref: HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c)."
         }
       ]
+    },
+    {
+      "id": "ord-7f0dd1d0-250e-45c4-b8fe-820dc75e75f0",
+      "orderReference": "ORD-a5adc75a-7960-4dd4-8845-86240a0b63d8",
+      "customerFirstName": "Msughter",
+      "customerLastName": "Jimin",
+      "customerEmail": "yuwamsughter@gmail.com",
+      "customerPhone": "+234234074910764",
+      "institution": "",
+      "ticketTierId": "hideout-pvc",
+      "ticketTierName": "With your PVC",
+      "ticketQuantity": 1,
+      "unitPrice": 15000,
+      "totalAmount": 15000,
+      "currency": "NGN",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc",
+      "createdAt": "2026-10-21T12:10:15.081Z",
+      "attendeeUuids": [
+        "4990b8fc-eea9-4851-9439-7c20cc0fa705"
+      ],
+      "paymentAuditLog": [
+        {
+          "timestamp": "2026-10-21T12:10:15.081Z",
+          "action": "ORDER_INITIALIZED",
+          "details": "Order initialized for 1 With your PVC ticket(s) totaling ₦15,000 (Ref: HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc)."
+        }
+      ]
+    },
+    {
+      "id": "ord-347518de-c0c1-49dc-94a3-c14d3d83b9f0",
+      "orderReference": "ORD-2241bee0-2597-4e47-af45-15093705cdb5",
+      "customerFirstName": "Msughter",
+      "customerLastName": "Jimin",
+      "customerEmail": "yuwamsughter@gmail.com",
+      "customerPhone": "+234234074910764",
+      "institution": "",
+      "ticketTierId": "hideout-pvc",
+      "ticketTierName": "With your PVC",
+      "ticketQuantity": 1,
+      "unitPrice": 15000,
+      "totalAmount": 15000,
+      "currency": "NGN",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c",
+      "createdAt": "2026-10-21T12:10:22.212Z",
+      "attendeeUuids": [
+        "1715c49e-59c8-4291-bf20-7784059b4101"
+      ],
+      "paymentAuditLog": [
+        {
+          "timestamp": "2026-10-21T12:10:22.212Z",
+          "action": "ORDER_INITIALIZED",
+          "details": "Order initialized for 1 With your PVC ticket(s) totaling ₦15,000 (Ref: HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c)."
+        }
+      ]
     }
   ],
   "attendees": [
@@ -921,6 +977,44 @@
       "paymentReference": "HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c",
       "checkedIn": false,
       "createdAt": "2026-10-21T09:41:07.088Z"
+    },
+    {
+      "uuid": "4990b8fc-eea9-4851-9439-7c20cc0fa705",
+      "ticketCode": "HID-PVC-043446DE",
+      "orderReference": "ORD-a5adc75a-7960-4dd4-8845-86240a0b63d8",
+      "orderId": "ord-7f0dd1d0-250e-45c4-b8fe-820dc75e75f0",
+      "ticketTierId": "hideout-pvc",
+      "ticketTierName": "With your PVC",
+      "unitPrice": 15000,
+      "firstName": "Msughter",
+      "lastName": "Jimin",
+      "email": "yuwamsughter@gmail.com",
+      "phone": "+234234074910764",
+      "institution": "",
+      "additionalNotes": "",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc",
+      "checkedIn": false,
+      "createdAt": "2026-10-21T12:10:15.081Z"
+    },
+    {
+      "uuid": "1715c49e-59c8-4291-bf20-7784059b4101",
+      "ticketCode": "HID-PVC-0001019B",
+      "orderReference": "ORD-2241bee0-2597-4e47-af45-15093705cdb5",
+      "orderId": "ord-347518de-c0c1-49dc-94a3-c14d3d83b9f0",
+      "ticketTierId": "hideout-pvc",
+      "ticketTierName": "With your PVC",
+      "unitPrice": 15000,
+      "firstName": "Msughter",
+      "lastName": "Jimin",
+      "email": "yuwamsughter@gmail.com",
+      "phone": "+234234074910764",
+      "institution": "",
+      "additionalNotes": "",
+      "paymentStatus": "pending",
+      "paymentReference": "HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c",
+      "checkedIn": false,
+      "createdAt": "2026-10-21T12:10:22.212Z"
     }
   ],
   "menuItems": [
@@ -1162,6 +1256,34 @@
       "metadata": {
         "purchaser": "hey jeay",
         "tier": "Access",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "pay-2fb9e95a-bc84-42c3-96f9-0e81e1097aa2",
+      "orderReference": "ORD-a5adc75a-7960-4dd4-8845-86240a0b63d8",
+      "paymentReference": "HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc",
+      "amount": 15000,
+      "currency": "NGN",
+      "status": "pending",
+      "createdAt": "2026-10-21T12:10:15.081Z",
+      "metadata": {
+        "purchaser": "Msughter Jimin",
+        "tier": "With your PVC",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "pay-3163adde-675e-4a39-bdce-761380e2640c",
+      "orderReference": "ORD-2241bee0-2597-4e47-af45-15093705cdb5",
+      "paymentReference": "HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c",
+      "amount": 15000,
+      "currency": "NGN",
+      "status": "pending",
+      "createdAt": "2026-10-21T12:10:22.212Z",
+      "metadata": {
+        "purchaser": "Msughter Jimin",
+        "tier": "With your PVC",
         "quantity": 1
       }
     }
