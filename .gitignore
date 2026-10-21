@@ -12,3 +12,4 @@ coverage/
 *.sqlite-wal
 *.sqlite-shm
 *.sqlite-journal
+.neon

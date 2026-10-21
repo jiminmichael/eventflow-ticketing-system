@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import '../server/env.js';
 import express, { Request, Response } from 'express';
 import { apiRouter } from '../server/routes.js';
 

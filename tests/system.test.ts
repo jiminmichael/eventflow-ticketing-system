@@ -1,3 +1,4 @@
+process.env.DATABASE_DRIVER = 'sqlite';
 /**
  * Comprehensive Automated System Tests
  * Tests:

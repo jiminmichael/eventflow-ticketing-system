@@ -285,11 +285,15 @@ function validateCatalog(data: Partial<TicketTier & MenuItem>, kind: 'ticket' | 
   }
 }
 
-class DatabaseService {
+export class DatabaseService {
   private data: DatabaseSchema;
   private store!: SQLiteStore;
 
-  constructor() {
+  constructor(private transaction?: { snapshot: DatabaseSchema; save: (data: DatabaseSchema) => void }) {
+    if (transaction) {
+      this.data = transaction.snapshot;
+      return;
+    }
     this.data = {
       event: initialEvent,
       ticketTiers: initialTicketTiers,
@@ -339,6 +343,10 @@ class DatabaseService {
   }
 
   private saveToDisk() {
+    if (this.transaction) {
+      this.transaction.save(this.data);
+      return;
+    }
     try {
       this.store.save(this.data);
     } catch (error) {
@@ -890,4 +898,12 @@ class DatabaseService {
   }
 }
 
-export const db = new DatabaseService();
+// Lazy local fallback: importing domain logic on Vercel never opens SQLite.
+let localDb: DatabaseService | undefined;
+export const db = new Proxy({} as DatabaseService, {
+  get(_target, property) {
+    localDb ??= new DatabaseService();
+    const value = Reflect.get(localDb, property);
+    return typeof value === 'function' ? value.bind(localDb) : value;
+  },
+});

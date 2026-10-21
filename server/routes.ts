@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { requireAdmin, adminLogin, adminLogout } from './adminAuth.js';
 import { Router, Request, Response, NextFunction } from 'express';
-import { db } from './db.js';
+import { db } from './database.js';
 import { paystack } from './paystack.js';
 import {
   generateAttendeesExcel,
@@ -13,10 +13,10 @@ import QRCode from 'qrcode';
 export const apiRouter = Router();
 
 // Quick Guestlist Collation & Summary for Party Organizers (RESTRICTED TO AUTHENTICATED ADMINS)
-apiRouter.get('/guestlist/collation-summary', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/guestlist/collation-summary', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const stats = db.getDashboardStats();
-    const paidAttendees = db.getAttendees({ paymentStatus: 'verified' });
+    const stats = await db.getDashboardStats();
+    const paidAttendees = await db.getAttendees({ paymentStatus: 'verified' });
     res.json({
       totalRevenue: stats.totalVerifiedRevenue,
       paidAttendeesCount: stats.totalConfirmedAttendees,
@@ -48,13 +48,13 @@ apiRouter.get('/guestlist/collation-summary', requireAdmin, (req: Request, res: 
 });
 
 // Direct Export of Verified Paid Guests (Supports .xlsx and .csv - RESTRICTED TO AUTHENTICATED ADMINS)
-apiRouter.get('/export/paid-guestlist', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/export/paid-guestlist', requireAdmin, async (req: Request, res: Response) => {
   try {
     const format = req.query.format === 'csv' ? 'csv' : 'xlsx';
     const timestamp = new Date().toISOString().slice(0, 10);
     const tierId = req.query.tierId as string | undefined;
 
-    let paidAttendees = db.getAttendees({ paymentStatus: 'verified' });
+    let paidAttendees = await db.getAttendees({ paymentStatus: 'verified' });
     if (tierId && tierId !== 'ALL') {
       paidAttendees = paidAttendees.filter((a) => a.ticketTierId === tierId);
     }
@@ -93,9 +93,9 @@ apiRouter.get('/export/paid-guestlist', requireAdmin, (req: Request, res: Respon
 // ==========================================
 
 // Get Event Information
-apiRouter.get('/event', (req: Request, res: Response) => {
+apiRouter.get('/event', async (req: Request, res: Response) => {
   try {
-    const event = db.getEvent();
+    const event = await db.getEvent();
     res.json(event);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to fetch event data', message: err.message });
@@ -103,9 +103,9 @@ apiRouter.get('/event', (req: Request, res: Response) => {
 });
 
 // Get Ticket Tiers
-apiRouter.get('/tickets', (req: Request, res: Response) => {
+apiRouter.get('/tickets', async (req: Request, res: Response) => {
   try {
-    const tiers = db.getTicketTiers();
+    const tiers = await db.getTicketTiers();
     res.json(tiers);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to fetch tickets', message: err.message });
@@ -117,9 +117,9 @@ apiRouter.get('/tickets', (req: Request, res: Response) => {
 // ==========================================
 
 // Get Menu Items (strictly informational, view-only)
-apiRouter.get('/menu', (req: Request, res: Response) => {
+apiRouter.get('/menu', async (req: Request, res: Response) => {
   try {
-    const items = db.getMenuItems();
+    const items = await db.getMenuItems();
     res.json({
       notice: 'Viewing only. Items cannot be purchased online or added to ticket orders.',
       items,
@@ -171,7 +171,7 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
     const paymentRef = `HID-PAY-${crypto.randomUUID()}`;
 
     // Create pending order and reserve inventory (in a safe server transaction)
-    const { order, attendees: createdAttendees } = db.createPendingOrder({
+    const { order, attendees: createdAttendees } = await db.createPendingOrder({
       ticketTierId,
       quantity: qty,
       purchaser,
@@ -208,7 +208,10 @@ apiRouter.post('/orders/initialize', async (req: Request, res: Response) => {
       publicKey: paystack.getPublicKey(),
     });
   } catch (err: any) {
-    if (reservedReference) db.markPaymentFailed(reservedReference, 'Payment initialization failed');
+    if (reservedReference) {
+      try { await db.markPaymentFailed(reservedReference, 'Payment initialization failed'); }
+      catch { console.error('[DB] Failed to release reservation after initialization error'); }
+    }
     console.error('[API] /orders/initialize error:', err.message);
     res.status(400).json({ error: 'Order Initialization Failed', message: err.message });
   }
@@ -225,14 +228,14 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing Reference', message: 'Payment reference is required.' });
     }
 
-    const order = db.getOrderByReference(reference);
+    const order = await db.getOrderByReference(reference);
     if (!order) {
       return res.status(404).json({ error: 'Not Found', message: 'Order reference not found in database.' });
     }
 
     // If order is already verified, return idempotent success
     if (order.paymentStatus === 'verified') {
-      const attendees = db.getAttendeesByOrderReference(order.orderReference);
+      const attendees = await db.getAttendeesByOrderReference(order.orderReference);
       return res.json({
         status: true,
         alreadyConfirmed: true,
@@ -250,7 +253,7 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
     );
 
     if (paystackResponse.data.status !== 'success') {
-      db.markPaymentFailed(reference, paystackResponse.data.gateway_response || 'Payment declined by provider');
+      await db.markPaymentFailed(reference, paystackResponse.data.gateway_response || 'Payment declined by provider');
       return res.status(400).json({
         status: false,
         message: 'Payment verification failed or was declined by Paystack.',
@@ -259,7 +262,7 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
     }
 
     // Confirm payment and activate attendee records
-    const confirmation = db.confirmPayment({
+    const confirmation = await db.confirmPayment({
       paymentReference: reference,
       channel: paystackResponse.data.channel,
       gatewayResponse: paystackResponse.data.gateway_response,
@@ -285,26 +288,30 @@ apiRouter.post('/orders/verify', async (req: Request, res: Response) => {
 });
 
 // The private order reference is the booking's access link. Never issue downloads for unpaid orders.
-apiRouter.get('/orders/:reference/tickets', (req: Request, res: Response) => {
+apiRouter.get('/orders/:reference/tickets', async (req: Request, res: Response) => {
+  try {
   res.setHeader('Cache-Control', 'no-store');
-  const order = db.getOrderByReference(req.params.reference);
+  const order = await db.getOrderByReference(req.params.reference);
   if (!order) return res.status(404).json({message:'Booking not found. Check your reference or contact the organizers.'});
   if (order.paymentStatus !== 'verified') return res.status(403).json({message:'Payment has not been verified yet. Please check payment status or retry after a moment.'});
-  const attendees = db.getAttendeesByOrderReference(order.orderReference).filter(a=>a.paymentStatus==='verified');
+  const attendees = (await db.getAttendeesByOrderReference(order.orderReference)).filter(a=>a.paymentStatus==='verified');
   if (!attendees.length) return res.status(409).json({message:'Your guest records are not ready. Please contact the organizers.'});
-  return res.json({event:db.getEvent(),order,attendees});
+  return res.json({event:await db.getEvent(),order,attendees});
+  } catch {
+    return res.status(503).json({message: 'Ticket storage is temporarily unavailable. Please retry.'});
+  }
 });
 
 // Retrieve Order & Attendees for Confirmation Display or Printing
 apiRouter.get('/orders/:reference', async (req: Request, res: Response) => {
   try {
     const { reference } = req.params;
-    const order = db.getOrderByReference(reference);
+    const order = await db.getOrderByReference(reference);
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    const attendees = db.getAttendeesByOrderReference(order.orderReference);
+    const attendees = await db.getAttendeesByOrderReference(order.orderReference);
 
     // Generate QR codes for each confirmed attendee ticket
     const attendeesWithQr = await Promise.all(
@@ -349,14 +356,14 @@ apiRouter.post('/paystack/webhook', async (req: Request, res: Response) => {
     if (event?.event === 'charge.success') {
       const data = event.data;
       if (data?.reference) {
-        const order = db.getOrderByReference(data.reference);
+        const order = await db.getOrderByReference(data.reference);
         if (!order) return res.status(200).json({received:true});
         if (data.amount !== order.totalAmount * 100 || data.currency !== 'NGN' || data.status !== 'success') {
           return res.status(400).json({error:'Webhook payment details do not match this order.'});
         }
         const verified = await paystack.verifyTransaction(data.reference, order.totalAmount);
         if (verified.data.status !== 'success') return res.status(400).json({error:'Payment is not successful.'});
-        db.confirmPayment({
+        await db.confirmPayment({
           paymentReference: data.reference,
           channel: data.channel,
           gatewayResponse: data.gateway_response,
@@ -376,7 +383,7 @@ apiRouter.post('/paystack/webhook', async (req: Request, res: Response) => {
 apiRouter.get('/attendees/:uuid', async (req: Request, res: Response) => {
   try {
     const { uuid } = req.params;
-    const attendee = db.getAttendeeByUuid(uuid);
+    const attendee = await db.getAttendeeByUuid(uuid);
     if (!attendee) {
       return res.status(404).json({ error: 'Attendee not found with provided UUID' });
     }
@@ -405,9 +412,9 @@ apiRouter.post('/admin/login', adminLogin);
 apiRouter.post('/admin/logout', requireAdmin, adminLogout);
 
 // Dashboard Statistics Overview
-apiRouter.get('/admin/stats', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/admin/stats', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const stats = db.getDashboardStats();
+    const stats = await db.getDashboardStats();
     res.json(stats);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to retrieve stats', message: err.message });
@@ -415,11 +422,11 @@ apiRouter.get('/admin/stats', requireAdmin, (req: Request, res: Response) => {
 });
 
 // Searchable & Filterable Attendee Table
-apiRouter.get('/admin/attendees', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/admin/attendees', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { search, ticketTierId, paymentStatus, checkedIn, startDate, endDate } = req.query;
 
-    const attendees = db.getAttendees({
+    const attendees = await db.getAttendees({
       search: search ? String(search) : undefined,
       ticketTierId: ticketTierId ? String(ticketTierId) : undefined,
       paymentStatus: paymentStatus ? String(paymentStatus) : undefined,
@@ -438,10 +445,10 @@ apiRouter.get('/admin/attendees', requireAdmin, (req: Request, res: Response) =>
 });
 
 // Toggle Attendee Check-In
-apiRouter.post('/admin/attendees/:uuid/checkin', requireAdmin, (req: Request, res: Response) => {
+apiRouter.post('/admin/attendees/:uuid/checkin', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { uuid } = req.params;
-    const attendee = db.toggleAttendeeCheckIn(uuid);
+    const attendee = await db.toggleAttendeeCheckIn(uuid);
     if (!attendee) {
       return res.status(404).json({ error: 'Attendee not found' });
     }
@@ -452,9 +459,9 @@ apiRouter.post('/admin/attendees/:uuid/checkin', requireAdmin, (req: Request, re
 });
 
 // Payment Audit Trail
-apiRouter.get('/admin/payments', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/admin/payments', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const payments = db.getPayments();
+    const payments = await db.getPayments();
     res.json(payments);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to fetch payment audit logs', message: err.message });
@@ -462,18 +469,18 @@ apiRouter.get('/admin/payments', requireAdmin, (req: Request, res: Response) => 
 });
 
 // Manage Ticket Tiers (Admin CRUD)
-apiRouter.post('/admin/tickets', requireAdmin, (req: Request, res: Response) => {
+apiRouter.post('/admin/tickets', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const newTier = db.createTicketTier(req.body);
+    const newTier = await db.createTicketTier(req.body);
     res.status(201).json(newTier);
   } catch (err: any) {
     res.status(400).json({ error: 'Failed to create ticket tier', message: err.message });
   }
 });
 
-apiRouter.put('/admin/tickets/:id', requireAdmin, (req: Request, res: Response) => {
+apiRouter.put('/admin/tickets/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const updated = db.updateTicketTier(req.params.id, req.body);
+    const updated = await db.updateTicketTier(req.params.id, req.body);
     if (!updated) {
       return res.status(404).json({ error: 'Ticket tier not found' });
     }
@@ -483,9 +490,9 @@ apiRouter.put('/admin/tickets/:id', requireAdmin, (req: Request, res: Response) 
   }
 });
 
-apiRouter.delete('/admin/tickets/:id', requireAdmin, (req: Request, res: Response) => {
+apiRouter.delete('/admin/tickets/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const success = db.deleteTicketTier(req.params.id);
+    const success = await db.deleteTicketTier(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'Ticket tier not found or could not be removed' });
     }
@@ -496,18 +503,18 @@ apiRouter.delete('/admin/tickets/:id', requireAdmin, (req: Request, res: Respons
 });
 
 // Manage Menu Items (Admin CRUD)
-apiRouter.post('/admin/menu', requireAdmin, (req: Request, res: Response) => {
+apiRouter.post('/admin/menu', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const newItem = db.createMenuItem(req.body);
+    const newItem = await db.createMenuItem(req.body);
     res.status(201).json(newItem);
   } catch (err: any) {
     res.status(400).json({ error: 'Failed to create menu item', message: err.message });
   }
 });
 
-apiRouter.put('/admin/menu/:id', requireAdmin, (req: Request, res: Response) => {
+apiRouter.put('/admin/menu/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const updated = db.updateMenuItem(req.params.id, req.body);
+    const updated = await db.updateMenuItem(req.params.id, req.body);
     if (!updated) {
       return res.status(404).json({ error: 'Menu item not found' });
     }
@@ -517,9 +524,9 @@ apiRouter.put('/admin/menu/:id', requireAdmin, (req: Request, res: Response) => 
   }
 });
 
-apiRouter.delete('/admin/menu/:id', requireAdmin, (req: Request, res: Response) => {
+apiRouter.delete('/admin/menu/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const success = db.deleteMenuItem(req.params.id);
+    const success = await db.deleteMenuItem(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'Menu item not found' });
     }
@@ -529,13 +536,13 @@ apiRouter.delete('/admin/menu/:id', requireAdmin, (req: Request, res: Response) 
   }
 });
 
-apiRouter.post('/admin/menu/reorder', requireAdmin, (req: Request, res: Response) => {
+apiRouter.post('/admin/menu/reorder', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { orderedIds } = req.body;
     if (!Array.isArray(orderedIds)) {
       return res.status(400).json({ error: 'orderedIds must be an array of IDs' });
     }
-    const reordered = db.reorderMenuItems(orderedIds);
+    const reordered = await db.reorderMenuItems(orderedIds);
     res.json(reordered);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to reorder menu items', message: err.message });
@@ -543,9 +550,9 @@ apiRouter.post('/admin/menu/reorder', requireAdmin, (req: Request, res: Response
 });
 
 // Update Event Settings
-apiRouter.put('/admin/event', requireAdmin, (req: Request, res: Response) => {
+apiRouter.put('/admin/event', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const updated = db.updateEvent(req.body);
+    const updated = await db.updateEvent(req.body);
     res.json(updated);
   } catch (err: any) {
     res.status(400).json({ error: 'Failed to update event settings', message: err.message });
@@ -564,28 +571,28 @@ apiRouter.put('/admin/event', requireAdmin, (req: Request, res: Response) => {
  * - filtered: Exact records matching current search & filters
  * - payments: Financial audit report with Paystack refs, amounts, statuses
  */
-apiRouter.get('/admin/export/:type', requireAdmin, (req: Request, res: Response) => {
+apiRouter.get('/admin/export/:type', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { type } = req.params;
     const format = req.query.format === 'csv' ? 'csv' : 'xlsx';
     const timestamp = new Date().toISOString().slice(0, 10);
 
     if (type === 'payments') {
-      const payments = db.getPayments();
+      const payments = await db.getPayments();
       const excelBuffer = generatePaymentsExcel(payments);
       res.setHeader('Content-Disposition', `attachment; filename="Hideout_Payments_Report_${timestamp}.xlsx"`);
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       return res.send(excelBuffer);
     }
 
-    let attendees = db.getAttendees();
+    let attendees = await db.getAttendees();
 
     if (type === 'paid') {
       attendees = attendees.filter((a) => a.paymentStatus === 'verified');
     } else if (type === 'tier' && req.query.tierId) {
       attendees = attendees.filter((a) => a.ticketTierId === req.query.tierId);
     } else if (type === 'filtered') {
-      attendees = db.getAttendees({
+      attendees = await db.getAttendees({
         search: req.query.search ? String(req.query.search) : undefined,
         ticketTierId: req.query.ticketTierId ? String(req.query.ticketTierId) : undefined,
         paymentStatus: req.query.paymentStatus ? String(req.query.paymentStatus) : undefined,
