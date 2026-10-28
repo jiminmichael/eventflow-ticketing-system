@@ -48,7 +48,7 @@ export const fallbackEvent: EventDetails = {
     {
       question: "What is the PVC ticket?",
       answer:
-        "The poster lists \u201cWith your PVC\u201d at \u20a615,000. Contact the organizers to confirm eligibility and what to bring before booking.",
+        "You need to show your Permanent Voters Card To be eligible and validate the pvc Ticket. Note that if you do not provide your PVC your Ticket would be invalidated.",
     },
     {
       question: "Who can I contact for sponsorship?",
