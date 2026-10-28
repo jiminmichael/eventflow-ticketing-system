@@ -13,7 +13,7 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 3000;
 
   // Middleware
-  app.use(express.json({ limit: '1mb', verify: (req, _res, buffer) => {
+  app.use(express.json({ limit: '10mb', verify: (req, _res, buffer) => {
     (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
   } }));
   app.use(express.urlencoded({ extended: true }));

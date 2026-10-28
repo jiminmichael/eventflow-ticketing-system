@@ -4,7 +4,8 @@ import { apiRouter } from '../server/routes.js';
 
 const app = express();
 
-app.use(express.json({ limit: '1mb', verify: (req, _res, buffer) => {
+// Raise body size limit to 10 MB to support PVC image uploads (base64-encoded images ~5 MB raw = ~7 MB base64)
+app.use(express.json({ limit: '10mb', verify: (req, _res, buffer) => {
     (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
   } }));
 app.use(express.urlencoded({ extended: true }));

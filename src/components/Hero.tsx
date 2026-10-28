@@ -60,13 +60,13 @@ export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
           fetchPriority="high"
         />
       </div>
-      <div className="sunset-glass">
+      {/* <div className="sunset-glass">
         <Sun size={30} strokeWidth={1.3} aria-hidden="true" />
         <div>
           <span className="eyebrow">SAVE THE SATURDAY</span>
           <strong>Meet us at golden hour.</strong>
         </div>
-      </div>
+      </div> */}
       <span className="artwork-caption">THE HIDEOUT / POOL EDITION / 2026</span>
     </div>
     <div className="experience-ribbon">

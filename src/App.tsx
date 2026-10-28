@@ -346,8 +346,8 @@ function MainApp() {
           errorMessage={registrationError}
         />}
 
-        {/* Step 6: Available Event Menu (STRICT REQUIREMENT: Displayed directly below ticket registration and payment section) */}
-        {menuItems.length > 0 && <EventMenuSection menuItems={menuItems} />}
+        {/* Step 6: Food/Menu section — temporarily hidden by organizer request */}
+        {/* {menuItems.length > 0 && <EventMenuSection menuItems={menuItems} />} */}
 
         {/* Step 7: Contact information, FAQs, and footer */}
         <FaqAndContact

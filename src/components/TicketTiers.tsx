@@ -5,8 +5,7 @@ import { TicketTier } from "../types.js";
 const tierBenefits: Record<string, string[]> = {
   CABANA: [
     "Admits 6 max",
-    "1 bottle of Martel",
-    "1 bottle of Casamigo",
+    "1 bottle of Martel/Casamigo",
     "Unlimited cocktail",
     "2 pots of shisha",
   ],
@@ -23,7 +22,7 @@ const tierImages: Record<string, string> = {
   ACCESS: "/images/access.png",
   COUPLE: "/images/couple.png",
   VIP: "/images/vip.png",
-  VVIP: "/images/vvip.png",
+  VVIP: "/images/vvip.PNG",
   CABANA: "/images/cabana.png",
 };
 
@@ -58,11 +57,13 @@ export const TicketTiers: React.FC<Props> = ({
               className={`pass-card glass-panel ${tier.code === "ACCESS" ? "featured-pass" : ""} has-pass-banner`}
               key={tier.id}
             >
-              <img
-                className="pass-banner"
-                src={tierImages[tier.code] ?? "/images/background-image.png"}
-                alt={`${tier.name} ticket banner`}
-              />
+              <div className="pass-banner-container">
+                <img
+                  className="pass-banner"
+                  src={tierImages[tier.code] ?? "/images/background-image.png"}
+                  alt={`${tier.name} ticket banner`}
+                />
+              </div>
               <div className="pass-top">
                 <Ticket size={22} strokeWidth={1.3} />
                 <span className="eyebrow">
