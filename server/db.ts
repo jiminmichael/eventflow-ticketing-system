@@ -13,6 +13,7 @@ import {
   PaymentAudit,
   DashboardStats,
   PaymentStatus,
+  ReferralSurvey,
 } from '../src/types.js';
 
 export interface DatabaseSchema {
@@ -460,6 +461,7 @@ export class DatabaseService {
       notes?: string;
     }>;
     paymentReference: string;
+    referralSurvey?: ReferralSurvey;
   }): { order: Order; attendees: Attendee[] } {
     // 1. Fetch ticket tier from database - SERVER-SIDE TRUTH
     const tier = this.getTicketTierById(params.ticketTierId);
@@ -555,6 +557,7 @@ export class DatabaseService {
       paymentReference: params.paymentReference,
       createdAt: timestamp,
       attendeeUuids,
+      referralSurvey: params.referralSurvey,
       paymentAuditLog: [
         {
           timestamp,
@@ -684,6 +687,10 @@ export class DatabaseService {
     }
 
     this.saveToDisk();
+  }
+
+  getOrders(): Order[] {
+    return [...this.data.orders];
   }
 
   getOrderByReference(reference: string): Order | undefined {

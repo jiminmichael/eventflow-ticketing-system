@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ReferralAnalyticsTab } from './ReferralAnalyticsTab.js';
 import {
   ShieldCheck,
   Users,
@@ -63,7 +64,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 }) => {
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'attendees' | 'tiers' | 'menu' | 'payments' | 'checkin' | 'settings'
+    'overview' | 'referrals' | 'attendees' | 'tiers' | 'menu' | 'payments' | 'checkin' | 'settings'
   >('attendees');
 
   // Login form state
@@ -655,6 +656,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               >
                 <TrendingUp className="w-4 h-4" />
                 <span>Overview & Metrics</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('referrals')}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer text-left whitespace-nowrap ${
+                  activeTab === 'referrals'
+                    ? 'bg-gradient-to-r from-[#FF6B35] to-[#D84A1B] text-white font-bold shadow-sm'
+                    : 'text-[var(--ui-text)] hover:text-[#FF8C42] hover:bg-[var(--ui-raised)]'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4 text-[#FF8C42]" />
+                <span>Referral Sources</span>
+                <span className="ml-auto text-[9px] uppercase px-1.5 py-0.5 rounded bg-[#FF6B35]/20 text-[#FF8C42] font-bold border border-[#FF6B35]/30">
+                  New
+                </span>
               </button>
 
               <button
@@ -1470,6 +1486,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </table>
                   </div>
                 </div>
+              )}
+
+              {/* TAB: REFERRAL SOURCES & QUESTIONNAIRE ANALYTICS */}
+              {activeTab === 'referrals' && (
+                <ReferralAnalyticsTab adminToken={adminToken} tiers={tiers} />
               )}
 
               {/* TAB 7: EVENT SETTINGS */}

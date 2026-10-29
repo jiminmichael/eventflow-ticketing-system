@@ -43,7 +43,7 @@ export const fallbackEvent: EventDetails = {
     {
       question: "How do I book a table or cabana?",
       answer:
-        "All packages can be booked online. Couple and VIP table of 2 each include two individual passes. For VVIP and Cabana, our team will contact the booking contact after payment to confirm guest arrangements.",
+        "All packages can be booked online. Couple and VIP table of 2 each include two individual passes. For Sunset Deck and Cabana, our team will contact the booking contact after payment to confirm guest arrangements.",
     },
     {
       question: "What is the PVC ticket?",
@@ -134,7 +134,7 @@ export const fallbackTicketTiers: TicketTier[] = [
   },
   {
     id: "hideout-vvip",
-    name: "VVIP",
+    name: "Sunset Deck",
     code: "VVIP",
     description:
       "Package booking. Our team will contact you after payment to confirm guest arrangements.",

@@ -1,0 +1,692 @@
+import React, { useState, useEffect } from 'react';
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Download,
+  Filter,
+  RefreshCw,
+  Award,
+  Sparkles,
+  ArrowUpRight,
+  PieChart,
+  Calendar,
+  FileSpreadsheet,
+  CheckCircle2,
+  Clock,
+  HelpCircle,
+} from 'lucide-react';
+import { ReferralAnalyticsSummary, TicketTier } from '../types.js';
+import { downloadFile } from '../utils/download.js';
+
+interface Props {
+  adminToken: string | null;
+  tiers: TicketTier[];
+}
+
+export const ReferralAnalyticsTab: React.FC<Props> = ({ adminToken, tiers }) => {
+  const [data, setData] = useState<ReferralAnalyticsSummary | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Filters
+  const [dateFilter, setDateFilter] = useState('');
+  const [tierFilter, setTierFilter] = useState('ALL');
+  const [sourceFilter, setSourceFilter] = useState('ALL');
+
+  // Export states
+  const [isExporting, setIsExporting] = useState<'csv' | 'xlsx' | null>(null);
+
+  const ALL_SOURCES = [
+    'ALL',
+    'Instagram',
+    'TikTok',
+    'Snapchat',
+    'WhatsApp',
+    'Facebook',
+    'YouTube',
+    'Friends & Family',
+    'Influencers',
+    'Event Promoters',
+    'Ticket Vendors',
+    'Posters',
+    'Partner Brands',
+    'Google Search',
+    'Other',
+  ];
+
+  const fetchAnalytics = async () => {
+    if (!adminToken) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (dateFilter) params.append('startDate', dateFilter);
+      if (dateFilter) params.append('endDate', dateFilter);
+      if (tierFilter !== 'ALL') params.append('tierId', tierFilter);
+      if (sourceFilter !== 'ALL') params.append('source', sourceFilter);
+
+      const res = await fetch(`/api/admin/referrals/analytics?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      if (!res.ok) throw new Error((await res.json()).message || 'Failed to fetch analytics');
+      const json = await res.json();
+      setData(json);
+    } catch (err: any) {
+      setError(err.message || 'Error loading referral analytics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [adminToken, dateFilter, tierFilter, sourceFilter]);
+
+  const handleExport = async (format: 'csv' | 'xlsx', paidOnly = false) => {
+    if (!adminToken) return;
+    setIsExporting(format);
+    try {
+      const params = new URLSearchParams();
+      params.append('format', format);
+      if (paidOnly) params.append('paidOnly', 'true');
+      if (dateFilter) params.append('startDate', dateFilter);
+      if (dateFilter) params.append('endDate', dateFilter);
+      if (tierFilter !== 'ALL') params.append('tierId', tierFilter);
+      if (sourceFilter !== 'ALL') params.append('source', sourceFilter);
+
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `Hideout_Referrals_${timestamp}.${format}`;
+      await downloadFile(`/api/admin/referrals/export?${params.toString()}`, filename, adminToken);
+    } catch (err: any) {
+      alert(err.message || 'Export failed');
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Tab Header Banner styled in VybeCheck Sunset Orange & Obsidian */}
+      <div
+        className="p-6 rounded-2xl border"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.12) 0%, rgba(14, 14, 18, 0.95) 100%)',
+          borderColor: 'rgba(255, 107, 53, 0.3)',
+        }}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B35 0%, #D84A1B 100%)',
+                boxShadow: '0 4px 18px rgba(255, 107, 53, 0.35)',
+              }}
+            >
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-black text-white tracking-tight">
+                  “How Did You Hear About Us?” Analytics
+                </h3>
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
+                  style={{
+                    background: 'rgba(255, 107, 53, 0.2)',
+                    color: '#FF8C42',
+                    border: '1px solid rgba(255, 107, 53, 0.4)',
+                  }}
+                >
+                  VybeCheck Intelligence
+                </span>
+              </div>
+              <p className="text-xs text-[#E2D7CC] mt-0.5">
+                Real-time attribution, conversion tracking, revenue generated by channel, and top referrers.
+              </p>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={fetchAnalytics}
+              disabled={loading}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#F7EDE2',
+              }}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#FF6B35]' : ''}`} />
+              <span>Refresh</span>
+            </button>
+
+            <button
+              onClick={() => handleExport('csv')}
+              disabled={isExporting !== null}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#F7EDE2',
+              }}
+            >
+              <Download className="w-3.5 h-3.5 text-[#FF8C42]" />
+              <span>Export CSV</span>
+            </button>
+
+            <button
+              onClick={() => handleExport('xlsx')}
+              disabled={isExporting !== null}
+              className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all text-white cursor-pointer shadow-md"
+              style={{
+                background: 'linear-gradient(135deg, #FF6B35 0%, #D84A1B 100%)',
+                boxShadow: '0 4px 14px rgba(255, 107, 53, 0.3)',
+              }}
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-white" />
+              <span>Export Excel (.xlsx)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Filter Bar */}
+        <div
+          className="mt-6 pt-5 border-t flex flex-wrap items-center gap-3 text-xs"
+          style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
+        >
+          <div className="flex items-center gap-1.5 text-[#E2D7CC] font-semibold">
+            <Filter className="w-3.5 h-3.5 text-[#FF6B35]" />
+            <span>Filter By:</span>
+          </div>
+
+          {/* Date Filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[#A89F91]">Date:</span>
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-2.5 py-1.5 rounded-lg text-xs text-white outline-none"
+              style={{
+                background: '#0E0E12',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+              }}
+            />
+            {dateFilter && (
+              <button
+                onClick={() => setDateFilter('')}
+                className="text-[11px] text-[#FF8C42] hover:underline cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {/* Ticket Tier Filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[#A89F91]">Ticket:</span>
+            <select
+              value={tierFilter}
+              onChange={(e) => setTierFilter(e.target.value)}
+              className="px-2.5 py-1.5 rounded-lg text-xs text-white outline-none cursor-pointer"
+              style={{
+                background: '#0E0E12',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+              }}
+            >
+              <option value="ALL">All Ticket Categories</option>
+              {tiers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Referral Source Filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[#A89F91]">Channel:</span>
+            <select
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value)}
+              className="px-2.5 py-1.5 rounded-lg text-xs text-white outline-none cursor-pointer"
+              style={{
+                background: '#0E0E12',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+              }}
+            >
+              {ALL_SOURCES.map((s) => (
+                <option key={s} value={s}>
+                  {s === 'ALL' ? 'All Referral Sources' : s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {(dateFilter || tierFilter !== 'ALL' || sourceFilter !== 'ALL') && (
+            <button
+              onClick={() => {
+                setDateFilter('');
+                setTierFilter('ALL');
+                setSourceFilter('ALL');
+              }}
+              className="ml-auto text-xs text-[#FF8C42] hover:text-[#FFA066] font-semibold cursor-pointer"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+          {error}
+        </div>
+      )}
+
+      {/* KPI Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          className="p-5 rounded-2xl border"
+          style={{
+            background: '#0E0E12',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center justify-between text-[#A89F91] text-xs font-semibold mb-2">
+            <span>Verified Paid Revenue</span>
+            <DollarSign className="w-4 h-4 text-[#FF6B35]" />
+          </div>
+          <div className="text-2xl font-black text-white font-mono">
+            ₦{(data?.totalPaidRevenue || 0).toLocaleString('en-NG')}
+          </div>
+          <p className="text-[11px] text-[#A89F91] mt-1.5">
+            Attributed directly to referral questionnaire
+          </p>
+        </div>
+
+        <div
+          className="p-5 rounded-2xl border"
+          style={{
+            background: '#0E0E12',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center justify-between text-[#A89F91] text-xs font-semibold mb-2">
+            <span>Paid Bookings</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-2xl font-black text-white font-mono">
+            {data?.totalPaidBookings || 0}
+          </div>
+          <p className="text-[11px] text-[#A89F91] mt-1.5">
+            Deduplicated bookings (multiple attempts merged)
+          </p>
+        </div>
+
+        <div
+          className="p-5 rounded-2xl border"
+          style={{
+            background: '#0E0E12',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center justify-between text-[#A89F91] text-xs font-semibold mb-2">
+            <span>Tickets / Packages Sold</span>
+            <Users className="w-4 h-4 text-sky-400" />
+          </div>
+          <div className="text-2xl font-black text-white font-mono">
+            {data?.totalTicketsSold || 0}
+          </div>
+          <p className="text-[11px] text-[#A89F91] mt-1.5">
+            Total guest passes issued
+          </p>
+        </div>
+
+        <div
+          className="p-5 rounded-2xl border"
+          style={{
+            background: '#0E0E12',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center justify-between text-[#A89F91] text-xs font-semibold mb-2">
+            <span>Returning Guests</span>
+            <Sparkles className="w-4 h-4 text-[#FF8C42]" />
+          </div>
+          <div className="text-2xl font-black text-white font-mono">
+            {data?.priorAttendanceBreakdown?.yes || 0}
+          </div>
+          <p className="text-[11px] text-[#A89F91] mt-1.5">
+            Previously attended a VybeCheck event
+          </p>
+        </div>
+      </div>
+
+      {/* Main Grid: Channels Breakdown + Top Referrers */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Source Performance Table (2 Cols) */}
+        <div
+          className="lg:col-span-2 p-6 rounded-2xl border"
+          style={{
+            background: '#0E0E12',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-base font-bold text-white">Referral Source Performance</h4>
+              <p className="text-xs text-[#A89F91]">
+                Breakdown of traffic, conversions, and revenue by channel
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr
+                  className="border-b text-[#A89F91] uppercase tracking-wider text-[10px]"
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                >
+                  <th className="py-3 px-3">Referral Source</th>
+                  <th className="py-3 px-3 text-center">Bookings</th>
+                  <th className="py-3 px-3 text-center">Paid</th>
+                  <th className="py-3 px-3 text-center">Conversion</th>
+                  <th className="py-3 px-3 text-right">Revenue (NGN)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data?.sourceBreakdown?.map((item) => {
+                  const maxRevenue = Math.max(...(data?.sourceBreakdown?.map((s) => s.revenue) || [1]), 1);
+                  const barWidth = Math.max(4, Math.round((item.revenue / maxRevenue) * 100));
+
+                  return (
+                    <tr
+                      key={item.source}
+                      className="border-b transition-colors hover:bg-white/[0.02]"
+                      style={{ borderColor: 'rgba(255, 255, 255, 0.05)' }}
+                    >
+                      <td className="py-3 px-3 font-semibold text-white">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{
+                              background: item.revenue > 0 ? '#FF6B35' : 'rgba(255, 255, 255, 0.2)',
+                            }}
+                          />
+                          <span>{item.source}</span>
+                        </div>
+                        {/* Tiny revenue bar under source name */}
+                        {item.revenue > 0 && (
+                          <div
+                            className="mt-1.5 h-1 rounded-full"
+                            style={{
+                              width: `${barWidth}%`,
+                              background: 'linear-gradient(90deg, #FF6B35, #FFA066)',
+                            }}
+                          />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-[#E2D7CC]">
+                        {item.totalBookings}
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-emerald-400 font-bold">
+                        {item.paidBookings}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                          style={{
+                            background:
+                              item.conversionRate >= 50
+                                ? 'rgba(16, 185, 129, 0.15)'
+                                : item.conversionRate > 0
+                                ? 'rgba(255, 107, 53, 0.15)'
+                                : 'rgba(255, 255, 255, 0.05)',
+                            color:
+                              item.conversionRate >= 50
+                                ? '#34D399'
+                                : item.conversionRate > 0
+                                ? '#FF8C42'
+                                : '#A89F91',
+                          }}
+                        >
+                          {item.conversionRate}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono font-bold text-white">
+                        ₦{item.revenue.toLocaleString('en-NG')}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top Referrers & Returning Guest Ratio (1 Col) */}
+        <div className="space-y-6">
+          {/* Top Referrers Box */}
+          <div
+            className="p-6 rounded-2xl border"
+            style={{
+              background: '#0E0E12',
+              borderColor: 'rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Award className="w-5 h-5 text-[#FF6B35]" />
+              <div>
+                <h4 className="text-base font-bold text-white">Top Referrers</h4>
+                <p className="text-[11px] text-[#A89F91]">
+                  Influencers, promoters, vendors & friends
+                </p>
+              </div>
+            </div>
+
+            {(!data?.topReferrers || data.topReferrers.length === 0) ? (
+              <p className="text-xs text-[#A89F91] py-4 text-center">
+                No individual referrers recorded yet. They will appear here once attendees enter referral names.
+              </p>
+            ) : (
+              <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
+                {data.topReferrers.map((ref, idx) => (
+                  <div
+                    key={`${ref.name}-${idx}`}
+                    className="p-3 rounded-xl flex items-center justify-between border"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      borderColor: 'rgba(255, 255, 255, 0.06)',
+                    }}
+                  >
+                    <div>
+                      <div className="font-semibold text-white text-xs flex items-center gap-1.5">
+                        <span className="text-[#FF8C42] font-mono">#{idx + 1}</span>
+                        <span>{ref.name}</span>
+                      </div>
+                      <span className="text-[10px] text-[#A89F91]">{ref.category}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-mono font-bold text-white">
+                        ₦{ref.revenue.toLocaleString('en-NG')}
+                      </div>
+                      <span className="text-[10px] text-emerald-400 font-semibold">
+                        {ref.count} paid booking{ref.count > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Prior Attendance Breakdown */}
+          <div
+            className="p-6 rounded-2xl border"
+            style={{
+              background: '#0E0E12',
+              borderColor: 'rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            <h4 className="text-sm font-bold text-white mb-1">Returning vs New Guests</h4>
+            <p className="text-[11px] text-[#A89F91] mb-4">
+              Responses to previous VybeCheck event attendance:
+            </p>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <span className="text-emerald-300 font-semibold">Yes (Returning)</span>
+                <span className="font-mono font-bold text-white">
+                  {data?.priorAttendanceBreakdown?.yes || 0}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-sky-500/10 border border-sky-500/20">
+                <span className="text-sky-300 font-semibold">No (First Time)</span>
+                <span className="font-mono font-bold text-white">
+                  {data?.priorAttendanceBreakdown?.no || 0}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <span className="text-amber-300 font-semibold">Not Sure</span>
+                <span className="font-mono font-bold text-white">
+                  {data?.priorAttendanceBreakdown?.not_sure || 0}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/10">
+                <span className="text-[#A89F91]">Skipped / Unspecified</span>
+                <span className="font-mono font-bold text-white">
+                  {data?.priorAttendanceBreakdown?.unspecified || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Survey Responses Stream */}
+      <div
+        className="p-6 rounded-2xl border"
+        style={{
+          background: '#0E0E12',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="text-base font-bold text-white">Recent Referral Responses</h4>
+            <p className="text-xs text-[#A89F91]">
+              Live log of questionnaires saved against booking IDs
+            </p>
+          </div>
+          <span className="text-[11px] text-[#FF8C42] font-semibold">
+            Showing latest {data?.recentResponses?.length || 0} bookings
+          </span>
+        </div>
+
+        {(!data?.recentResponses || data.recentResponses.length === 0) ? (
+          <p className="text-xs text-[#A89F91] py-6 text-center">
+            No booking responses recorded yet. As customers book passes, their survey responses will stream here.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr
+                  className="border-b text-[#A89F91] uppercase tracking-wider text-[10px]"
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
+                >
+                  <th className="py-3 px-3">Booking Ref</th>
+                  <th className="py-3 px-3">Customer</th>
+                  <th className="py-3 px-3">Ticket Category</th>
+                  <th className="py-3 px-3">Channel</th>
+                  <th className="py-3 px-3">Referral Details</th>
+                  <th className="py-3 px-3 text-center">Prior Guest?</th>
+                  <th className="py-3 px-3 text-center">Status</th>
+                  <th className="py-3 px-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.recentResponses.map((r) => (
+                  <tr
+                    key={r.orderReference}
+                    className="border-b transition-colors hover:bg-white/[0.02]"
+                    style={{ borderColor: 'rgba(255, 255, 255, 0.05)' }}
+                  >
+                    <td className="py-3 px-3 font-mono text-[11px] text-[#FF8C42]">
+                      {r.orderReference}
+                    </td>
+                    <td className="py-3 px-3">
+                      <div className="font-semibold text-white">{r.customerName}</div>
+                      <div className="text-[10px] text-[#A89F91]">{r.customerEmail}</div>
+                    </td>
+                    <td className="py-3 px-3 text-[#E2D7CC] font-semibold">
+                      {r.tierName}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span
+                        className="px-2 py-0.5 rounded-full text-[11px] font-bold"
+                        style={{
+                          background: 'rgba(255, 107, 53, 0.15)',
+                          color: '#FF8C42',
+                          border: '1px solid rgba(255, 107, 53, 0.3)',
+                        }}
+                      >
+                        {r.referral?.source || 'Unspecified'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-[#E2D7CC]">
+                      {r.referral?.referralName ? (
+                        <span className="font-semibold text-white">
+                          Name: {r.referral.referralName}
+                        </span>
+                      ) : r.referral?.otherDetails ? (
+                        <span className="italic text-[#E2D7CC]">
+                          “{r.referral.otherDetails}”
+                        </span>
+                      ) : (
+                        <span className="text-[#A89F91]">—</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      {r.referral?.previouslyAttended === 'yes' ? (
+                        <span className="text-emerald-400 font-bold">Yes</span>
+                      ) : r.referral?.previouslyAttended === 'no' ? (
+                        <span className="text-[#A89F91]">No</span>
+                      ) : r.referral?.previouslyAttended === 'not_sure' ? (
+                        <span className="text-amber-400">Not sure</span>
+                      ) : (
+                        <span className="text-[#A89F91]">—</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          r.paymentStatus === 'verified'
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        }`}
+                      >
+                        {r.paymentStatus.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-white">
+                      ₦{r.amount.toLocaleString('en-NG')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+

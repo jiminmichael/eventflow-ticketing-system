@@ -1,6 +1,6 @@
 import { TicketDownloads } from './components/TicketDownloads.js';
 import React, { useState, useEffect } from 'react';
-import { EventDetails, TicketTier, MenuItem, Order, Attendee } from './types.js';
+import { EventDetails, TicketTier, MenuItem, Order, Attendee, ReferralSurvey } from './types.js';
 import { Navbar } from './components/Navbar.js';
 import { Hero } from './components/Hero.js';
 import { EventSchedule } from './components/EventSchedule.js';
@@ -159,6 +159,7 @@ function MainApp() {
       email: string;
       phone: string;
       institution?: string;
+      instagram?: string;
     };
     attendees: Array<{
       firstName: string;
@@ -168,6 +169,7 @@ function MainApp() {
       institution?: string;
       notes?: string;
     }>;
+    referralSurvey?: ReferralSurvey;
   }) => {
     setIsInitializingPayment(true);
     setRegistrationError(null);

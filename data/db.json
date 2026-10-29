@@ -1,9 +1,9 @@
 {
   "event": {
     "id": "evt-hideout-pool-2026",
-    "title": "The Hideout — Pool Edition",
+    "title": "The Hideout \u2014 Pool Edition",
     "subtitle": "The hilltop sunset pool party",
-    "theme": "Pool · Music · Fun games · Networking · Sunset",
+    "theme": "Pool \u00b7 Music \u00b7 Fun games \u00b7 Networking \u00b7 Sunset",
     "description": "An afternoon by the pool. Music in the air. A sunset worth staying for. Join The Vybecheck with Bama for The Hideout, Pool Edition.",
     "date": "November 28, 2026",
     "startTime": "2 PM",
@@ -23,7 +23,7 @@
     },
     "schedule": [
       {
-        "time": "2 PM – Late",
+        "time": "2 PM \u2013 Late",
         "title": "Pool, music & good company",
         "description": "Pool, music, fun games, networking and sunset. The detailed programme will be announced by the organizers."
       }
@@ -39,11 +39,11 @@
       },
       {
         "question": "How do I book a table or cabana?",
-        "answer": "All packages can be booked online. Couple and VIP table of 2 each include two individual passes. For VVIP and Cabana, our team will contact the booking contact after payment to confirm guest arrangements."
+        "answer": "All packages can be booked online. Couple and VIP table of 2 each include two individual passes. For Sunset Deck and Cabana, our team will contact the booking contact after payment to confirm guest arrangements."
       },
       {
         "question": "What is the PVC ticket?",
-        "answer": "The poster lists “With your PVC” at ₦15,000. Contact the organizers to confirm eligibility and what to bring before booking."
+        "answer": "The poster lists \u201cWith your PVC\u201d at \u20a615,000. Contact the organizers to confirm eligibility and what to bring before booking."
       },
       {
         "question": "Who can I contact for sponsorship?",
@@ -77,7 +77,7 @@
       "id": "hideout-access",
       "name": "Access",
       "code": "ACCESS",
-      "description": "Individual entry to The Hideout — Pool Edition.",
+      "description": "Individual entry to The Hideout \u2014 Pool Edition.",
       "price": 25000,
       "availableQuantity": 0,
       "soldQuantity": 1,
@@ -109,7 +109,7 @@
     },
     {
       "id": "hideout-vip",
-      "name": "VIP · Table of 2",
+      "name": "VIP \u00b7 Table of 2",
       "code": "VIP",
       "description": "Includes two individual guest passes.",
       "price": 100000,
@@ -126,7 +126,7 @@
     },
     {
       "id": "hideout-vvip",
-      "name": "VVIP",
+      "name": "Sunset Deck",
       "code": "VVIP",
       "description": "Package booking. Our team will contact you after payment to confirm guest arrangements.",
       "price": 250000,
@@ -272,7 +272,7 @@
         {
           "timestamp": "2026-10-12T10:15:30.000Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initiated for 2 VIP Party passes totaling ₦70,000."
+          "details": "Order initiated for 2 VIP Party passes totaling \u20a670,000."
         },
         {
           "timestamp": "2026-10-12T10:17:10.000Z",
@@ -307,7 +307,7 @@
         {
           "timestamp": "2026-10-13T14:20:00.000Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initiated for 1 VVIP Cabana Table totaling ₦120,000."
+          "details": "Order initiated for 1 VVIP Cabana Table totaling \u20a6120,000."
         },
         {
           "timestamp": "2026-10-13T14:22:05.000Z",
@@ -342,7 +342,7 @@
         {
           "timestamp": "2026-10-14T09:40:10.000Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initiated for 1 Regular Party Pass totaling ₦15,000."
+          "details": "Order initiated for 1 Regular Party Pass totaling \u20a615,000."
         },
         {
           "timestamp": "2026-10-14T09:41:45.000Z",
@@ -376,12 +376,12 @@
         {
           "timestamp": "2026-10-17T12:09:06.898Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 2 Early Bird Party Pass ticket(s) totaling ₦16,000 (Ref: EVT-PAY-1792238946897-7447)."
+          "details": "Order initialized for 2 Early Bird Party Pass ticket(s) totaling \u20a616,000 (Ref: EVT-PAY-1792238946897-7447)."
         },
         {
           "timestamp": "2026-10-17T12:09:21.985Z",
           "action": "PAYSTACK_VERIFIED",
-          "details": "Payment verified via Paystack. Channel: card, Gateway: Successful approval (Paystack Test Verification). Total: ₦16,000"
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Successful approval (Paystack Test Verification). Total: \u20a616,000"
         }
       ],
       "verifiedAt": "2026-10-17T12:09:21.985Z",
@@ -413,12 +413,12 @@
         {
           "timestamp": "2026-10-17T17:06:56.506Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling ₦45,000 (Ref: EVT-TEST-1792256816504)."
+          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling \u20a645,000 (Ref: EVT-TEST-1792256816504)."
         },
         {
           "timestamp": "2026-10-17T17:06:56.633Z",
           "action": "PAYSTACK_VERIFIED",
-          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: ₦45,000"
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: \u20a645,000"
         }
       ],
       "verifiedAt": "2026-10-17T17:06:56.633Z"
@@ -449,12 +449,12 @@
         {
           "timestamp": "2026-10-17T17:42:05.576Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling ₦45,000 (Ref: EVT-TEST-1792258925574)."
+          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling \u20a645,000 (Ref: EVT-TEST-1792258925574)."
         },
         {
           "timestamp": "2026-10-17T17:42:05.856Z",
           "action": "PAYSTACK_VERIFIED",
-          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: ₦45,000"
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: \u20a645,000"
         }
       ],
       "verifiedAt": "2026-10-17T17:42:05.856Z"
@@ -485,12 +485,12 @@
         {
           "timestamp": "2026-10-17T18:07:28.712Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling ₦45,000 (Ref: EVT-TEST-1792260448710)."
+          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling \u20a645,000 (Ref: EVT-TEST-1792260448710)."
         },
         {
           "timestamp": "2026-10-17T18:07:28.977Z",
           "action": "PAYSTACK_VERIFIED",
-          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: ₦45,000"
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: \u20a645,000"
         }
       ],
       "verifiedAt": "2026-10-17T18:07:28.977Z"
@@ -521,12 +521,12 @@
         {
           "timestamp": "2026-10-18T14:27:31.774Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling ₦45,000 (Ref: EVT-TEST-1792333651768)."
+          "details": "Order initialized for 3 Regular Party Pass ticket(s) totaling \u20a645,000 (Ref: EVT-TEST-1792333651768)."
         },
         {
           "timestamp": "2026-10-18T14:27:31.844Z",
           "action": "PAYSTACK_VERIFIED",
-          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: ₦45,000"
+          "details": "Payment verified via Paystack. Channel: card, Gateway: Approved. Total: \u20a645,000"
         }
       ],
       "verifiedAt": "2026-10-18T14:27:31.844Z"
@@ -555,7 +555,7 @@
         {
           "timestamp": "2026-10-21T09:41:07.088Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 1 Access ticket(s) totaling ₦25,000 (Ref: HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c)."
+          "details": "Order initialized for 1 Access ticket(s) totaling \u20a625,000 (Ref: HID-PAY-c65dc4d0-b7e2-4dee-846b-21b5416c035c)."
         }
       ]
     },
@@ -583,7 +583,7 @@
         {
           "timestamp": "2026-10-21T12:10:15.081Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 1 With your PVC ticket(s) totaling ₦15,000 (Ref: HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc)."
+          "details": "Order initialized for 1 With your PVC ticket(s) totaling \u20a615,000 (Ref: HID-PAY-58947878-5bb4-429c-b3f4-d08e471208bc)."
         }
       ]
     },
@@ -611,7 +611,7 @@
         {
           "timestamp": "2026-10-21T12:10:22.212Z",
           "action": "ORDER_INITIALIZED",
-          "details": "Order initialized for 1 With your PVC ticket(s) totaling ₦15,000 (Ref: HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c)."
+          "details": "Order initialized for 1 With your PVC ticket(s) totaling \u20a615,000 (Ref: HID-PAY-f31c2bbf-277b-46f5-ba9a-a14e07d7b16c)."
         }
       ]
     }

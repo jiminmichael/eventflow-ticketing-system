@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CreditCard, ShieldCheck, Loader2, Minus, Plus, Upload, CheckCircle2, AlertCircle, Instagram } from "lucide-react";
-import { TicketTier } from "../types.js";
+import {
+  CreditCard,
+  ShieldCheck,
+  Loader2,
+  Minus,
+  Plus,
+  Upload,
+  CheckCircle2,
+  AlertCircle,
+  Instagram,
+  Sparkles,
+} from "lucide-react";
+import { TicketTier, ReferralSurvey, ReferralSource } from "../types.js";
 
 interface Guest {
   firstName: string;
@@ -18,6 +29,7 @@ interface Props {
     quantity: number;
     purchaser: Guest & { instagram?: string };
     attendees: Guest[];
+    referralSurvey: ReferralSurvey;
   }) => Promise<void>;
   isLoading: boolean;
   errorMessage: string | null;
@@ -32,6 +44,33 @@ const blank = (): Guest => ({
 
 const MAX_FILE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+// 14 Required sources in exact order requested
+export const REFERRAL_SOURCES: ReferralSource[] = [
+  "Instagram",
+  "TikTok",
+  "Snapchat",
+  "WhatsApp",
+  "Facebook",
+  "YouTube",
+  "Friends & Family",
+  "Influencers",
+  "Event Promoters",
+  "Ticket Vendors",
+  "Posters",
+  "Partner Brands",
+  "Google Search",
+  "Other",
+];
+
+// Sources that trigger an optional referral-name field
+const SOURCES_WITH_OPTIONAL_NAME = [
+  "Friends & Family",
+  "Influencers",
+  "Event Promoters",
+  "Ticket Vendors",
+  "Partner Brands",
+];
 
 export const RegistrationForm: React.FC<Props> = ({
   tiers,
@@ -52,8 +91,68 @@ export const RegistrationForm: React.FC<Props> = ({
   const [pvcPreview, setPvcPreview] = useState<string | null>(null);
   const [pvcUploading, setPvcUploading] = useState(false);
   const [pvcUploadError, setPvcUploadError] = useState<string | null>(null);
-  const [pvcUploadRef, setPvcUploadRef] = useState<string | null>(null); // server-side ref after upload
+  const [pvcUploadRef, setPvcUploadRef] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Referral survey state (preserved in localStorage so retries & payment failures keep responses)
+  const [selectedSource, setSelectedSource] = useState<string>(() => {
+    try {
+      return localStorage.getItem("hideout_referral_source") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [referralName, setReferralName] = useState<string>(() => {
+    try {
+      return localStorage.getItem("hideout_referral_name") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [otherDetails, setOtherDetails] = useState<string>(() => {
+    try {
+      return localStorage.getItem("hideout_referral_other") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [previouslyAttended, setPreviouslyAttended] = useState<"yes" | "no" | "not_sure" | "">(() => {
+    try {
+      return (localStorage.getItem("hideout_referral_prior") as any) || "";
+    } catch {
+      return "";
+    }
+  });
+  const [surveyError, setSurveyError] = useState<string | null>(null);
+
+  // Persist survey responses across page reloads & failed payment attempts
+  useEffect(() => {
+    try {
+      if (selectedSource) localStorage.setItem("hideout_referral_source", selectedSource);
+      else localStorage.removeItem("hideout_referral_source");
+    } catch {}
+  }, [selectedSource]);
+
+  useEffect(() => {
+    try {
+      if (referralName) localStorage.setItem("hideout_referral_name", referralName);
+      else localStorage.removeItem("hideout_referral_name");
+    } catch {}
+  }, [referralName]);
+
+  useEffect(() => {
+    try {
+      if (otherDetails) localStorage.setItem("hideout_referral_other", otherDetails);
+      else localStorage.removeItem("hideout_referral_other");
+    } catch {}
+  }, [otherDetails]);
+
+  useEffect(() => {
+    try {
+      if (previouslyAttended) localStorage.setItem("hideout_referral_prior", previouslyAttended);
+      else localStorage.removeItem("hideout_referral_prior");
+    } catch {}
+  }, [previouslyAttended]);
 
   const isPvc = selectedTier?.code === "PVC";
   const count = quantity * (selectedTier?.guestsPerTicket || 1);
@@ -92,12 +191,10 @@ export const RegistrationForm: React.FC<Props> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       setPvcUploadError("Please upload a JPEG, PNG or WebP image of your PVC.");
       return;
     }
-    // Validate size
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       setPvcUploadError(`File is too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
       return;
@@ -107,7 +204,6 @@ export const RegistrationForm: React.FC<Props> = ({
     setPvcUploadRef(null);
     setPvcFile(file);
 
-    // Show preview
     const reader = new FileReader();
     reader.onload = (ev) => setPvcPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
@@ -178,7 +274,7 @@ export const RegistrationForm: React.FC<Props> = ({
     e.preventDefault();
     if (!selectedTier || !limit) return;
 
-    // Block PVC payment if image not uploaded
+    // 1. Block PVC payment if image not uploaded
     if (isPvc && !pvcUploadRef) {
       setPvcUploadError(
         "You must upload your Permanent Voters Card image before proceeding to payment.",
@@ -186,10 +282,36 @@ export const RegistrationForm: React.FC<Props> = ({
       return;
     }
 
+    // 2. Validate Referral Questionnaire
+    if (!selectedSource) {
+      setSurveyError("Please select how you heard about The Hideout before proceeding.");
+      const el = document.getElementById("questionnaire-section");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    if (selectedSource === "Other" && !otherDetails.trim()) {
+      setSurveyError("Please specify how you heard about us in the field provided.");
+      const el = document.getElementById("referral-other-details");
+      if (el) el.focus();
+      return;
+    }
+
+    setSurveyError(null);
+
     const clean = (g: Guest) =>
       Object.fromEntries(
         Object.entries(g).map(([k, v]) => [k, v.trim()]),
       ) as unknown as Guest;
+
+    const surveyData: ReferralSurvey = {
+      source: selectedSource,
+      referralName: SOURCES_WITH_OPTIONAL_NAME.includes(selectedSource) && referralName.trim()
+        ? referralName.trim()
+        : undefined,
+      otherDetails: selectedSource === "Other" ? otherDetails.trim() : undefined,
+      previouslyAttended: previouslyAttended || undefined,
+    };
 
     await onInitializePayment({
       ticketTierId: selectedTier.id,
@@ -199,10 +321,13 @@ export const RegistrationForm: React.FC<Props> = ({
         instagram: instagram.trim() || undefined,
       },
       attendees: guests.map((g, i) => clean(i === 0 && same ? purchaser : g)),
+      referralSurvey: surveyData,
     });
   };
 
   const pvcGateBlocked = isPvc && !pvcUploadRef;
+  const showOptionalNameField = SOURCES_WITH_OPTIONAL_NAME.includes(selectedSource);
+  const showOtherField = selectedSource === "Other";
 
   return (
     <section id="register" className="section-shell registration-section">
@@ -211,7 +336,7 @@ export const RegistrationForm: React.FC<Props> = ({
         <h2>
           Make it <em>a date.</em>
         </h2>
-        <p>Register your guests, then pay securely with Paystack.</p>
+        <p>Register your guests, complete a quick question, then pay securely with Paystack.</p>
       </div>
       <form onSubmit={submit} className="registration-form">
         <fieldset disabled={isLoading}>
@@ -290,7 +415,6 @@ export const RegistrationForm: React.FC<Props> = ({
           <fieldset disabled={isLoading}>
             <legend>2. PVC Verification</legend>
 
-            {/* Info banner */}
             <div
               style={{
                 background: "rgba(255,255,255,0.05)",
@@ -316,7 +440,6 @@ export const RegistrationForm: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* File picker */}
             {!pvcUploadRef && (
               <>
                 <label htmlFor="pvc-image" style={{ cursor: "pointer" }}>
@@ -331,7 +454,6 @@ export const RegistrationForm: React.FC<Props> = ({
                   />
                 </label>
 
-                {/* Preview */}
                 {pvcPreview && (
                   <div style={{ marginTop: "12px" }}>
                     <img
@@ -373,7 +495,6 @@ export const RegistrationForm: React.FC<Props> = ({
               </>
             )}
 
-            {/* Success state */}
             {pvcUploadRef && (
               <div
                 style={{
@@ -459,7 +580,6 @@ export const RegistrationForm: React.FC<Props> = ({
                   value={instagram}
                   onChange={(e) => {
                     let val = e.target.value;
-                    // Strip leading @ for storage consistency
                     if (val.startsWith("@")) val = val.slice(1);
                     setInstagram(val);
                   }}
@@ -508,6 +628,137 @@ export const RegistrationForm: React.FC<Props> = ({
               )}
             </div>
           ))}
+        </fieldset>
+
+        {/* ── 5. HOW DID YOU HEAR ABOUT US? (QUESTIONNAIRE) ────────── */}
+        <fieldset id="questionnaire-section" disabled={isLoading} className="referral-fieldset">
+          <legend className="flex items-center gap-2">
+            <span>{isPvc ? "5. How did you hear about us?" : "4. How did you hear about us?"}</span>
+            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#FF6B35]/20 text-[#FF8C42] border border-[#FF6B35]/40">
+              Required
+            </span>
+          </legend>
+
+          <p className="form-note" style={{ marginBottom: "16px" }}>
+            Help us learn where you found The Hideout. Select one option below:
+          </p>
+
+          {/* 14 Single-Choice Options Styled in Sunset Orange & Black */}
+          <div className="referral-grid" role="radiogroup" aria-label="Referral Source">
+            {REFERRAL_SOURCES.map((source) => {
+              const isSelected = selectedSource === source;
+              return (
+                <label
+                  key={source}
+                  className={`referral-card ${isSelected ? "selected" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="referralSource"
+                    value={source}
+                    checked={isSelected}
+                    onChange={() => {
+                      setSelectedSource(source);
+                      setSurveyError(null);
+                    }}
+                    required
+                    className="sr-only"
+                  />
+                  <span className="radio-circle" aria-hidden="true">
+                    {isSelected && <span className="radio-dot" />}
+                  </span>
+                  <span className="source-label">{source}</span>
+                </label>
+              );
+            })}
+          </div>
+
+          {/* Conditional field for Friends & Family, Influencer, Event Promoter, Ticket Vendor, Partner Brand */}
+          {showOptionalNameField && (
+            <div className="referral-conditional-box animate-in fade-in duration-200">
+              <label htmlFor="referral-name-input">
+                <span>Who referred you? </span>
+                <span style={{ opacity: 0.6, fontWeight: 400 }}>(Optional — Name or Handle)</span>
+                <input
+                  id="referral-name-input"
+                  type="text"
+                  placeholder={`e.g. ${
+                    selectedSource === "Influencers"
+                      ? "@influencer_handle"
+                      : selectedSource === "Friends & Family"
+                      ? "Friend's name"
+                      : selectedSource === "Event Promoters"
+                      ? "Promoter name or team"
+                      : "Vendor or Brand name"
+                  }`}
+                  value={referralName}
+                  onChange={(e) => setReferralName(e.target.value)}
+                  maxLength={100}
+                />
+              </label>
+            </div>
+          )}
+
+          {/* Conditional REQUIRED text field for "Other" */}
+          {showOtherField && (
+            <div className="referral-conditional-box animate-in fade-in duration-200">
+              <label htmlFor="referral-other-details">
+                <span>Please tell us how you heard about us: </span>
+                <span className="text-[#FF8C42] font-bold">*</span>
+                <input
+                  id="referral-other-details"
+                  type="text"
+                  required
+                  placeholder="e.g. Billboard, radio, friend at the club, etc."
+                  value={otherDetails}
+                  onChange={(e) => {
+                    setOtherDetails(e.target.value);
+                    if (e.target.value.trim()) setSurveyError(null);
+                  }}
+                  maxLength={150}
+                />
+              </label>
+            </div>
+          )}
+
+          {/* Optional Question: Have you previously attended a VybeCheck event? */}
+          <div className="prior-attendance-box">
+            <p className="prior-title">
+              Have you previously attended a VybeCheck event?{" "}
+              <span style={{ opacity: 0.6, fontWeight: 400 }}>(Optional)</span>
+            </p>
+            <div className="prior-options">
+              {[
+                { id: "yes", label: "Yes, I'm a returning guest" },
+                { id: "no", label: "No, this is my first time" },
+                { id: "not_sure", label: "Not sure" },
+              ].map((opt) => (
+                <label
+                  key={opt.id}
+                  className={`prior-choice ${previouslyAttended === opt.id ? "selected" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="previouslyAttended"
+                    value={opt.id}
+                    checked={previouslyAttended === opt.id}
+                    onChange={() => setPreviouslyAttended(opt.id as any)}
+                    className="sr-only"
+                  />
+                  <span className="radio-circle-small" aria-hidden="true">
+                    {previouslyAttended === opt.id && <span className="radio-dot-small" />}
+                  </span>
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {surveyError && (
+            <p className="form-error" role="alert" style={{ marginTop: "12px" }}>
+              {surveyError}
+            </p>
+          )}
         </fieldset>
 
         <div className="registration-total glass-panel">
