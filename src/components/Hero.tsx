@@ -39,7 +39,7 @@ export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
       </div>
       <div className="hero-actions">
         <button className="btn-primary" onClick={onGetTicketsClick}>
-          Discover your escape <ArrowUpRight size={18} />
+          Discover your hideout <ArrowUpRight size={18} />
         </button>
         <a href="#schedule" className="text-link">
           Explore the experience <ArrowDown size={16} />
@@ -47,7 +47,7 @@ export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
       </div>
       <div className="hero-note">
         <Waves size={22} aria-hidden="true" />
-        <span>A little escape. A beautiful sunset. A whole new vibe.</span>
+        <span>A little hideout. A beautiful sunset. A whole new vibe.</span>
       </div>
     </div>
     <div className="hero-artwork">

@@ -22,7 +22,7 @@ const tierImages: Record<string, string> = {
   ACCESS: "/images/access.png",
   COUPLE: "/images/couple.png",
   VIP: "/images/vip.png",
-  VVIP: "/images/vvip.PNG",
+  VVIP: "/images/vvip.png",
   CABANA: "/images/cabana.png",
 };
 
@@ -40,7 +40,7 @@ export const TicketTiers: React.FC<Props> = ({
     <div className="section-heading">
       <p className="eyebrow">AN INVITATION TO UNWIND</p>
       <h2>
-        Choose your <em>kind of escape.</em>
+        Choose your <em>kind of hideout.</em>
       </h2>
       <p>
         From a day by the pool to your own cabana. Find your place at The

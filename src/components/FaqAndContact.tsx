@@ -16,7 +16,7 @@ export const FaqAndContact: React.FC<Props> = ({
       <div>
         <p className="eyebrow">A FEW THINGS TO KNOW</p>
         <h2>
-          Before you <em>escape.</em>
+          Before the <em>hideout.</em>
         </h2>
         <p>
           For bookings, venue details or a little more information, get in touch
