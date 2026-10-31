@@ -22,7 +22,7 @@ const tierImages: Record<string, string> = {
   ACCESS: "/images/access.png",
   COUPLE: "/images/couple.png",
   VIP: "/images/vip.png",
-  VVIP: "/images/vvip.png",
+  VVIP: "/images/sunset.png",
   CABANA: "/images/cabana.png",
 };
 
