@@ -2,6 +2,7 @@ import React from "react";
 import {
   ArrowUpRight,
   CalendarDays,
+  CalendarPlus,
   Clock3,
   Waves,
   Sun,
@@ -9,6 +10,42 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { EventDetails } from "../types.js";
+
+const calendarDate = (value: string): Date | null => {
+  const isoDate = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  const date = isoDate
+    ? new Date(Date.UTC(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3])))
+    : new Date(value);
+
+  if (Number.isNaN(date.getTime())) return null;
+  if (isoDate && date.toISOString().slice(0, 10) !== value.trim()) return null;
+  return date;
+};
+
+const googleCalendarUrl = (event: EventDetails): string | null => {
+  const start = calendarDate(event.date);
+  const end = calendarDate(event.endDate || event.date);
+  if (!start || !end || end < start) return null;
+
+  end.setUTCDate(end.getUTCDate() + 1);
+  const formatDate = (date: Date) => date.toISOString().slice(0, 10).replace(/-/g, "");
+  const details = [
+    `Time: ${event.startTime} – ${event.endTime}`,
+    event.description,
+  ].join("\n\n");
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: event.title,
+    dates: `${formatDate(start)}/${formatDate(end)}`,
+    details,
+    location: [event.venue, event.address, event.city, event.country]
+      .filter(Boolean)
+      .join(", "),
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+};
+
 interface HeroProps {
   event: EventDetails;
   onGetTicketsClick: () => void;
@@ -16,22 +53,40 @@ interface HeroProps {
   onOpenExportModal?: () => void;
   isAdminLoggedIn?: boolean;
 }
-export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
+export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => {
+  const calendarUrl = googleCalendarUrl(event);
+
+  return (
   <section id="hero" className="hideout-hero">
     <div className="hero-copy">
       <p className="eyebrow">
         <span className="small-rule" /> THE VYBECHECK WITH BAMA PRESENTS
       </p>
       <h1>
-        {event.title === 'The Hideout — Pool Edition' ? <>The Hideout<span>Pool Edition.</span></> : event.title}
+        {event.title === 'The Hideout — Pool Edition' ? <>The Hideout<span className="hero-pool-edition">Pool Edition.</span></> : event.title}
       </h1>
       <p className="hero-tagline">{event.subtitle}</p>
       <p className="hero-description">{event.description}</p>
       <div className="hero-details">
-        <span>
-          <CalendarDays aria-hidden="true" />
-          {event.date}
-        </span>
+        {calendarUrl ? (
+          <a
+            className="hero-calendar-link"
+            href={calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Add ${event.title} on ${event.date} to Google Calendar`}
+            title="Add event to Google Calendar"
+          >
+            <CalendarDays aria-hidden="true" />
+            {event.date}
+            <CalendarPlus className="hero-calendar-add" aria-hidden="true" />
+          </a>
+        ) : (
+          <span>
+            <CalendarDays aria-hidden="true" />
+            {event.date}
+          </span>
+        )}
         <span>
           <Clock3 aria-hidden="true" />
           {event.startTime} — {event.endTime}
@@ -86,3 +141,4 @@ export const Hero: React.FC<HeroProps> = ({ event, onGetTicketsClick }) => (
     </div>
   </section>
 );
+};
