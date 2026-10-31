@@ -137,7 +137,7 @@ export const fallbackTicketTiers: TicketTier[] = [
     name: "Sunset Deck",
     code: "VVIP",
     description:
-      "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "It Admits Six Individuals",
     price: 250000,
     availableQuantity: 0,
     soldQuantity: 0,

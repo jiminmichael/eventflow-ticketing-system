@@ -10,6 +10,7 @@ const tierBenefits: Record<string, string[]> = {
     "2 pots of shisha",
   ],
   VVIP: [
+    "Admits 6 max",
     "1 bottle of spirit",
     "Complimentary cocktails",
     "1 pot of shisha",
