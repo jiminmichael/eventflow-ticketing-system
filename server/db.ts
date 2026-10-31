@@ -359,6 +359,10 @@ export class DatabaseService {
 
   // --- EVENT SETTINGS ---
   getEvent(): EventDetails {
+    if (this.data.event.bannerImage === "/images/hideout-pool-edition.png") {
+      this.data.event.bannerImage = "/images/hero-banner.jpg";
+      this.saveToDisk();
+    }
     return this.data.event;
   }
 

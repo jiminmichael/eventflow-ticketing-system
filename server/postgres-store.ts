@@ -57,7 +57,7 @@ export function createPostgresDatabase(connectionString: string) {
       if (!(property in DatabaseService.prototype)) throw new Error('Unknown database operation');
       return async (...args: unknown[]) => {
         const client = await pool.connect();
-        const readonly = property.startsWith('get') && property !== 'getTicketTiers';
+        const readonly = property.startsWith('get') && !['getTicketTiers', 'getEvent'].includes(property);
         try {
           await client.query(readonly ? 'BEGIN READ ONLY' : 'BEGIN');
           if (!readonly) await client.query('SELECT pg_advisory_xact_lock($1)', [WRITE_LOCK]);

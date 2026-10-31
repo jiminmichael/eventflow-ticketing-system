@@ -13,7 +13,7 @@ export const fallbackEvent: EventDetails = {
   address: "Call the organizers for venue details.",
   city: "",
   country: "Nigeria",
-  bannerImage: "/images/hideout-pool-edition.png",
+  bannerImage: "/images/hero-banner.jpg",
   organizerName: "The Vybecheck with Bama",
   organizerEmail: "",
   organizerPhone: "+2349030064744",
