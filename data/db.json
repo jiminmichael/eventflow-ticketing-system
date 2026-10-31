@@ -128,7 +128,7 @@
       "id": "hideout-vvip",
       "name": "Sunset Deck",
       "code": "VVIP",
-      "description": "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "description": "Admits four guests and includes one bottle of whisky.",
       "price": 250000,
       "availableQuantity": 0,
       "soldQuantity": 0,
@@ -139,13 +139,13 @@
       "isActive": true,
       "bookingOnly": false,
       "inventoryUnlimited": true,
-      "guestsPerTicket": 1
+      "guestsPerTicket": 4
     },
     {
       "id": "hideout-cabana",
       "name": "Cabana",
       "code": "CABANA",
-      "description": "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "description": "Our team will contact you after payment to confirm your Cabana booking.",
       "price": 1000000,
       "availableQuantity": 0,
       "soldQuantity": 0,
@@ -156,7 +156,7 @@
       "isActive": true,
       "bookingOnly": false,
       "inventoryUnlimited": true,
-      "guestsPerTicket": 1
+      "guestsPerTicket": 6
     },
     {
       "id": "tier-early-bird",

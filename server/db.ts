@@ -374,7 +374,71 @@ export class DatabaseService {
 
   // --- TICKET TIERS ---
   getTicketTiers(): TicketTier[] {
+    if (this.synchronizeHideoutTicketSettings()) this.saveToDisk();
     return this.data.ticketTiers;
+  }
+
+  private synchronizeHideoutTicketSettings(): boolean {
+    const settings = [
+      {
+        id: "hideout-couple",
+        name: "Couple",
+        code: "COUPLE",
+        guestsPerTicket: 2,
+        description: "Includes two individual guest passes.",
+      },
+      {
+        id: "hideout-vip",
+        name: "VIP · Table of 2",
+        code: "VIP",
+        guestsPerTicket: 2,
+        description: "Includes two individual guest passes.",
+      },
+      {
+        id: "hideout-vvip",
+        name: "Sunset Deck",
+        code: "VVIP",
+        guestsPerTicket: 4,
+        description: "Admits four guests and includes one bottle of whisky.",
+      },
+      {
+        id: "hideout-cabana",
+        name: "Cabana",
+        code: "CABANA",
+        guestsPerTicket: 6,
+        description:
+          "Our team will contact you after payment to confirm your Cabana booking.",
+      },
+    ] as const;
+    let changed = false;
+
+    for (const setting of settings) {
+      const tier = this.data.ticketTiers.find(
+        (item) =>
+          item.id === setting.id ||
+          item.name.trim().toLowerCase() === setting.name.toLowerCase(),
+      );
+      if (!tier) continue;
+
+      if (tier.name !== setting.name) {
+        tier.name = setting.name;
+        changed = true;
+      }
+      if (tier.code !== setting.code) {
+        tier.code = setting.code;
+        changed = true;
+      }
+      if (tier.guestsPerTicket !== setting.guestsPerTicket) {
+        tier.guestsPerTicket = setting.guestsPerTicket;
+        changed = true;
+      }
+      if (tier.description !== setting.description) {
+        tier.description = setting.description;
+        changed = true;
+      }
+    }
+
+    return changed;
   }
 
   getTicketTierById(id: string): TicketTier | undefined {
@@ -463,6 +527,8 @@ export class DatabaseService {
     paymentReference: string;
     referralSurvey?: ReferralSurvey;
   }): { order: Order; attendees: Attendee[] } {
+    this.synchronizeHideoutTicketSettings();
+
     // 1. Fetch ticket tier from database - SERVER-SIDE TRUTH
     const tier = this.getTicketTierById(params.ticketTierId);
     if (!tier) {

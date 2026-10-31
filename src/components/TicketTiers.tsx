@@ -10,8 +10,8 @@ const tierBenefits: Record<string, string[]> = {
     "2 pots of shisha",
   ],
   VVIP: [
-    "Admits 6 max",
-    "1 bottle of spirit",
+    "Admits 4 guests",
+    "1 bottle of whisky",
     "Complimentary cocktails",
     "1 pot of shisha",
   ],
@@ -52,16 +52,28 @@ export const TicketTiers: React.FC<Props> = ({
       {tiers
         .filter((t) => t.isActive || t.bookingOnly)
         .map((tier, i) => {
-          const benefits = tierBenefits[tier.code];
+          const tierCode = tier.code.trim().toUpperCase();
+          const isSunsetDeck =
+            tier.id === "hideout-vvip" ||
+            tier.name.trim().toLowerCase() === "sunset deck";
+          const benefits = isSunsetDeck
+            ? tierBenefits.VVIP
+            : tierBenefits[tierCode];
+          const image = isSunsetDeck
+            ? tierImages.VVIP
+            : tierImages[tierCode] ?? "/images/background-image.png";
+          const isPackage =
+            isSunsetDeck ||
+            ["COUPLE", "VIP", "VVIP", "CABANA"].includes(tierCode);
           return (
             <article
-              className={`pass-card glass-panel ${tier.code === "ACCESS" ? "featured-pass" : ""} has-pass-banner`}
+              className={`pass-card glass-panel ${tierCode === "ACCESS" ? "featured-pass" : ""} has-pass-banner`}
               key={tier.id}
             >
               <div className="pass-banner-container">
                 <img
                   className="pass-banner"
-                  src={tierImages[tier.code] ?? "/images/background-image.png"}
+                  src={image}
                   alt={`${tier.name} ticket banner`}
                 />
               </div>
@@ -76,9 +88,7 @@ export const TicketTiers: React.FC<Props> = ({
                 ₦{tier.price.toLocaleString("en-NG")}
               </p>
               <p className="pass-unit">
-                {["COUPLE", "VIP", "VVIP", "CABANA"].includes(tier.code)
-                  ? "per package"
-                  : "per person"}
+                {isPackage ? "per package" : "per person"}
               </p>
               <p className="pass-description">{tier.description}</p>
               {benefits && (

@@ -83,8 +83,6 @@ export const RegistrationForm: React.FC<Props> = ({
   const [quantity, setQuantity] = useState(1);
   const [purchaser, setPurchaser] = useState<Guest>(blank);
   const [instagram, setInstagram] = useState("");
-  const [guests, setGuests] = useState<Guest[]>([blank()]);
-  const [same, setSame] = useState(true);
 
   // PVC upload state
   const [pvcFile, setPvcFile] = useState<File | null>(null);
@@ -156,8 +154,6 @@ export const RegistrationForm: React.FC<Props> = ({
 
   const isPvc = selectedTier?.code === "PVC";
   const count = quantity * (selectedTier?.guestsPerTicket || 1);
-  const followUp =
-    selectedTier?.code === "VVIP" || selectedTier?.code === "CABANA";
   const limit = selectedTier
     ? Math.min(
         selectedTier.maxPerRegistration,
@@ -180,12 +176,6 @@ export const RegistrationForm: React.FC<Props> = ({
       setPvcUploadRef(null);
     }
   }, [selectedTier?.id]);
-
-  useEffect(() => {
-    setGuests((prev) =>
-      Array.from({ length: count }, (_, i) => prev[i] || blank()),
-    );
-  }, [count]);
 
   const handlePvcFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -320,7 +310,7 @@ export const RegistrationForm: React.FC<Props> = ({
         ...clean(purchaser),
         instagram: instagram.trim() || undefined,
       },
-      attendees: guests.map((g, i) => clean(i === 0 && same ? purchaser : g)),
+      attendees: Array.from({ length: count }, () => clean(purchaser)),
       referralSurvey: surveyData,
     });
   };
@@ -336,7 +326,7 @@ export const RegistrationForm: React.FC<Props> = ({
         <h2>
           Make it <em>a date.</em>
         </h2>
-        <p>Register your guests, complete a quick question, then pay securely with Paystack.</p>
+        <p>Enter your booking contact, answer a quick question, then pay securely with Paystack. Each included guest receives an individual entry pass.</p>
       </div>
       <form onSubmit={submit} className="registration-form">
         <fieldset disabled={isLoading}>
@@ -404,9 +394,7 @@ export const RegistrationForm: React.FC<Props> = ({
             </div>
           </div>
           <p className="form-note">
-            {followUp
-              ? "Your team will contact you after payment to confirm package and guest arrangements."
-              : `${count} guest${count === 1 ? "" : "s"} · Each guest receives an individual UUID and QR pass after payment.`}
+            {count} guest{count === 1 ? "" : "s"} · Each included guest receives an individual QR pass using the booking contact details.
           </p>
         </fieldset>
 
@@ -590,50 +578,10 @@ export const RegistrationForm: React.FC<Props> = ({
           </div>
         </fieldset>
 
-        {/* ── GUEST DETAILS ─────────────────────────────────────────── */}
-        <fieldset disabled={isLoading}>
-          <legend>{isPvc ? "4." : "3."} {followUp ? "Package contacts" : "Guest details"}</legend>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={same}
-              onChange={(e) => setSame(e.target.checked)}
-            />
-            {followUp
-              ? "Use my details for the first package"
-              : "I am the first guest"}
-          </label>
-          {guests.map((g, i) => (
-            <div className="guest-fields" key={i}>
-              <h3>
-                {followUp ? "Package contact" : "Guest"} {i + 1}
-              </h3>
-              {i === 0 && same ? (
-                <p className="form-note">
-                  Using the booking contact's details above.
-                </p>
-              ) : (
-                <div className="form-grid">
-                  {fields(
-                    g,
-                    (key, value) =>
-                      setGuests((prev) =>
-                        prev.map((v, n) =>
-                          n === i ? { ...v, [key]: value } : v,
-                        ),
-                      ),
-                    `guest-${i}`,
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </fieldset>
-
-        {/* ── 5. HOW DID YOU HEAR ABOUT US? (QUESTIONNAIRE) ────────── */}
+        {/* ── HOW DID YOU HEAR ABOUT US? (QUESTIONNAIRE) ───────────── */}
         <fieldset id="questionnaire-section" disabled={isLoading} className="referral-fieldset">
           <legend className="flex items-center gap-2">
-            <span>{isPvc ? "5. How did you hear about us?" : "4. How did you hear about us?"}</span>
+            <span>{isPvc ? "4. How did you hear about us?" : "3. How did you hear about us?"}</span>
             <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#FF6B35]/20 text-[#FF8C42] border border-[#FF6B35]/40">
               Required
             </span>

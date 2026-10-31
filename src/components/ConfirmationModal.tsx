@@ -97,7 +97,7 @@ END:VCALENDAR`;
             <div>
               <h2 className="text-xl font-extrabold text-[var(--ui-text)]">Payment Verified & Passes Issued!</h2>
               <p className="text-xs text-[var(--ui-success)] font-semibold">
-                {['VVIP', 'Cabana'].some(name => order?.ticketTierName.includes(name)) ? 'Payment confirmed. Our team will contact you to arrange your package and guest details. Keep this booking reference.' : 'Payment confirmed. Each guest has an individual UUID and QR entry pass.'}
+                {order?.ticketTierName.includes('Cabana') ? 'Payment confirmed. Our team will contact you to confirm your Cabana booking. Keep this booking reference.' : 'Payment confirmed. Each included guest has an individual UUID and QR entry pass.'}
               </p>
             </div>
           </div>

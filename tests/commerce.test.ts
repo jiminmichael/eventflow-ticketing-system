@@ -98,18 +98,22 @@ const guest = {
   email: "ada@example.com",
   phone: "+2348012345678",
 };
-const booking = (id = "hideout-couple", quantity = 1) => ({
-  ticketTierId: id,
-  quantity,
-  purchaser: guest,
-  attendees:
-    id === "hideout-couple"
-      ? [guest, { ...guest, firstName: "Tobi" }]
-      : [guest],
-  price: 1,
-  totalAmount: 1,
-  menuItems: [{ id: "menu-1", quantity: 10 }],
-});
+const booking = (id = "hideout-couple", quantity = 1) => {
+  const tier = fallbackTicketTiers.find((item) => item.id === id);
+  const guestCount = quantity * (tier?.guestsPerTicket ?? 1);
+  return {
+    ticketTierId: id,
+    quantity,
+    purchaser: guest,
+    attendees:
+      id === "hideout-couple" && quantity === 1
+        ? [guest, { ...guest, firstName: "Tobi" }]
+        : Array.from({ length: guestCount }, () => guest),
+    price: 1,
+    totalAmount: 1,
+    menuItems: [{ id: "menu-1", quantity: 10 }],
+  };
+};
 try {
   assert.equal((await (await request("/menu")).json()).items.length, 8);
   for (const token of [
@@ -141,6 +145,23 @@ try {
     })
   ).json();
   assert.ok(login.token);
+  db.updateTicketTier("hideout-vvip", {
+    code: "SUNSET",
+    name: "Sunset package",
+    guestsPerTicket: 1,
+    description: "Stale Sunset Deck settings",
+  });
+  const synchronizedTiers = await (await request("/tickets")).json();
+  const synchronizedSunset = synchronizedTiers.find(
+    (tier: { id: string }) => tier.id === "hideout-vvip",
+  );
+  assert.equal(synchronizedSunset.name, "Sunset Deck");
+  assert.equal(synchronizedSunset.code, "VVIP");
+  assert.equal(synchronizedSunset.guestsPerTicket, 4);
+  assert.equal(
+    synchronizedSunset.description,
+    "Admits four guests and includes one bottle of whisky.",
+  );
   assert.equal(
     (await request("/orders/initialize", booking("hideout-couple", 1.5)))
       .status,
@@ -209,6 +230,49 @@ try {
   ).json();
   assert.equal(guests.attendees.length, 2);
   assert.equal(guests.attendees[1].firstName, "Tobi");
+
+  const sunset = await (
+    await request("/orders/initialize", booking("hideout-vvip"))
+  ).json();
+  const sunsetOrder = db.getOrderByReference(sunset.paymentReference)!;
+  const sunsetAttendees = db.getAttendeesByOrderReference(
+    sunsetOrder.orderReference,
+  );
+  assert.equal(sunsetAttendees.length, 4);
+  assert.equal(new Set(sunsetAttendees.map((attendee) => attendee.uuid)).size, 4);
+  assert.equal(
+    new Set(sunsetAttendees.map((attendee) => attendee.ticketCode)).size,
+    4,
+  );
+  assert.ok(
+    sunsetAttendees.every(
+      (attendee) =>
+        attendee.firstName === guest.firstName &&
+        attendee.lastName === guest.lastName &&
+        attendee.email === guest.email &&
+        attendee.phone === guest.phone,
+    ),
+    "All four Sunset Deck passes use the single booking contact",
+  );
+  const sunsetTransaction = providerTransactions.get(sunset.paymentReference);
+  sunsetTransaction.status = "success";
+  sunsetTransaction.amount = 25000000;
+  sunsetTransaction.currency = "NGN";
+  assert.equal(
+    (await request("/orders/verify", { reference: sunset.paymentReference }))
+      .status,
+    200,
+  );
+  for (const attendee of sunsetAttendees) {
+    const checkin = await request(
+      `/admin/attendees/${attendee.uuid}/checkin`,
+      {},
+      login.token,
+    );
+    assert.equal(checkin.status, 200);
+    assert.equal((await checkin.json()).attendee.checkedIn, true);
+  }
+
   const pending = await (
     await request("/orders/initialize", booking("hideout-access"))
   ).json();
@@ -224,9 +288,11 @@ try {
   const rows = XLSX.utils.sheet_to_json<any>(
     workbook.Sheets[workbook.SheetNames[0]],
   );
-  assert.equal(rows.length, 2);
-  assert.equal(rows[0]["Attendee UUID"], order.attendeeUuids[0]);
-  assert.equal(rows[1]["Full Name"], "Tobi Okafor");
+  assert.equal(rows.length, 6);
+  assert.ok(
+    rows.some((row) => row["Attendee UUID"] === order.attendeeUuids[0]),
+  );
+  assert.ok(rows.some((row) => row["Full Name"] === "Tobi Okafor"));
   const csv = await (
     await request("/export/paid-guestlist?format=csv", undefined, login.token)
   ).text();
@@ -286,7 +352,7 @@ try {
   assert.equal(cabana.totalAmount, 1000000);
   assert.equal(
     db.getOrderByReference(cabana.paymentReference)?.attendeeUuids.length,
-    1,
+    6,
   );
   await request("/admin/logout", {}, login.token);
   assert.equal(

@@ -136,8 +136,7 @@ export const fallbackTicketTiers: TicketTier[] = [
     id: "hideout-vvip",
     name: "Sunset Deck",
     code: "VVIP",
-    description:
-      "It Admits Six Individuals",
+    description: "Admits four guests and includes one bottle of whisky.",
     price: 250000,
     availableQuantity: 0,
     soldQuantity: 0,
@@ -148,14 +147,14 @@ export const fallbackTicketTiers: TicketTier[] = [
     isActive: true,
     bookingOnly: false,
     inventoryUnlimited: true,
-    guestsPerTicket: 1,
+    guestsPerTicket: 4,
   },
   {
     id: "hideout-cabana",
     name: "Cabana",
     code: "CABANA",
     description:
-      "Package booking. Our team will contact you after payment to confirm guest arrangements.",
+      "Our team will contact you after payment to confirm your Cabana booking.",
     price: 1000000,
     availableQuantity: 0,
     soldQuantity: 0,
@@ -166,7 +165,7 @@ export const fallbackTicketTiers: TicketTier[] = [
     isActive: true,
     bookingOnly: false,
     inventoryUnlimited: true,
-    guestsPerTicket: 1,
+    guestsPerTicket: 6,
   },
 ];
 export const fallbackMenuItems: MenuItem[] = [
